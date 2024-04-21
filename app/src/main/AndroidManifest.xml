@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.arnichem.arnichem_barcode"
+    tools:ignore="ExtraText">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+    <uses-permission
+        android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+
+    <permission
+        android:name="com.example.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.example.permission.MAPS_RECEIVE" />
+
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".util.MyApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/logo"
+        android:label="@string/app_name"
+        android:launchMode="singleInstance"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:requestLegacyExternalStorage="true"
+        android:required="false"
+        android:roundIcon="@mipmap/logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Arnichem"
+        android:usesCleartextTraffic="true"
+        tools:node="merge">
+        <activity
+            android:name=".FileUpload.FIleUploadMainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FileUpload.FileUploadSubActivity"
+            android:exported="false" />
+        <activity
+            android:name=".other_entries.OtherEntryPrintActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".other_entries.OtherEntryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".BarcodeScan"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCWPZQ-BZiCC8pMX1YgOlZzU0AWKuOKydY" />
+
+        <activity
+            android:name=".attendance.Attendance_log"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.DryIce.dry_ice_print"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.DryIce.DryIcePrint"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.HydroTest.HydroMain"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.DryIce.DryIceFIrstScreen"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.DryIce.DryIceDelivery"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.DryIce.DryIceMain"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.deliveryAmmonia.AmmoniaMaindelivery"
+            android:exported="false"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.deliveryAmmonia.ammonia_deliveryprint"
+            android:exported="false"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Barcode.NewCamerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".Barcode.NewScanner"
+            android:exported="false"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".CustomerHolding.WebViewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".CustomerHolding.MainHoldingScreen"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+
+        <activity
+            android:name=".Producation.NewAmmonia.ammoniaMain"
+            android:exported="false"
+            android:parentActivityName=".Producation.NewAmmonia.ammoniafirstpage"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".Producation.NewAmmonia.ammoniaprint"
+            android:exported="false"
+            android:parentActivityName=".Producation.NewAmmonia.ammoniafirstpage"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".digital_signature.ActivityDigitalSignature"
+            android:exported="false"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".Producation.NewAmmonia.ammoniafirstpage"
+            android:exported="false"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".GetData.Test"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Company.SelectCompanyActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.Closing_stock.NewClosingStock.ClosingPrint"
+            android:exported="true"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.Closing_stock.NewClosingStock.ClosingStockMain"
+            android:exported="true"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".view.gps" />
+        <activity
+            android:name=".GodownView.Closing_stock.closing_stock_print"
+            android:exported="true"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.Closing_stock.Closing_stock"
+            android:exported="true"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CRM.CRM_Main"
+            android:exported="true"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Liquid_Delivery.LiqourPrint"
+            android:exported="true"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Liquid_Delivery.LiquidDel_main"
+            android:exported="true"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".DieselEntry.MainDieselEntry"
+            android:exported="true"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" /> <!-- <activity -->
+        <!-- android:name=".TransactionsView.LiquidDel.PrintLiquid" -->
+        <!-- android:exported="true" /> -->
+        <!-- <activity -->
+        <!-- android:name=".TransactionsView.LiquidDel.LiquidMainActivity" -->
+        <!-- android:exported="true" /> -->
+        <!-- <activity -->
+        <!-- android:name=".GPStracker.GPSTracker" -->
+        <!-- android:exported="true" /> -->
+        <activity
+            android:name=".PaymentReceipt.PaymentPrint"
+            android:exported="true"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Settings.newPassword"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PaymentReceipt.MainPaymentReceipt"
+            android:exported="true"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Settings.TestPrinter"
+            android:exported="true"
+            android:parentActivityName=".Settings.MainSettings"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Settings.ChanePassword"
+            android:exported="true"
+            android:parentActivityName=".Settings.MainSettings"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Settings.AppVersion"
+            android:exported="true"
+            android:parentActivityName=".Settings.MainSettings"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.DuraEmptyPrint.DuraEmptyPrintView"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.DuraDeliveyPrint.DuraDeliPrintView"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.DuraEmptyPrint.DuraEmptyPrintMain"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.DuraDeliveyPrint.DuraDelPrintMain"
+            android:exported="true" />
+        <activity
+            android:name=".PrintReceipt.GodownDeliveryPrintActivity.GodownDeliveryPrintView"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.GodownEmptyPrintActivity.GodownEmptyPrintView"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.GodownFullReceiptmain.GodownFullRecPrintVIew"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.OutwardPrint.outwardPrintVIew"
+            android:exported="true" />
+        <activity
+            android:name=".PrintReceipt.InwardPrint.InwardPrintView"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.FullReceipt.ActivityfullrccprintviewActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.GodownFullReceiptmain.GodownFullRecPrintMain"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.FullReceipt.FullReceiptPrintMain"
+            android:exported="true" />
+        <activity
+            android:name=".PrintReceipt.OutwardPrint.OutwardPrintMainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.InwardPrint.InwardPrintMainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.GodownEmptyPrintActivity.GodownEmptyPrintMainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.GodownDeliveryPrintActivity.GodownDeliveryMainActivity"
+            android:exported="true" />
+        <activity
+            android:name=".PrintReceipt.EmptyPrint.ViewEmptyPrint"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.EmptyPrint.EmptyPrintMainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.DeliveryPrint.ViewDeliveryPrint"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.DeliveryPrint.DeliveryPrintMainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PrintReceipt.MainPrintActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Oxygen.OxygenFillPrint"
+            android:parentActivityName=".Producation.Oxygen.FisrtPart"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Co2.Co2Print"
+            android:parentActivityName=".Producation.Co2.FirstCo2"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Nitrogen.NitrogenPrint"
+            android:parentActivityName=".Producation.Nitrogen.FirstNitrogen"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.ZeroAir.ZeroAirPrint"
+            android:parentActivityName=".Producation.ZeroAir.ZeroAirPrint"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.ZeroAir.FirstZeroAir"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Co2.FirstCo2"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Nitrogen.FirstNitrogen"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Co2.CO2Filling"
+            android:parentActivityName=".Producation.Co2.FirstCo2"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.ZeroAir.ZeroAirFilling"
+            android:parentActivityName=".Producation.ZeroAir.FirstZeroAir"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Nitrogen.NitrogenFilling"
+            android:parentActivityName=".Producation.Nitrogen.FirstNitrogen"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Duraempty.duraemptyprint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Duraempty.Duraemptyadd"
+            android:parentActivityName=".TransactionsView.Duraempty.duraemptymain"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Duraempty.duraemptymain"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Outward.OutwardPrint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.InWard.InwardPrint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Oxygen.FisrtPart"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Oxygen.OxygenFilling"
+            android:parentActivityName=".Producation.Oxygen.FisrtPart"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Settings.MainSettings"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.GodownFullRecipt.GodownFullRecpPrint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.FullRecipt.FullRecPrint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.godowndelivery.GodownDelPrint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.godownempty.GOdownEmptyprint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.deliverynew.deliveryprint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Empty.Empty_Print"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.DuraDelivery.Duradeliveryprint"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity android:name=".finalprint.finalprint" />
+        <activity
+            android:name=".TransactionsView.DuraDelivery.DuraDeliveryMain"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.GodownFullRecipt.AddGodownFullRecipt"
+            android:parentActivityName=".GodownView.GodownFullRecipt.FullReciptMain"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.FullRecipt.AddFullReciptActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.FullRecipt.FullReciptMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.GodownFullRecipt.FullReciptMain"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.GOdownMainActivity"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="fullSensor" />
+        <activity android:name=".VehicleLog.vehicle_logout" />
+        <activity
+            android:name=".Producation.DuraScan"
+            android:parentActivityName=".Producation.Dura"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Dura"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Printer.yourDeviceListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Printer.MainPrint"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Producation.Producation_Main"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.godownempty.GodownEmptyAddActivity"
+            android:parentActivityName=".GodownView.godownempty.GodownEmptyMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.godownempty.GodownEmptyMainActivity"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.godowndelivery.GodownDeliveryAddActivity"
+            android:parentActivityName=".GodownView.godowndelivery.GodownDeliveryMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GodownView.godowndelivery.GodownDeliveryMainActivity"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Empty.emptyadd"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.deliverynew.deliAdd"
+            android:parentActivityName=".TransactionsView.deliverynew.Maindelivery"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.deliverynew.Maindelivery"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VehicleLog.check"
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".view.Dashboard" />
+        <activity
+            android:name=".view.loading"
+            android:screenOrientation="portrait" />
+        <activity android:name=".view.newspinner" />
+        <activity
+            android:name=".TransactionsView.InWard.InWardAdd"
+            android:parentActivityName=".TransactionsView.InWard.InWardMain"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view.login"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Barcode.registration"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.InWard.InWardMain"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Empty.EmptyMain"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Googlepay.GooglepayScreen" />
+        <activity
+            android:name=".TransactionsView.Outward.AddActivity"
+            android:parentActivityName=".TransactionsView.Outward.Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".print.print"
+            android:parentActivityName=".Producation.Producation_Main"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".print.DeviceList"
+            android:parentActivityName=".print.print"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".TransactionsView.Outward.Main"
+            android:parentActivityName=".TransactionsView.Transactions"
+            android:screenOrientation="portrait" /> <!-- <activity android:name=".Vi"> -->
+        <!--  -->
+        <!-- </activity> -->
+        <!-- <activity android:name=".view.Emptyscan" /> -->
+        <!-- <activity android:name=".view.delivery" /> -->
+        <!-- <activity android:name=".view.outwardscan" /> &lt;!&ndash; <activity android:name=".view.outward" /> &ndash;&gt; -->
+        <!-- <activity android:name=".view.InWard" /> -->
+        <!-- <activity android:name=".view.Producation" /> -->
+        <activity
+            android:name=".TransactionsView.Transactions"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="fullSensor" />
+        <activity android:name=".view.Dashboard" />
+        <activity
+            android:name=".view.SplashScreen"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".Barcode.ScannerView"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.arnichem.arnichem_barcode.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <service
+            android:name=".ClipboardMonitorService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:name=".view.AlarmReceiver"
+            android:exported="true" />
+    </application>
+
+</manifest>

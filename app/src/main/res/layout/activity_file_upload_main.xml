@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+    tools:context=".FileUpload.FIleUploadMainActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <LinearLayout
+                android:id="@+id/delivery"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/file_upload_bg"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="DELIVERY \nसिलिंडर दिल्यानंतर"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <!-- Repeat the same for other TextViews -->
+            <!-- You can adjust cardCornerRadius and cardElevation for your preference -->
+
+            <LinearLayout
+                android:id="@+id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/file_upload_bg"
+                android:orientation="horizontal"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="EMPTY \nपरत घेतल्यानंतर"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/dcrf"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/file_upload_bg"
+                android:orientation="horizontal"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="DCRF\n फॅक्टरी चलन"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/outward"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/file_upload_bg"
+                android:orientation="horizontal"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="OUTWARD \nप्लांट वरून सिलिंडर बाहेर पाठवताना"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/inward"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/file_upload_bg"
+                android:orientation="horizontal"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="INWARD \nप्लांट मध्ये सिलिंडर पाठवताना"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bmr"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginVertical="10dp"
+                android:background="@drawable/file_upload_bg"
+                android:orientation="horizontal"
+                app:cardCornerRadius="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="BMR"
+                    android:textAlignment="center"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

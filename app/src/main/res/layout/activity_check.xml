@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/checkid"
+    tools:context=".VehicleLog.check">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="40dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/vehicleno"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Select Vehicle No:/गाडी क्र निवडा"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+            android:id="@+id/dynamic_spinner"
+            android:layout_width="250dp"
+            android:layout_marginTop="15dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:background="@drawable/editbox"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/resdingtype"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="Enter Vehicle Reading:/गाडी रिडींग टाका"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+
+        <EditText
+            android:id="@+id/ed1resdingtype"
+            android:layout_width="254dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/editbox"
+            android:inputType="number"
+            android:textAlignment="center" />
+        <TextView
+            android:id="@+id/readingphoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="Vehicle Riding Photo:/गाडी रिडींग फोटो"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <ImageView
+            android:id="@+id/image_viewfor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/circle"
+            android:layout_marginTop="20dp"
+            android:padding="25dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_photo_camera_black_24dp" />
+        <TextView
+            android:id="@+id/opencamera"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="OPEN CAMERA"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <TextView
+            android:id="@+id/opencameramarthi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="कॅमेरा चालू करा"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <Button
+            android:id="@+id/UploadBtn"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="Upload/पाठवा "
+            android:textStyle="bold"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:background="@color/arnichem"/>
+    </LinearLayout>
+
+
+</ScrollView>

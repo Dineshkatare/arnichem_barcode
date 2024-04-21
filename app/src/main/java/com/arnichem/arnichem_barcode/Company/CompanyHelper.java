@@ -1,0 +1,139 @@
+package com.arnichem.arnichem_barcode.Company;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CompanyHelper extends SQLiteOpenHelper {
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "companyHelper";
+    private static final String TABLE_NAME = "labels";
+    private static final String COLUMN_ID = "id";
+    private static final String COMPANY_ID = "companyID";
+    private static final String COMPANY_SHORT_NAME = "companyShortName";
+    private static final String COMPANY_FULL_NAME = "companFullName";
+    private static final String DB_HOST = "dbHost";
+    private static final String DB_USERNAME = "dbUsername";
+    private static final String DB_PASSWORD = "dbPassword";
+    private static final String DB_NAME = "dbName";
+    private static final String DB_BASE_URL = "dbBaseUrl";
+    private static final String DB_TERMS_TEXT = "termsText";
+    private static final String DB_OWN_CODE = "owncode";
+    private static final String DB_BATCH_PREMIX = "batch_premix";
+    private static final String DB_CYC_PREMIX = "cyc_premix";
+
+
+
+    private Context context;
+    public CompanyHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    // Creating Tables
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String query = "CREATE TABLE " + TABLE_NAME +
+                " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COMPANY_ID + " TEXT UNIQUE, " +
+                COMPANY_SHORT_NAME + " TEXT, " +
+                COMPANY_FULL_NAME + " TEXT, " +
+                DB_HOST + " TEXT, " +
+                DB_USERNAME + " TEXT, " +
+                DB_PASSWORD + " TEXT, " +
+                DB_BASE_URL + " TEXT, " +
+                DB_NAME + " TEXT, " +
+                DB_TERMS_TEXT + " TEXT, " +
+                DB_OWN_CODE + " TEXT, " +
+                DB_BATCH_PREMIX + " TEXT, " +
+                DB_CYC_PREMIX + " TEXT);";
+        db.execSQL(query);
+    }
+
+    // Upgrading database
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Drop older table if existed
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+
+        // Create tables again
+        onCreate(db);
+    }
+
+    /**
+     * Inserting new lable into lables table
+     * */
+    public void addCompany(String company_id,String company_short_name,String company_full_name,String db_host,String db_username,String db_password,String db_name,String base_url,String terms_text,String own_code,String batch_premix,String cyc_prefix){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(COMPANY_ID,company_id);
+        cv.put(COMPANY_SHORT_NAME,company_short_name);
+        cv.put(COMPANY_FULL_NAME,company_full_name);
+        cv.put(DB_HOST,db_host);
+        cv.put(DB_USERNAME,db_username);
+        cv.put(DB_PASSWORD,db_password);
+        cv.put(DB_NAME,db_name);
+        cv.put(DB_BASE_URL,base_url);
+        cv.put(DB_TERMS_TEXT,terms_text);
+        cv.put(DB_OWN_CODE,own_code);
+        cv.put(DB_BATCH_PREMIX,batch_premix);
+        cv.put(DB_CYC_PREMIX,cyc_prefix);
+
+
+        long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
+        if(result == -1){
+            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+        }else {
+            //   Toast.makeText(context, "Added Successfully!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    public Cursor readAllData(){
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+
+    /**
+     * Getting all labels
+     * returns list of labels
+     * */
+    public List<String> getAllLabels(){
+        List<String> list = new ArrayList<String>();
+
+        // Select All Query
+        String selectQuery = "SELECT  * FROM " + TABLE_NAME;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);//selectQuery,selectedArguments
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                list.add(cursor.getString(3));//adding 2nd column data
+            } while (cursor.moveToNext());
+        }
+        // closing connection
+        cursor.close();
+        db.close();
+        // returning lables
+        return list;
+    }
+
+    public void deleteAllData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_NAME);
+    }
+}

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:id="@+id/scannerviewmain"
+    tools:context=".Barcode.ScannerView">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:orientation="vertical">
+        <Button android:id="@+id/button"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:drawableRight="@drawable/barcodesm"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="Scan" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:text="" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+            <ImageView
+                android:id="@+id/img1"
+                android:layout_width="0dp"
+                android:padding="1dp"
+                android:src="@drawable/ic_baseline_image_24"
+                android:layout_height="100dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/img2"
+                android:layout_width="0dp"
+                android:padding="1dp"
+                android:src="@drawable/ic_baseline_image_24"
+                android:layout_height="100dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/img3"
+                android:layout_width="0dp"
+                android:src="@drawable/ic_baseline_image_24"
+                android:layout_height="100dp"
+                android:padding="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/img4"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:padding="1dp"
+                android:src="@drawable/ic_baseline_image_24"
+                android:layout_weight="1" />
+
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/enterdate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Select Manufacture Date:"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/mm"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="MM"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:layout_marginRight="45dp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal" />
+            <TextView
+                android:id="@+id/yyyy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="45dp"
+                android:text="YYYY"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal" />
+
+        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="2"
+        android:orientation="horizontal">
+        <Spinner
+          android:id="@+id/spinmm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_weight="1">
+
+        </Spinner>
+        <Spinner
+            android:id="@+id/spinyyyy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_weight="1">
+
+        </Spinner>
+    </LinearLayout>
+        <TextView
+            android:id="@+id/aicode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="Enter Cylinder Number:/सिलेंडर नंबर टाका"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="12"
+            android:paddingRight="40dp"
+            android:paddingLeft="40dp"
+            android:layout_marginTop="10dp"
+            >
+            <Spinner
+                android:id="@+id/spinselect"
+                android:layout_width="wrap_content"
+                android:layout_weight="2"
+                android:layout_marginTop="3dp"
+                android:layout_marginLeft="30dp"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="12dp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:background="@drawable/editbox"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textdash"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:layout_gravity="center"
+                android:textSize="30dp"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:text="-"
+                >
+
+            </TextView>
+
+            <EditText
+                android:id="@+id/edaicode"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="2dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="40dp"
+                android:textAlignment="center"
+                android:layout_weight="9"
+                android:inputType="number"
+                android:background="@drawable/editbox"
+                />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/enterweight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="Enter Cylinder weight:/सिलेंडर वजन टाका"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:inputType="numberDecimal|numberSigned"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <EditText
+            android:id="@+id/edenterweight"
+            android:layout_width="250dp"
+            android:layout_marginTop="15dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:inputType="numberDecimal|numberSigned"
+            android:background="@drawable/editbox"
+            />
+        <TextView
+            android:id="@+id/serialnumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="Enter Cylinder Serial Number:/सिलेंडर सिरिअल नंबर टाका"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <EditText
+            android:id="@+id/edserialnumber"
+            android:layout_width="250dp"
+            android:layout_marginTop="15dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:inputType="text"
+            android:background="@drawable/editbox"
+            />
+
+        <TextView
+            android:id="@+id/manufacturer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="Manufacturer Name:"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal" />
+        <EditText
+            android:id="@+id/manufacturerval"
+            android:layout_width="250dp"
+            android:layout_marginTop="15dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:inputType="text"
+            android:background="@drawable/editbox"
+            />
+
+
+        <Button android:id="@+id/uploadregitration"
+            android:layout_width="250dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="30dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:text="Upload/पाठवा" />
+
+    </LinearLayout>
+
+
+
+</ScrollView>

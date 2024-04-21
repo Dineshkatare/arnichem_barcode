@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Producation.NewAmmonia.ammoniaMain">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/linear"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/CylinderDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal"
+                android:text="Cylinder Details"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/selectManifold"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/selectManifoldtxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="Select Manifold"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinermanifold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/editbox"
+                    android:textAlignment="center" />
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/custnamespintxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal"
+                android:text="Distributor Name"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/spinnerDistributor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/editbox"
+                android:textAlignment="center" />
+
+            <AutoCompleteTextView
+                android:id="@+id/cylindernumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="9"
+                android:background="@drawable/editbox"
+                android:hint="सिलेंडर नंबर टाका "
+                android:inputType="number"
+                android:textAlignment="center" />
+
+            <AutoCompleteTextView
+                android:id="@+id/cylindernumber1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="9"
+                android:background="@drawable/editbox"
+                android:hint="सिलेंडर नंबर टाका "
+                android:inputType="text"
+                android:textAlignment="center" />
+
+            <AutoCompleteTextView
+                android:id="@+id/cylinderempty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="9"
+                android:background="@drawable/editbox"
+                android:hint="सिलेंडर एमटी वेट टाका"
+                android:inputType="numberDecimal|numberSigned"
+                android:textAlignment="center" />
+
+            <AutoCompleteTextView
+                android:id="@+id/cylinderfullweight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="9"
+                android:background="@drawable/editbox"
+                android:hint="सिलेंडर फुल वेट टाका "
+                android:inputType="numberDecimal|numberSigned"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/adddata"
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:backgroundTint="#688488"
+                android:text="ADD"
+                android:textColor="#ffffff" />
+
+            <LinearLayout
+                android:id="@+id/dynamic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+              >
+
+
+                <TextView
+                    android:id="@+id/mani"
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="Mani"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/cylno"
+                    android:layout_width="120dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="Cyl No"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/fuulwt"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="Full"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/emwt"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="Empty"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/netwt"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="Net"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/sdynamic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+
+                <TextView
+                    android:id="@+id/smani"
+                    android:layout_width="40dp"
+                    android:layout_height="20dp"
+                    android:gravity="center_horizontal"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/scylno"
+                    android:layout_width="120dp"
+                    android:layout_height="20dp"
+                    android:gravity="center_horizontal"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/sfuulwt"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:gravity="center_horizontal"
+                    android:text="Wt"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/semwt"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:gravity="center_horizontal"
+                    android:text="Wt"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/snetwt"
+                    android:layout_width="50dp"
+                    android:layout_height="20dp"
+                    android:gravity="center_horizontal"
+                    android:text="Wt"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/oxygenfillrecyle"
+                    android:layout_width="409dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingTop="20dp" />
+
+            </androidx.core.widget.NestedScrollView>
+
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/distnamerecycle"
+                    android:layout_width="409dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingTop="20dp" />
+
+            </androidx.core.widget.NestedScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:id="@+id/Totalscan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="50"
+                    android:gravity="end"
+                    android:text="Total Scan :"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/Totalscanvalue"
+                    android:layout_width="match_parent"
+                    android:paddingLeft="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="50"
+                    android:text="0"
+                    android:textAlignment="textStart"
+                    android:textColor="@color/black"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/OxygenSubmit"
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:backgroundTint="#688488"
+                android:text="Submit"
+                android:textColor="#ffffff" />
+
+            <Button
+                android:id="@+id/OxygenPrint"
+                android:layout_width="120dp"
+                android:layout_height="60dp"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:backgroundTint="#688488"
+                android:text="Print"
+                android:textColor="#ffffff" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/deliveryscan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="28dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:srcCompat="@drawable/barcode" />
+</RelativeLayout>

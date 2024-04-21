@@ -1,0 +1,101 @@
+package com.arnichem.arnichem_barcode.TransactionsView.FullRecipt;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.arnichem.arnichem_barcode.R;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+
+public class FullReciptAdapter extends RecyclerView.Adapter<FullReciptAdapter.ViewHolder>  {
+
+    private Context context;
+    private Activity activity;
+    private ArrayList book_id, book_title;
+    FullReciptAdapter(Activity activity, Context context, ArrayList book_id, ArrayList book_title
+    ){
+        this.activity = activity;
+        this.context = context;
+        this.book_id = book_id;
+        this.book_title = book_title;
+    }
+
+    @NonNull
+    @Override
+    public FullReciptAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.my_row, parent, false);
+        return new FullReciptAdapter.ViewHolder(view);
+    }
+    @Override
+    public void onBindViewHolder(@NonNull @NotNull FullReciptAdapter.ViewHolder holder, int position) {
+//        holder.book_id_txt.setText(String.valueOf(book_id.get(position)));
+        holder.book_title_txt.setText(String.valueOf(book_title.get(position)));
+
+//        holder.book_author_txt.setText(String.valueOf(book_author.get(position)));
+//        holder.book_pages_txt.setText(String.valueOf(book_pages.get(position)));
+        //Recyclerview onClickListener
+        holder.mainLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //            Intent intent = new Intent(context, UpdateActivity.class);
+                //            intent.putExtra("id", String.valueOf(book_id.get(position)));
+                //         intent.putExtra("title", String.valueOf(book_title.get(position)));
+//                intent.putExtra("author", String.valueOf(book_author.get(position)));
+//                intent.putExtra("pages", String.valueOf(book_pages.get(position)));
+                //               activity.startActivityForResult(intent, 1);
+            }
+        });
+        holder.deletebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FullReciptHelper myDB = new FullReciptHelper(context.getApplicationContext());
+                myDB.deleteOneRow(String.valueOf(book_id.get(position)));
+                Intent intent = new Intent(context, FullReciptMainActivity.class);
+                activity.startActivityForResult(intent, 1);
+
+            }
+        });
+    }
+
+
+
+    @Override
+    public int getItemCount() {
+        return book_id.size();
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+
+        TextView book_id_txt, book_title_txt,book_author_txt, book_pages_txt;
+        LinearLayout mainLayout;
+        ImageView deletebutton;
+
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            book_title_txt = itemView.findViewById(R.id.book_title_txt);
+            deletebutton=itemView.findViewById(R.id.delete);
+            mainLayout = itemView.findViewById(R.id.mainLayout);
+            Animation translate_anim = AnimationUtils.loadAnimation(context, R.anim.translate_anim);
+            mainLayout.setAnimation(translate_anim);
+        }
+
+    }
+
+}
