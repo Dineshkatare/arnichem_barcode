@@ -15,6 +15,14 @@
         android:text="Capture"
         android:layout_gravity="bottom|center_horizontal"/>
 
+    <EditText
+        android:id="@+id/newScan"
+        android:layout_width="match_parent"
+        android:focusable="true"
+        android:layout_height="20dp"
+        android:background="@null"
+        android:text="fnnf"
+        android:layout_gravity="bottom|center_horizontal"/>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progressCl"
         android:layout_width="wrap_content"

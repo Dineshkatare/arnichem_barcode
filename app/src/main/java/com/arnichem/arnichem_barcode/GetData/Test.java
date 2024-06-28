@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 import retrofit2.Call;
@@ -69,299 +70,196 @@ public class Test extends AppCompatActivity {
         dialog.show();
         apiInterface = APIClient.getClient().create(APIInterface.class);
         sync = new syncHelper(Test.this);
-        durasyncHelper=new DurasyncHelper(Test.this);
-        databaseHandlercustomer=new DatabaseHandler(Test.this);
-        distributorHelper=new DistributorHelper(Test.this);
-        bp_contact_handler= new bp_contact_handler(Test.this);
-        vehicleHandler=new VehicleHandler(Test.this);
-        fromloccodehandler=new fromloccodehandler(Test.this);
-        delivery_type_liquidHandler=new Delivery_type_liquid_Handler(Test.this);
-        inventoryGases =new InventoryGases(Test.this);
-        employeHandler =new EmployeHandler(Test.this);
+        durasyncHelper = new DurasyncHelper(Test.this);
+        databaseHandlercustomer = new DatabaseHandler(Test.this);
+        distributorHelper = new DistributorHelper(Test.this);
+        bp_contact_handler = new bp_contact_handler(Test.this);
+        vehicleHandler = new VehicleHandler(Test.this);
+        fromloccodehandler = new fromloccodehandler(Test.this);
+        delivery_type_liquidHandler = new Delivery_type_liquid_Handler(Test.this);
+        inventoryGases = new InventoryGases(Test.this);
+        employeHandler = new EmployeHandler(Test.this);
         businessPartnersHandler = new BusinessPartnersHandler(Test.this);
         otherItemsHandler = new OtherItemsHandler(Test.this);
+
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
                 sync.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-
                 durasyncHelper.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 databaseHandlercustomer.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 distributorHelper.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 vehicleHandler.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 fromloccodehandler.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 delivery_type_liquidHandler.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 bp_contact_handler.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 inventoryGases.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 employeHandler.deleteAllData();
-            }
-        });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
                 otherItemsHandler.deleteAllData();
+                getData();
             }
         });
-
-
-
-        getData();
     }
 
     private void getData() {
         /**
 
-    } GET List Resources
+         } GET List Resources
          **/
-    Call<GetDataResponse> call = apiInterface.doCreateUserWithField(SharedPref.mInstance.getDBHost(),SharedPref.mInstance.getDBUsername(),SharedPref.mInstance.getDBPassword(),SharedPref.mInstance.getDBName());
+        Call<GetDataResponse> call = apiInterface.doCreateUserWithField(SharedPref.mInstance.getDBHost(), SharedPref.mInstance.getDBUsername(), SharedPref.mInstance.getDBPassword(), SharedPref.mInstance.getDBName());
         call.enqueue(new Callback<GetDataResponse>() {
-        @Override
-        public void onResponse(Call<GetDataResponse> call, Response<GetDataResponse> response) {
-           if(response.body().getData()!=null)
-                loadData(response.body().getData());
-        }
+            @Override
+            public void onResponse(Call<GetDataResponse> call, Response<GetDataResponse> response) {
+                if (response.body().getData() != null)
+                    loadData(response.body().getData());
+            }
 
-        @Override
-        public void onFailure(Call<GetDataResponse> call, Throwable t) {
-            call.cancel();
-        }
-    });
+            @Override
+            public void onFailure(Call<GetDataResponse> call, Throwable t) {
+                call.cancel();
+            }
+        });
     }
 
     private void loadData(Data data) {
-        if(data.getInventoryGas().size()!=0&&data.getInventoryGas()!=null)
-            loadInventoryGases(data.getInventoryGas());
+        CountDownLatch latch = new CountDownLatch(12);
 
-        if(data.getBpContact().size()!=0&&data.getBpContact()!=null)
-            loadBPContact(data.getBpContact());
+        loadInventoryGases(data.getInventoryGas(), latch);
+        loadBPContact(data.getBpContact(), latch);
+        loadBusinessPartners(data.getBusinessPartners(), latch);
+        loadInventoryCylinders(data.getInventoryCylinders(), latch);
+        loadInventoryLiquid(data.getInventoryLiquid(), latch);
+        loadLocationCode(data.getLocationCode(), latch);
+        loadVehicleDetail(data.getVehicleDetails(), latch);
+        loadDistributor(data.getDistributor(), latch);
+        loadDuraCylinder(data.getDuraCylinder(), latch);
+        loadAllBusinessPartner(data.getBusinessPartnerAllList(), latch);
+        loadAllEmployee(data.getEmployeList(), latch);
+        loadAllOtherData(data.getOtherData().getOtherItems(), latch);
 
-
-        if(data.getBusinessPartners().size()!=0&&data.getBusinessPartners()!=null)
-            loadBusinessPartners(data.getBusinessPartners());
-
-        if(data.getInventoryCylinders().size()!=0&&data.getInventoryCylinders()!=null)
-            loadInventoryCylinders(data.getInventoryCylinders());
-        
-
-        if(data.getInventoryLiquid().size()!=0&&data.getInventoryLiquid()!=null)
-            loadInventoryLiquid(data.getInventoryLiquid());
-
-        if(data.getLocationCode().size()!=0&&data.getLocationCode()!=null)
-            loadLocationCode(data.getLocationCode());
-
-        if(data.getVehicleDetails().size()!=0&&data.getVehicleDetails()!=null)
-            loadVehicleDetail(data.getVehicleDetails());
-
-        if(data.getDistributor().size()!=0&&data.getDistributor()!=null)
-            loadDistributor(data.getDistributor());
-
-        if(data.getDuraCylinder().size()!=0&&data.getDuraCylinder()!=null)
-            loadDuraCylinder(data.getDuraCylinder());
-
-        if(data.getBusinessPartnerAllList().size()!=0&&data.getBusinessPartnerAllList()!=null)
-            loadAllBusinessPartener(data.getBusinessPartnerAllList());
-
-        if(data.getEmployeList().size()!=0&&data.getEmployeList()!=null)
-            loadAllEmployee(data.getEmployeList());
-
-        if(data.getOtherData().getOtherItems().size()!=0&&data.getOtherData().getOtherItems()!=null)
-            loadAllOtherData(data.getOtherData().getOtherItems());
-
-
-        loin();
-
-    }
-
-    private void loadAllOtherData(List<OtherItem> otherItemList) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=0;i<otherItemList.size();i++)
-                {
-                    otherItemsHandler.addItems(otherItemList.get(i).getItem_code(),otherItemList.get(i).getShort_description());
-                }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                latch.await(); // Wait until all tasks are completed
+                runOnUiThread(() -> navigateToDashboard());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
     }
 
-    private void loadAllBusinessPartener(List<BusinessPartner> businessPartnerAllList) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<businessPartnerAllList.size();i++)
-                {
-                    businessPartnersHandler.add(businessPartnerAllList.get(i).getName(),businessPartnerAllList.get(i).getCode());
-                }
+    private void navigateToDashboard() {
+        dialog.dismiss();
+        Intent intent = new Intent(Test.this, Dashboard.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void loadAllOtherData(List<OtherItem> otherItemList, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (OtherItem item : otherItemList) {
+                otherItemsHandler.addItems(item.getItem_code(), item.getShort_description());
             }
+            latch.countDown();
         });
     }
 
-    private void loadAllEmployee(List<Employe> employeList) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=0;i<employeList.size();i++)
-                {
-                    employeHandler.addEmployee(employeList.get(i).getName(),employeList.get(i).getCode());
-                }
+    private void loadAllBusinessPartner(List<BusinessPartner> businessPartnerAllList, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (BusinessPartner partner : businessPartnerAllList) {
+                businessPartnersHandler.add(partner.getName(), partner.getCode());
             }
+            latch.countDown();
         });
     }
 
-
-    private void loadDuraCylinder(List<DuraCylinder> duraCylinder) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<duraCylinder.size();i++)
-                {
-                    durasyncHelper.addBook(duraCylinder.get(i).getItemCode(),duraCylinder.get(i).getBarcode(),duraCylinder.get(i).getWeight(),duraCylinder.get(i).getVolume(),duraCylinder.get(i).getFilledWith());
-                }
+    private void loadAllEmployee(List<Employe> employeList, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (Employe employee : employeList) {
+                employeHandler.addEmployee(employee.getName(), employee.getCode());
             }
+            latch.countDown();
         });
     }
 
-
-    private void loadDistributor(List<Distributor> distributor) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-
-                for(int i=1;i<distributor.size();i++)
-                {
-                    distributorHelper.addcust(distributor.get(i).getName(),distributor.get(i).getCode());
-                }
+    private void loadDuraCylinder(List<DuraCylinder> duraCylinder, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (DuraCylinder cylinder : duraCylinder) {
+                durasyncHelper.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith());
             }
+            latch.countDown();
         });
     }
 
-    private void loadVehicleDetail(List<VehicleDetail> vehicleDetails) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<vehicleDetails.size();i++)
-                {
-                    vehicleHandler.insertLabel(vehicleDetails.get(i).getName());
-                }
+    private void loadDistributor(List<Distributor> distributor, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (Distributor dist : distributor) {
+                distributorHelper.addcust(dist.getName(), dist.getCode());
             }
+            latch.countDown();
         });
     }
 
-    private void loadLocationCode(List<LocationCode> locationCode) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<locationCode.size();i++)
-                {
-                    fromloccodehandler.addcust(locationCode.get(i).getName(),locationCode.get(i).getCode());
-                }
+    private void loadVehicleDetail(List<VehicleDetail> vehicleDetails, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (VehicleDetail detail : vehicleDetails) {
+                vehicleHandler.insertLabel(detail.getName());
             }
+            latch.countDown();
         });
     }
 
-    private void loadInventoryLiquid(List<InventoryLiquid> inventoryLiquid) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<inventoryLiquid.size();i++)
-                {
-                    delivery_type_liquidHandler.insertLabel(inventoryLiquid.get(i).getName(),inventoryLiquid.get(i).getCode(),inventoryLiquid.get(i).getUnit(),inventoryLiquid.get(i).getConvFactor(),inventoryLiquid.get(i).getHsn(),inventoryLiquid.get(i).getGst());
-                }
+    private void loadLocationCode(List<LocationCode> locationCode, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (LocationCode code : locationCode) {
+                fromloccodehandler.addcust(code.getName(), code.getCode());
             }
-        });
-
-    }
-
-    private void loadInventoryCylinders(List<InventoryCylinder> inventoryCylinders) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<inventoryCylinders.size();i++)
-                {
-                    sync.addBook(inventoryCylinders.get(i).getItemCode(),
-                            inventoryCylinders.get(i).getBarcode(),
-                            inventoryCylinders.get(i).getWeight(),
-                            inventoryCylinders.get(i).getVolume(),
-                            inventoryCylinders.get(i).getFilledWith(),
-                            inventoryCylinders.get(i).getSerial_no(),
-                            inventoryCylinders.get(i).getHydrotest_date(),
-                            inventoryCylinders.get(i).getOwner(),
-                            inventoryCylinders.get(i).getStatus(),
-                            inventoryCylinders.get(i).getLocation());
-
-                }
-            }
+            latch.countDown();
         });
     }
 
-    private void loadBusinessPartners(List<BusinessPartner> businessPartners) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<businessPartners.size();i++)
-                {
-                    databaseHandlercustomer.addcust(businessPartners.get(i).getName(),businessPartners.get(i).getCode(),businessPartners.get(i).getInvoice());
-                }
+    private void loadInventoryLiquid(List<InventoryLiquid> inventoryLiquid, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (InventoryLiquid liquid : inventoryLiquid) {
+                delivery_type_liquidHandler.insertLabel(liquid.getName(), liquid.getCode(), liquid.getUnit(), liquid.getConvFactor(), liquid.getHsn(), liquid.getGst());
             }
+            latch.countDown();
         });
     }
 
-    private void loadBPContact(List<BpContact> bpContact) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<bpContact.size();i++)
-                {
-                    bp_contact_handler.addcust(bpContact.get(i).getName(),bpContact.get(i).getCode());
-                }
+    private void loadInventoryCylinders(List<InventoryCylinder> inventoryCylinders, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (InventoryCylinder cylinder : inventoryCylinders) {
+                sync.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith(), cylinder.getSerial_no(), cylinder.getHydrotest_date(), cylinder.getOwner(), cylinder.getStatus(), cylinder.getLocation());
             }
+            latch.countDown();
         });
     }
 
-
-    private void loadInventoryGases(List<InventoryGa> inventoryGa) {
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                for(int i=1;i<inventoryGa.size();i++)
-                {
-                    inventoryGases.addGas(inventoryGa.get(i).getGasName(),inventoryGa.get(i).getItem_code());
-                }
+    private void loadBusinessPartners(List<BusinessPartner> businessPartners, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (BusinessPartner partner : businessPartners) {
+                databaseHandlercustomer.addcust(partner.getName(), partner.getCode(), partner.getInvoice());
             }
+            latch.countDown();
         });
     }
-    private void loin() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-                Intent intent=new Intent(Test.this, Dashboard.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();            }
-        }, 5000);
+
+    private void loadBPContact(List<BpContact> bpContact, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (BpContact contact : bpContact) {
+                bp_contact_handler.addcust(contact.getName(), contact.getCode());
+            }
+            latch.countDown();
+        });
+    }
+
+    private void loadInventoryGases(List<InventoryGa> inventoryGa, CountDownLatch latch) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            for (InventoryGa gas : inventoryGa) {
+                inventoryGases.addGas(gas.getGasName(), gas.getItem_code());
+            }
+            latch.countDown();
+        });
 
     }
 }

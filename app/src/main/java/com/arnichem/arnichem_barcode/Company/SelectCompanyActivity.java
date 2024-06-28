@@ -296,7 +296,10 @@ public class SelectCompanyActivity extends AppCompatActivity {
         save_upi_payment(base_url);
     }
 
-    private void save_upi_payment(String base_url) throws IOException {
+    private void
+
+
+    save_upi_payment(String base_url) throws IOException {
         dialog_upi = new ProgressDialog(SelectCompanyActivity.this);
         dialog_upi.setTitle("Data Inserting");
         dialog_upi.setMessage("Please wait....");

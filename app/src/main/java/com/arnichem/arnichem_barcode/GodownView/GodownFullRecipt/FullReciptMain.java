@@ -42,6 +42,7 @@ import com.arnichem.arnichem_barcode.Barcode.NewScanner;
 import com.arnichem.arnichem_barcode.GodownView.GOdownMainActivity;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
 import com.arnichem.arnichem_barcode.GodownView.godownempty.GodownEmptyMainActivity;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
@@ -77,7 +78,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class  FullReciptMain extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
+public class  FullReciptMain extends AppCompatActivity implements Listener, LocationData.AddressCallBack, OnItemClickListener {
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
     syncHelper synchelper;
@@ -253,7 +254,7 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
                 postUsingVolley();
             }
         });
-        customAdapter = new CustomAdapter(FullReciptMain.this, this, book_id, book_title, fillwith);
+        customAdapter = new CustomAdapter(FullReciptMain.this, this, book_id, book_title, fillwith,this,"full_receipt");
 
       //  customAdapter = new GodownFullReciptAdapter(FullReciptMain.this,this, book_id, book_title);
         recyclerView.setAdapter(customAdapter);
@@ -612,4 +613,8 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
     };
 
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
 }

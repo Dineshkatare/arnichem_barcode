@@ -41,6 +41,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
 import com.arnichem.arnichem_barcode.GodownView.Closing_stock.Closing_stock;
 import com.arnichem.arnichem_barcode.GodownView.GOdownMainActivity;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
@@ -78,7 +79,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class GodownDeliveryMainActivity extends AppCompatActivity implements Listener, LocationData.AddressCallBack {
+public class GodownDeliveryMainActivity extends AppCompatActivity implements Listener, LocationData.AddressCallBack  , OnItemClickListener {
     static JSONObject object = null;
     public int poslocfixdel, poscustfixdel;
     GetLocationDetail getLocationDetail;
@@ -277,7 +278,7 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
         filledWithAdapter = new FilledWithAdapter(GodownDeliveryMainActivity.this, this, name, tot);
         Filled_with_Recycle_View.setAdapter(filledWithAdapter);
         Filled_with_Recycle_View.setLayoutManager(new LinearLayoutManager(GodownDeliveryMainActivity.this));
-        customAdapter = new CustomAdapter(GodownDeliveryMainActivity.this, this, book_id, book_title, fillwith);
+        customAdapter = new CustomAdapter(GodownDeliveryMainActivity.this, this, book_id, book_title, fillwith,this,"godown_delivery");
 
        // customAdapter = new GodownDeliveryAdapter(GodownDeliveryMainActivity.this, this, book_id, book_title);
         recyclerView.setAdapter(customAdapter);
@@ -596,6 +597,7 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
         return super.onCreateOptionsMenu(menu);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.delete_all) {
@@ -670,6 +672,8 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
     };
 
 
+    @Override
+    public void onItemClick(int position) {
 
-
+    }
 }

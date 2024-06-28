@@ -3,6 +3,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.view.Dashboard;
@@ -14,6 +17,7 @@ import com.google.zxing.Result;
 public class registration extends AppCompatActivity  {
 
     private CodeScanner mCodeScanner;
+
 
 
     @Override
@@ -45,6 +49,9 @@ public class registration extends AppCompatActivity  {
         });
     }
 
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -59,7 +66,8 @@ public class registration extends AppCompatActivity  {
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, Dashboard.class);
-        startActivity(intent);
+        super.onBackPressed();
     }
+
+
 }

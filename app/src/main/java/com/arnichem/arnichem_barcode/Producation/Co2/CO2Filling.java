@@ -23,7 +23,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
+import com.arnichem.arnichem_barcode.Barcode.ProductionLaserScannerActivity;
 import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.FullReciptMain;
 import com.arnichem.arnichem_barcode.Producation.Nitrogen.NitrogenFilling;
 import com.arnichem.arnichem_barcode.Producation.Oxygen.FisrtPart;
@@ -33,10 +35,12 @@ import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.Producation.ZeroAir.ZeroAirFilling;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.TransactionsView.Empty.EmptyMain;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.DistributorHelper;
 import com.arnichem.arnichem_barcode.view.ItemCode;
 import com.arnichem.arnichem_barcode.view.syncHelper;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
@@ -79,6 +83,13 @@ public class CO2Filling extends AppCompatActivity {
     int finalAI_qty,finaldist_qty,totvolume;
     String sm,em,after_tank_pressure,after_tank_liquid_liter,before_tank_pressure,before_tank_liquid_liter,fillingp;
 
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+    Boolean isAllFabsVisible;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +112,13 @@ public class CO2Filling extends AppCompatActivity {
         is_scan=new ArrayList<>();
         cubic=new ArrayList<String>();
         cylindervolume=findViewById(R.id.cylindervolume);
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
+
         adapter= ArrayAdapter.createFromResource(this,R.array.manifold, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         try {
@@ -165,26 +183,26 @@ public class CO2Filling extends AppCompatActivity {
                 }
             }
         });
-        co2_scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (manifoldpos == 0) {
-
-                    MDToast.makeText(CO2Filling.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-                }else if(distributorpos==0){
-                    MDToast.makeText(CO2Filling.this, "कृपया distributor निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-                } else {
-                    status =true;
-                    Intent intent =new Intent(CO2Filling.this, NewScanner.class);
-                    intent.putExtra("type", "co2");
-                    intent.putExtra("dis", distributorname);
-                    startActivity(intent);
-
-                }
-              }
-        });
+//        co2_scan.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (manifoldpos == 0) {
+//
+//                    MDToast.makeText(CO2Filling.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+//
+//                }else if(distributorpos==0){
+//                    MDToast.makeText(CO2Filling.this, "कृपया distributor निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+//
+//                } else {
+//                    status =true;
+//                    Intent intent =new Intent(CO2Filling.this, NewScanner.class);
+//                    intent.putExtra("type", "co2");
+//                    intent.putExtra("dis", distributorname);
+//                    startActivity(intent);
+//
+//                }
+//              }
+//        });
         print.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -294,6 +312,98 @@ public class CO2Filling extends AppCompatActivity {
         distna=new distnameadapter(CO2Filling.this,this,iddist,disname,distot,distotvol);
         recyclerView1.setAdapter(distna);
         recyclerView1.setLayoutManager(new LinearLayoutManager(CO2Filling.this));
+
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        if (manifoldpos == 0) {
+
+                            MDToast.makeText(CO2Filling.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+
+                        }else if(distributorpos==0){
+                            MDToast.makeText(CO2Filling.this, "कृपया distributor निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+
+                        } else {
+                            Intent intent = new Intent(CO2Filling.this, ProductionLaserScannerActivity.class);
+                            intent.putExtra("type", "co2");
+                            intent.putExtra("dis", distributorname);
+                        //    intent.putExtra("vol", cylindervolume.getText().toString());
+                            startActivity(intent);
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(CO2Filling.this, NewScanner.class);
+                        intent.putExtra("type", "empty");
+                        startActivity(intent);
+                    }
+                });
+
+
+
+
 
     }
 
@@ -540,6 +650,7 @@ public class CO2Filling extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(this, FisrtPart.class);
         startActivity(intent);
     }

@@ -57,9 +57,28 @@
                 android:textColor="@color/black"
                 android:textSize="16dp"
                 android:textStyle="bold" />
-
             <TextView
                 android:id="@+id/vehicleno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Select Vehicle No:/गाडी क्र निवडा"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal" />
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/dynamic_spinner"
+                android:layout_width="250dp"
+                android:layout_marginTop="15dp"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:background="@drawable/editbox"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/vehicleno1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -68,12 +87,14 @@
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="16dp"
+                android:visibility="gone"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/vno"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/editbox"
                 android:gravity="center_horizontal"
@@ -209,7 +230,7 @@
             <TextView
                 android:id="@+id/Totalscanvalue"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="27dp"
                 android:layout_marginTop="10dp"
                 android:gravity="center_horizontal"
                 android:text="0"
@@ -274,15 +295,42 @@
     </ScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/inwardscan"
+        android:id="@+id/camera_scan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"
+        android:layout_marginRight="20dp"
         android:layout_marginBottom="28dp"
         android:clickable="true"
         android:focusable="true"
+        android:layout_above="@+id/barcode_scan"
+        app:srcCompat="@drawable/ic_photo_camera_black_24dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/barcode_scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="28dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_above="@+id/add_fab"
         app:srcCompat="@drawable/barcode" />
+
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/add_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/scanner_line"
+        app:icon="@drawable/baseline_add_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </RelativeLayout>

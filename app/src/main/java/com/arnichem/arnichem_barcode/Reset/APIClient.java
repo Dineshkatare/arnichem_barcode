@@ -19,11 +19,9 @@ public  class APIClient {
     public static final String crm_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/crm_entry.php";
     public static final String bpcontact_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/bpcontact_entry.php";
 
-    public static final String attendance_log = "http://arnichem.co.in/intranet/barcode/APP/app_apis/attendance_log.php";
 
     public static final String diesel_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/diesel_entry.php";
     public static final String closing_stock_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/closing_stock_entry.php";
-   // public static final String godown_delivery_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_delivery_entry.php";
     public static final String godown_delivery_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_delivery_entry_v6.2.php";//DONE
     public static final String other_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/other_entry_v6.2.php";//DONE
 
@@ -37,7 +35,7 @@ public  class APIClient {
     public static final String ammonia_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_entry_5.6.php";
     public static final String zero_air_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/zero_air_entry_5.6.php";
     public  static  final  String ammonia_delivery="http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_delivery_v6.2.php";
-    public  static  final  String ammonia_del_update="http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_get_details.php`w;
+    public  static  final  String ammonia_del_update="http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_get_details.php";
     public static final String fill_dura_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fill_dura_entry_4.7.php";
     public static final String outward_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/outward_entry_v4.5.php"; //DONE //DONE
     public static final String inward_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/inward_entry_v4.5.php";  //DONE

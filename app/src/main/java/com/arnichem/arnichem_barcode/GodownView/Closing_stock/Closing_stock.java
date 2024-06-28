@@ -89,7 +89,7 @@ public class Closing_stock extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
 
         cylinder = new ArrayList<String>();
-        add_button = findViewById(R.id.inwardscan);
+        add_button = findViewById(R.id.add_fab);
         spinner = findViewById(R.id.spinfrominward);
         Totalscanvalue = findViewById(R.id.Totalscanvalue);
         inwardpint = findViewById(R.id.inwardprintbtn);

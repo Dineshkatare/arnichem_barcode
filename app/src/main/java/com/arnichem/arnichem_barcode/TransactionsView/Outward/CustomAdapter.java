@@ -14,14 +14,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.FullReciptMain;
 import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.GodownFullReciptHelper;
 import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.GodownFullRecpPrint;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryHelper;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.TransactionsView.FullRecipt.FullReciptHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.FullRecipt.FullReciptMainActivity;
+import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardCustomAdapter;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
 
@@ -34,13 +37,19 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     private final ArrayList cycIDList;
     private final ArrayList cycNameList;
     private ArrayList fillWithList;
+    private OnItemClickListener clickListener;
+    private String type;
 
-    public CustomAdapter(Activity activity, Context context, ArrayList cycIDList, ArrayList cycNameList, ArrayList fillWithList) {
+
+
+    public CustomAdapter(Activity activity, Context context, ArrayList cycIDList, ArrayList cycNameList, ArrayList fillWithList,OnItemClickListener onItemClickListener,String type) {
         this.activity = activity;
         this.context = context;
         this.cycIDList = cycIDList;
         this.cycNameList = cycNameList;
         this.fillWithList = fillWithList;
+        this.clickListener = onItemClickListener;
+        this.type = type;
     }
 
     @NonNull
@@ -86,6 +95,22 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
                     Intent intent = new Intent(context, FullReciptMainActivity.class);
                     activity.startActivityForResult(intent, 1);
 
+                } else if (context instanceof LaserScannerActivity){
+                    if(type.equalsIgnoreCase("delivery")){
+                        deliDB myDB = new deliDB(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
+                        clickListener.onItemClick(position);
+
+                    }else {
+                        MyDatabaseHelper myDB = new MyDatabaseHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
+                        clickListener.onItemClick(position);
+
+                    }
+
+//                    Intent intent = new Intent(context, LaserScannerActivity.class);
+//                    activity.startActivityForResult(intent, 1);
+
                 }
 
             }
@@ -109,5 +134,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         }
 
     }
+
+
 
 }

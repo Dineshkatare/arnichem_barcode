@@ -61,7 +61,7 @@ public class OxygenHelper extends SQLiteOpenHelper {
         //Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला आहे ", Toast.LENGTH_LONG).show();
 
     }
-    Cursor readAllData(){
+    public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME+" ORDER BY "+COLUMN_cylname+" ASC";
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -71,6 +71,31 @@ public class OxygenHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
+
+    public Cursor readAllDataWithoutOrder(){
+        // Remove the ORDER BY clause
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    public Cursor readAllDataNew(){
+        String query = "SELECT * FROM " + TABLE_NAME+" ORDER BY "+COLUMN_cylname+" ASC";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
 
     void updateData(String row_id, String title){
         SQLiteDatabase db = this.getWritableDatabase();

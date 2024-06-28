@@ -23,7 +23,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
+import com.arnichem.arnichem_barcode.Barcode.ProductionLaserScannerActivity;
 import com.arnichem.arnichem_barcode.Producation.Co2.CO2Filling;
 import com.arnichem.arnichem_barcode.Producation.Oxygen.FisrtPart;
 import com.arnichem.arnichem_barcode.Producation.Oxygen.OxygenFilling;
@@ -32,10 +34,12 @@ import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.Producation.ZeroAir.ZeroAirFilling;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.TransactionsView.Empty.EmptyMain;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.DistributorHelper;
 import com.arnichem.arnichem_barcode.view.ItemCode;
 import com.arnichem.arnichem_barcode.view.syncHelper;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
@@ -76,7 +80,15 @@ public class NitrogenFilling extends AppCompatActivity {
     String temp="",tempvol;
     int finalAI_qty,finaldist_qty,totvolume;
     String sm,em,after_tank_pressure,after_tank_liquid_liter,before_tank_pressure,before_tank_liquid_liter,fillingp;
-    FloatingActionButton no2_scan;
+    // Use the FloatingActionButton for all the add person
+    // and add alarm
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+
+    Boolean isAllFabsVisible;
 
 
     @Override
@@ -91,10 +103,14 @@ public class NitrogenFilling extends AppCompatActivity {
         spinnermanifold=findViewById(R.id.spinermanifold);
         Totalscanvalue=findViewById(R.id.Totalscanvalue);
         adddata=findViewById(R.id.adddata);
-        no2_scan = findViewById(R.id.no2_scan);
         cylindernumber=findViewById(R.id.cylindernumber);
         cylindernumber1=findViewById(R.id.cylindernumber1);
-
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
         cylinder=new ArrayList<String>();
         is_scan=new ArrayList<>();
         cubic=new ArrayList<String>();
@@ -271,6 +287,99 @@ public class NitrogenFilling extends AppCompatActivity {
         recyclerView1.setAdapter(distna);
         recyclerView1.setLayoutManager(new LinearLayoutManager(NitrogenFilling.this));
 
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+
+                        if (manifoldpos == 0) {
+
+                            MDToast.makeText(NitrogenFilling.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+
+                        }else if(distributorpos==0){
+                            MDToast.makeText(NitrogenFilling.this, "कृपया distributor निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+
+                        } else {
+                            Intent intent = new Intent(NitrogenFilling.this, ProductionLaserScannerActivity.class);
+                            intent.putExtra("type", "no2");
+                            intent.putExtra("dis", distributorname);
+//                            intent.putExtra("vol", cylindervolume.getText().toString());
+                            startActivity(intent);
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(NitrogenFilling.this, NewScanner.class);
+                        intent.putExtra("type", "empty");
+                        startActivity(intent);
+                    }
+                });
+
+
+
+
+
     }
 
 
@@ -293,26 +402,26 @@ public class NitrogenFilling extends AppCompatActivity {
             spinnerDistributor.setSelection(distributorpos);
         }
 
-        no2_scan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (manifoldpos == 0) {
-
-                    MDToast.makeText(NitrogenFilling.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-                }else if(distributorpos==0){
-                    MDToast.makeText(NitrogenFilling.this, "कृपया distributor निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-                }else{
-
-                    status = true;
-                    Intent intent = new Intent(NitrogenFilling.this, NewScanner.class);
-                    intent.putExtra("type", "no2");
-                    intent.putExtra("dis", distributorname);
-                    startActivity(intent);
-                }
-            }
-        });
+//        no2_scan.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (manifoldpos == 0) {
+//
+//                    MDToast.makeText(NitrogenFilling.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+//
+//                }else if(distributorpos==0){
+//                    MDToast.makeText(NitrogenFilling.this, "कृपया distributor निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+//
+//                }else{
+//
+//                    status = true;
+//                    Intent intent = new Intent(NitrogenFilling.this, NewScanner.class);
+//                    intent.putExtra("type", "no2");
+//                    intent.putExtra("dis", distributorname);
+//                    startActivity(intent);
+//                }
+//            }
+//        });
 
     }
 
@@ -539,6 +648,7 @@ public class NitrogenFilling extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(this, FisrtPart.class);
         startActivity(intent);
     }

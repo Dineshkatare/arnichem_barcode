@@ -74,6 +74,17 @@ public class deliDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
+    public Cursor readAllDataWithoutOrder(){
+        // Remove the ORDER BY clause
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
 
     void updateData(String row_id, String title){
         SQLiteDatabase db = this.getWritableDatabase();

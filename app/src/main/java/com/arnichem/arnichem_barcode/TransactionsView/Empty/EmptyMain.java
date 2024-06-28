@@ -48,12 +48,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
 import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
 import com.arnichem.arnichem_barcode.Reset.APIInterface;
 import com.arnichem.arnichem_barcode.TransactionsView.DuraDelivery.DuraDeliveryMain;
+import com.arnichem.arnichem_barcode.TransactionsView.Outward.Main;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliveryprint;
 import com.arnichem.arnichem_barcode.attendance.MyResponseModel;
@@ -82,6 +84,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.valdesekamdem.library.mdtoast.MDToast;
 import org.json.JSONArray;
@@ -110,7 +113,6 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
     ProgressDialog dialog;
     ArrayList<String> book_id, book_title;
     RecyclerView recyclerView;
-    FloatingActionButton add_button;
     ImageView empty_imageview;
     DatabaseHandler databaseHandlercustomer;
     fromloccodehandler fromloccodehandler;
@@ -136,6 +138,13 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
     ConstraintLayout constraintSigned;
     ImageView closeImg,signedImg;
     APIInterface apiInterface;
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+    Boolean isAllFabsVisible;
+
 
 
     @SuppressLint("MissingInflatedId")
@@ -148,6 +157,13 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
         apiInterface = APIClient.getClient().create(APIInterface.class);
 
         getSupportActionBar().setTitle("Empty");
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
+
         getLocationDetail = new GetLocationDetail(this, this);
         easyWayLocation = new EasyWayLocation(this, false,true,this);
         print=findViewById(R.id.emptyprintbtn);
@@ -183,7 +199,6 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
-        add_button = findViewById(R.id.emptyscan);
         empty_imageview = findViewById(R.id.empty_imageview);
         no_data = findViewById(R.id.no_data);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -292,20 +307,89 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
                 constraintSigned.setVisibility(View.GONE);
             }
         });
-        add_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                status =true;
-                Intent intent =new Intent(EmptyMain.this, NewScanner.class);
-                intent.putExtra("type", "empty");
-                startActivity(intent);
-            }
-        });
 
 
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mServiceReceiver,
                 new IntentFilter("digital_sign"));
+
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(EmptyMain.this, LaserScannerActivity.class);
+                        intent.putExtra("type", "empty");
+                        startActivity(intent);
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(EmptyMain.this, NewScanner.class);
+                        intent.putExtra("type", "empty");
+                        startActivity(intent);
+                    }
+                });
+
 
 
 
@@ -472,7 +556,7 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
         emptycylindernumber.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                addClyHelper.addBook(emptycylindernumber.getText().toString(),"no");
+                addClyHelper.addBook(emptycylindernumber.getText().toString(),"N");
                 finish();
                 startActivity(getIntent());
             }
@@ -528,122 +612,6 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
             no_data.setVisibility(View.GONE);
         }
     }
-    private void postUsingVolley() {
-
-        dialog = new ProgressDialog(EmptyMain.this);
-        dialog.setTitle("Data Inserting");
-        dialog.setMessage("Please wait....");
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.show();
-        if (poslocfixdel == 0) {
-            dialog.dismiss();
-            button.setEnabled(true);
-            MDToast.makeText(EmptyMain.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-        } else if (poscustfixdel == 0) {
-            dialog.dismiss();
-            button.setEnabled(true);
-            MDToast.makeText(EmptyMain.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-
-        }  else {
-
-
-            StringBuilder str = new StringBuilder("");
-            for (String eachstring : cylinder) {
-                str.append(eachstring).append(",");
-            }
-
-
-//            // StringBuffer to String conversion
-            String commaseparatedlist = str.toString();
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.empty_entry,
-                    new Response.Listener<String>() {
-                        @SuppressLint("WrongConstant")
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                // Split the response to separate the location and the JSON array
-                                String[] responseParts = response.split("\\[", 2);
-                                String location = responseParts[0].trim();
-                                String jsonArrayPart = "[" + responseParts[1];
-
-                                // Handle the JSON array
-                                JSONArray jsonArray = new JSONArray(jsonArrayPart);
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                    String status = jsonObject.getString("status");
-                                    String msg = jsonObject.getString("msg");
-
-                                    if (status.equals("success")) {
-                                        MDToast.makeText(EmptyMain.this, "Empty Entry Done!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
-                                        button.setVisibility(View.GONE);
-                                        print.setVisibility(View.VISIBLE);
-                                        srno = jsonObject.getString("srno");
-                                        dialog.dismiss();
-                                        Intent intent = new Intent(EmptyMain.this, Empty_Print.class);
-                                        intent.putExtra("durano", String.valueOf(cylinder));
-                                        intent.putExtra("custname", to_warehouse);
-                                        intent.putExtra("empb", srno);
-                                        intent.putExtra("sign_path", digitalSignPath);
-                                        intent.putExtra("custcode", cust_code);
-                                        intent.putExtra("count", count);
-                                        intent.putExtra("cylinder", String.valueOf(cylinder));
-                                        button.setEnabled(true);
-                                        startActivity(intent);
-                                    } else {
-                                        button.setEnabled(true);
-                                        dialog.dismiss();
-                                    }
-
-                                    Log.e("JSON", "> " + status + msg);
-                                }
-                            } catch (JSONException e) {
-                                dialog.dismiss();
-                                button.setEnabled(true);
-                                e.printStackTrace();
-                            }
-                        }
-                    },
-                    new Response.ErrorListener() {
-                        @SuppressLint("WrongConstant")
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            button.setEnabled(true);
-                            dialog.dismiss();
-                            error.printStackTrace();
-                        }
-                    }) {
-                @Override
-                protected Map<String, String> getParams() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<>();
-                    params.put("dura_code", String.valueOf(cylinder));
-                    params.put("is_scan", String.valueOf(is_scan));
-                    params.put("from_warehouse", from_warehouse);
-                    params.put("to_warehouse", to_warehouse);
-                    params.put("transport_type", "ARNICHEM");
-                    params.put("cust_code", cust_code);
-                    params.put("from_code",from_code);
-                    params.put("lati", latitude);
-                    params.put("logi", logitude);
-                    params.put("addr",address);
-                    params.put("sign", digital_sign);
-                    params.put("transport_no", SharedPref.getInstance(EmptyMain.this).getVehicleNo());
-                    params.put("driver", SharedPref.getInstance(EmptyMain.this).getID());
-                    params.put("email", SharedPref.getInstance(EmptyMain.this).getEmail());
-                    params.put("count", count);
-                    params.put("db_host",SharedPref.mInstance.getDBHost());
-                    params.put("db_username",SharedPref.mInstance.getDBUsername());
-                    params.put("db_password",SharedPref.mInstance.getDBPassword());
-                    params.put("db_name",SharedPref.mInstance.getDBName());
-                    return params;
-                }
-            };
-            VolleySingleton.getInstance(EmptyMain.this).addToRequestQueue(stringRequest);
-
-
-        }
-        }
 
     private void postUsingRetrofit() {
 
@@ -815,6 +783,7 @@ public class EmptyMain extends AppCompatActivity implements Listener, LocationDa
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(this, Transactions.class);
         startActivity(intent);
     }

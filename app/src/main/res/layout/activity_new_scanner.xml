@@ -14,7 +14,12 @@
         android:layout_height="match_parent"
         app:auto_focus="true"
         app:use_flash="false" />
-
+    <EditText
+        android:id="@+id/newScan"
+        android:layout_width="match_parent"
+        android:focusable="true"
+        android:layout_height="20dp"
+        android:background="@null"/>
     <ImageView
         android:id="@+id/flash"
         android:layout_width="46dp"

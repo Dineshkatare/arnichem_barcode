@@ -12,11 +12,13 @@ import com.arnichem.arnichem_barcode.GodownView.Closing_stock.NewClosingStock.Cl
 import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.FullReciptMain;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
 import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.TransactionsView.Outward.Main;
+import com.arnichem.arnichem_barcode.TransactionsView.Transactions;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 
 public class GOdownMainActivity extends AppCompatActivity {
-    CardView godownempty,godowndelivery,godownFullRecipt,Closing_stock;
+    CardView godownempty,godowndelivery,godownFullRecipt,Closing_stock,outward,inward;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +29,23 @@ public class GOdownMainActivity extends AppCompatActivity {
         godowndelivery=findViewById(R.id.godowdelivery);
         godownFullRecipt=findViewById(R.id.godownfullrecipt);
         Closing_stock=findViewById(R.id.closing_stock);
+        outward=findViewById(R.id.outward);
+        inward=findViewById(R.id.inward);
+        outward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(GOdownMainActivity.this, Main.class);
+                startActivity(i);
+            }
+        });
+        inward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i=new Intent(GOdownMainActivity.this, com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardMain.class);
+                startActivity(i);
+            }
+        });
+
         godownempty.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

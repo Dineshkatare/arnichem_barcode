@@ -50,7 +50,7 @@ public class InWardDatabaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_TITLE, title);
-        //   cv.put(COLUMN_AUTHOR, author);
+           cv.put(STATUS, status);
 //        cv.put(COLUMN_PAGES, pages);
         long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
 
@@ -63,7 +63,7 @@ public class InWardDatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    Cursor readAllData(){
+    public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME+" ORDER BY "+COLUMN_TITLE+" ASC";
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -73,6 +73,19 @@ public class InWardDatabaseHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
+
+    public Cursor readAllDataWithoutOrder(){
+        // Remove the ORDER BY clause
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
 
     void updateData(String row_id, String title){
         SQLiteDatabase db = this.getWritableDatabase();
@@ -100,7 +113,7 @@ public class InWardDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    void deleteAllData(){
+    public void deleteAllData(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME);
     }

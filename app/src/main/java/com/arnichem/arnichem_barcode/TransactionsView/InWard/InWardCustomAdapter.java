@@ -16,7 +16,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
+import com.arnichem.arnichem_barcode.TransactionsView.Outward.Main;
+import com.arnichem.arnichem_barcode.TransactionsView.Outward.MyDatabaseHelper;
+import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
+import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,12 +34,18 @@ public class InWardCustomAdapter extends RecyclerView.Adapter<com.arnichem.arnic
     private Context context;
     private Activity activity;
     private ArrayList book_id, book_title;
-    InWardCustomAdapter(Activity activity, Context context, ArrayList book_id, ArrayList book_title
+    private OnItemClickListener clickListener;
+    private String  type;
+
+
+    public InWardCustomAdapter(Activity activity, Context context, ArrayList book_id, ArrayList book_title,OnItemClickListener clickListener,String type
     ){
         this.activity = activity;
         this.context = context;
         this.book_id = book_id;
         this.book_title = book_title;
+        this.clickListener = clickListener;
+        this.type = type;
 //        this.book_author = book_author;
 //        this.book_pages = book_pages;
     }
@@ -68,10 +81,28 @@ public class InWardCustomAdapter extends RecyclerView.Adapter<com.arnichem.arnic
             @Override
             public void onClick(View v) {
 
-                InWardDatabaseHelper myDB = new InWardDatabaseHelper(context.getApplicationContext());
-                myDB.deleteOneRow(String.valueOf(book_id.get(position)));
-                Intent intent = new Intent(context, InWardMain.class);
-                activity.startActivityForResult(intent, 1);
+                if (context instanceof InWardMain) {
+                    InWardDatabaseHelper myDB = new InWardDatabaseHelper(context.getApplicationContext());
+                    myDB.deleteOneRow(String.valueOf(book_id.get(position)));
+                    Intent intent = new Intent(context, InWardMain.class);
+                    activity.startActivityForResult(intent, 1);
+
+                } else if (context instanceof LaserScannerActivity){
+                    if(type.equalsIgnoreCase("empty")) {
+
+                        AddClyHelper myDB = new AddClyHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(book_id.get(position)));
+                        clickListener.onItemClick(position);
+                    }else {
+                        InWardDatabaseHelper myDB = new InWardDatabaseHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(book_id.get(position)));
+                        clickListener.onItemClick(position);
+
+                    }
+//                    Intent intent = new Intent(context, LaserScannerActivity.class);
+//                    activity.startActivityForResult(intent, 1);
+                }
+
 
             }
         });
@@ -106,6 +137,7 @@ public class InWardCustomAdapter extends RecyclerView.Adapter<com.arnichem.arnic
         }
 
     }
+
 
 }
 

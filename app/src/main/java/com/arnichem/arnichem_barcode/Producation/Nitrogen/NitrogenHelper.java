@@ -62,7 +62,19 @@ public class NitrogenHelper extends SQLiteOpenHelper {
         //Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला आहे ", Toast.LENGTH_LONG).show();
 
     }
-    Cursor readAllData(){
+    public Cursor readAllDataWithoutOrder(){
+        // Remove the ORDER BY clause
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    public Cursor readAllData(){
         String query = "SELECT * FROM " + TABLE_NAME+" ORDER BY "+COLUMN_cylname+" ASC";
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -99,7 +111,7 @@ public class NitrogenHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    void deleteOneRow(String row_id){
+    public void deleteOneRow(String row_id){
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete(TABLE_NAME, "_id=?", new String[]{row_id});
         if(result == -1){

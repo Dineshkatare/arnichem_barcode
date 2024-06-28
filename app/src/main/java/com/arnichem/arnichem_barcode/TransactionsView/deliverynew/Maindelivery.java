@@ -41,7 +41,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
@@ -65,6 +67,7 @@ import com.example.easywaylocation.EasyWayLocation;
 import com.example.easywaylocation.GetLocationDetail;
 import com.example.easywaylocation.Listener;
 import com.example.easywaylocation.LocationData;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
@@ -87,7 +90,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 
-public class Maindelivery extends AppCompatActivity implements Listener, LocationData.AddressCallBack {
+public class Maindelivery extends AppCompatActivity implements Listener, LocationData.AddressCallBack , OnItemClickListener {
     static JSONObject object = null;
     public int poslocfixdel, poscustfixdel;
     ProgressDialog dialog;
@@ -128,7 +131,15 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
     ImageView closeImg;
     String digital_sign = "", digitalSignPath = "";
     private EasyWayLocation easyWayLocation;
-    FloatingActionButton add_button;
+
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+
+    Boolean isAllFabsVisible;
+
     private final BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -159,6 +170,13 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         SharedPref.getInstance(Maindelivery.this).setDoubleEntry("false");
         getSupportActionBar().setTitle("Delivery");
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
+
         getLocationDetail = new GetLocationDetail(this, this);
         easyWayLocation = new EasyWayLocation(this, false, true, this);
         delidb = new deliDB(Maindelivery.this);
@@ -170,7 +188,7 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
         apiInterface = APIClient.getClient().create(APIInterface.class);
 
       //  deliadapter = new deliAdapter(Maindelivery.this, this, book_id, book_title);
-        customAdapter = new CustomAdapter(Maindelivery.this, this, cylIdList, cyclinderNameList, fillwith);
+        customAdapter = new CustomAdapter(Maindelivery.this, this, cylIdList, cyclinderNameList, fillwith,this,"delivery");
 
         filledWithAdapter = new FilledWithAdapter(Maindelivery.this, this, name, tot);
         spinner = findViewById(R.id.deliveryloc);
@@ -204,7 +222,6 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
         Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
-        add_button = findViewById(R.id.deliveryscan);
         empty_imageview = findViewById(R.id.empty_imageview);
         closeImg = findViewById(R.id.closeImg);
         no_data = findViewById(R.id.no_data);
@@ -287,15 +304,7 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
 
             }
         });
-        add_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                status =true;
-                Intent intent =new Intent(Maindelivery.this, NewScanner.class);
-                intent.putExtra("type", "delivery");
-                startActivity(intent);
-            }
-        });
+
         delprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -319,7 +328,7 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
         });
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
-        customAdapter = new CustomAdapter(Maindelivery.this, this, cylIdList, cyclinderNameList, fillwith);
+        customAdapter = new CustomAdapter(Maindelivery.this, this, cylIdList, cyclinderNameList, fillwith,this,"delivery");
         name = new ArrayList<>();
         tot = new ArrayList<>();
         volume = new ArrayList<>();
@@ -336,6 +345,84 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
         recyclerView.setLayoutManager(new LinearLayoutManager(Maindelivery.this));
         LocalBroadcastManager.getInstance(this).registerReceiver(mServiceReceiver,
                 new IntentFilter("digital_sign"));
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(Maindelivery.this, LaserScannerActivity.class);
+                        intent.putExtra("type", "delivery");
+                        startActivity(intent);
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(Maindelivery.this, NewScanner.class);
+                        intent.putExtra("type", "delivery");
+                        startActivity(intent);
+                    }
+                });
+
+
 
 
     }
@@ -781,7 +868,7 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
                         String Fillwith = cursor.getString(5);
                         String col1 = cursor.getString(1);
                         if (col1.contentEquals(deliverycylindersea.getText().toString())) {
-                            delidb.addBook(deliverycylindersea.getText().toString(), Fillwith, volume,"no");
+                            delidb.addBook(deliverycylindersea.getText().toString(), Fillwith, volume,"N");
                             finish();
                             startActivity(getIntent());
                         }
@@ -835,7 +922,13 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
     }
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(this, Transactions.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+
     }
 }

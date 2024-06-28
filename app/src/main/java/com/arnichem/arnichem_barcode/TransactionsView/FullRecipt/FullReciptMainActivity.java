@@ -49,6 +49,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
@@ -97,7 +98,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class FullReciptMainActivity extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
+public class FullReciptMainActivity extends AppCompatActivity implements Listener, LocationData.AddressCallBack, OnItemClickListener {
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
     ProgressDialog dialog;
@@ -254,7 +255,7 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
         fillwith = new ArrayList<>();
-        customAdapter = new CustomAdapter(FullReciptMainActivity.this, this, book_id, book_title, fillwith);
+        customAdapter = new CustomAdapter(FullReciptMainActivity.this, this, book_id, book_title, fillwith,this,"full_receipt");
 
       //  emptyadpter = new FullReciptAdapter(FullReciptMainActivity.this, this, book_id, book_title);
         storeDataInArrays();
@@ -636,4 +637,8 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
     };
 
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
 }

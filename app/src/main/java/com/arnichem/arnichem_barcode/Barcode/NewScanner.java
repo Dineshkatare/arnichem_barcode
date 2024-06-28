@@ -5,6 +5,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -17,10 +18,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,6 +41,7 @@ import com.arnichem.arnichem_barcode.TransactionsView.Duraempty.DuraemptyHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.FullRecipt.FullReciptHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardDatabaseHelper;
+import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardMain;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.MyDatabaseHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
 import com.arnichem.arnichem_barcode.digital_signature.ActivityDigitalSignature;
@@ -69,6 +74,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
     GodownDeliveryHelper godownDeliveryHelper;
     GodownEmptyHelper godownEmptyHelper;
     closing_helper closingHelper;
+    EditText editText;
     GodownFullReciptHelper godownFullReciptHelper;
     syncHelper synchelper;
     private BarcodeReader barcodeReader;
@@ -76,6 +82,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
     private Button finishBtn;
     Vibrator vibrate;
     ImageView flashImg;
+    private String inputHolder = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +98,9 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
                 onBackPressed();
             }
         });
+         editText = findViewById(R.id.newScan);
+        editText.requestFocus();
+
         flashImg.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("UseCompatLoadingForDrawables")
             @Override
@@ -111,7 +121,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
         });
     }
 
-    private void customDailog(String cyl_no, String barcode_no,String weight, String volume, String fillwith,String serial_no,String Hydrotest_date,String Owner,String Status,String location) {
+    private void customDailog(String cyl_no, String barcode_no,String weight, String volume, String fillwith,String serial_no,String Hydrotest_date,String Owner,String Status,String location,boolean val) {
         Cursor cursor = businessPartnersHandler.readAllData();
         if (cursor.getCount() == 0) {
             //      empty_imageview.setVisibility(View.VISIBLE);
@@ -170,6 +180,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
                     }
                 }
 
+
                 okay_text.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -189,7 +200,15 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
                 });
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                dialog.show();            }
+                dialog.show();
+//                if(val){
+//                    okay_text.setVisibility(View.GONE);
+//                    cancel_text.setVisibility(View.GONE);
+////                    status = true;
+//                    insertData(cyl_no,weight,barcode_no,volume,fillwith);
+//                }
+
+            }
         });
 
     }
@@ -197,9 +216,9 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
     private void insertData(String col,String weight, String col1, String volume, String fillwith) {
         smallVibarate();
         if(type.equalsIgnoreCase("delivery")){
-            deli_db.addBook(col,fillwith,volume,"yes");
+            deli_db.addBook(col,fillwith,volume,"C");
         }else if(type.equalsIgnoreCase("empty")){
-            empty_db.addBook(col,"yes");
+            empty_db.addBook(col,"C");
         }else if(type.equalsIgnoreCase("dura_delivery")){
             Intent intent = new Intent("dura_delivery");
             // You can also include some extra data.
@@ -208,7 +227,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
             finish();
 
         }else if(type.equalsIgnoreCase("full_receipt")){
-            full_receipt_db.addBook(col,fillwith,volume,"yes");
+            full_receipt_db.addBook(col,fillwith,volume,"C");
         }else if(type.equalsIgnoreCase("dura_empty")){
             duraEmptyHelper.addBook(col);
             finish();
@@ -221,27 +240,27 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
             finish();
 
         } else if(type.equalsIgnoreCase("inward")){
-            inward_db.addBook(col,"yes");
+            inward_db.addBook(col,"C");
         }else if(type.equalsIgnoreCase("outward")){
-            outward_db.addBook(col,fillwith,volume,"yes");
+            outward_db.addBook(col,fillwith,volume,"C");
         }else if(type.equalsIgnoreCase("closing_stock")) {
-            closingHelper.addBook(col,"yes");
+            closingHelper.addBook(col,"C");
         }else if(type.equalsIgnoreCase("godown_delivery")) {
             godownDeliveryHelper.addBook(col, fillwith, volume);
         }else if(type.equalsIgnoreCase("godown_empty")) {
-            godownEmptyHelper.addBook(col,"yes");
+            godownEmptyHelper.addBook(col,"C");
         }else if(type.equalsIgnoreCase("godown_fullreceipt")) {
-            godownFullReciptHelper.addBook(col,"yes");
+            godownFullReciptHelper.addBook(col,"C");
         }else if(type.equalsIgnoreCase("liquid_delivery")){
 
         }else if(type.equalsIgnoreCase("o2")){
-            o2db.addBook(col,dis,volume,"yes");
+            o2db.addBook(col,dis,volume,"C");
         }else if(type.equalsIgnoreCase("no2")){
-            no2_db.addBook(col,dis,volume,"yes");
+            no2_db.addBook(col,dis,volume,"C");
         }else if(type.equalsIgnoreCase("zero_air")){
-            zero_air_db.addBook(col,dis,volume,"yes");
+            zero_air_db.addBook(col,dis,volume,"C");
         }else if(type.equalsIgnoreCase("co2")){
-            co2_db.addBook(col,dis,volume,"yes");
+            co2_db.addBook(col,dis,volume,"C");
         } else if(type.equalsIgnoreCase("ammonia_delivery")){
             Intent intent = new Intent("ammonia_delivery");
             intent.putExtra("ammonia_no",col);
@@ -326,10 +345,16 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
 
     @Override
     public void onScanned(Barcode barcode) {
+
+        scanned(barcode.displayValue,false);
+
+    }
+
+    private void scanned(String displayValue,boolean val) {
         if(type.equalsIgnoreCase("barcode_register")){
             Intent intent = new Intent("barcode_register");
             // You can also include some extra data.
-            intent.putExtra("val",barcode.displayValue);
+            intent.putExtra("val",displayValue);
             LocalBroadcastManager.getInstance(NewScanner.this).sendBroadcast(intent);
             finish();
         }
@@ -339,8 +364,8 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
             } else {
                 while (cursor.moveToNext()) {
                     String col=cursor.getString(1);
-                    String col1 =cursor.getString(2);
-                    String weight =cursor.getString(3);
+                    String col1=cursor.getString(2);
+                    String weight=cursor.getString(3);
                     String volume=cursor.getString(4);
                     String Fillwith=cursor.getString(5);
                     String Serial_no=cursor.getString(6);
@@ -349,22 +374,26 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
                     String Status=cursor.getString(9);
                     String Location=cursor.getString(10);
 
-                    if(col1.contentEquals(barcode.displayValue))
+                    if(col1.contentEquals(displayValue))
                     {
                         status = false;
+                        editText.setText("");
+                        editText.requestFocus();
                         barcodeReader.playBeep();
                         vibarate();
-                        customDailog(col,col1,weight,volume,Fillwith,Serial_no,Hydrotest_date,Owner,Status,Location);
+                        customDailog(col,col1,weight,volume,Fillwith,Serial_no,Hydrotest_date,Owner,Status,Location,val);
                         break;
                     }
                 }
+                editText.setText("");
+                editText.requestFocus();
             }
 
         }
 
     }
 
-      @Override
+    @Override
     public void onScannedMultiple(List<Barcode> barcodes) {
 
     }
@@ -415,4 +444,58 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
         }
 
     }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event == null) {
+            return false;
+        }
+
+        int action = event.getAction();
+
+        try {
+            if (action == KeyEvent.ACTION_DOWN) {
+                Log.d("KEYDOWN", event.getKeyCode() + "");
+            } else if (action == KeyEvent.ACTION_UP) {
+                char pressedKey = (char) event.getUnicodeChar();
+                Log.d("pressedKey != 0", pressedKey + "");
+                if (pressedKey != 0) {
+                    if (pressedKey == ',' || pressedKey == 10) {
+                        Log.d("pressedKey != ','", "inputHolder " + this.inputHolder);
+                        // Perform action based on inputHolder value
+//                        registerID(this.inptHolder);
+                        // this.inputHolder = "";
+                    } else {
+                        this.inputHolder += pressedKey;
+                        Log.d("pressedKey", pressedKey + "");
+                    }
+                }
+                Log.d("KEYUP", event.getKeyCode() + "");
+            }
+
+            Log.d("load", editText.getText().toString() + "");
+
+            // Perform action based on EditText input
+            String text = editText.getText().toString();
+            if(type.equalsIgnoreCase("inward")){
+                if (!text.isEmpty()) {
+                    scanned(text, true);
+                }
+            }else if(type.equalsIgnoreCase("outward")){
+                if (!text.isEmpty()) {
+                    scanned(text, true);
+                }
+            }
+
+            // Delay the call to the `call()` method by 1000 milliseconds
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DispatchKeyEvent", "An exception occurred: " + e.getMessage());
+        }
+
+        Log.d("KEY", event.getKeyCode() + "");
+        return false;
+    }
+
 }

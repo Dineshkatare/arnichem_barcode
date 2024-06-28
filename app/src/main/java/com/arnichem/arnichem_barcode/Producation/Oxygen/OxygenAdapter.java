@@ -15,7 +15,15 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
+import com.arnichem.arnichem_barcode.Producation.Co2.Co2Helper;
+import com.arnichem.arnichem_barcode.Producation.Nitrogen.NitrogenHelper;
+import com.arnichem.arnichem_barcode.Producation.ZeroAir.ZeroAirHelper;
 import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.TransactionsView.Outward.MyDatabaseHelper;
+import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
+
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
@@ -23,7 +31,11 @@ public class OxygenAdapter extends RecyclerView.Adapter<OxygenAdapter.OxygenHold
     private Context context;
     private Activity activity;
     private ArrayList id, cyname,dist,vol;
-    OxygenAdapter(Activity activity, Context context, ArrayList id, ArrayList cyname,ArrayList dist, ArrayList vol
+    private String type;
+    private OnItemClickListener clickListener;
+
+
+    public OxygenAdapter(Activity activity, Context context, ArrayList id, ArrayList cyname, ArrayList dist, ArrayList vol,OnItemClickListener onItemClickListener,String type
     ){
         this.activity = activity;
         this.context = context;
@@ -31,6 +43,8 @@ public class OxygenAdapter extends RecyclerView.Adapter<OxygenAdapter.OxygenHold
         this.cyname = cyname;
         this.dist = dist;
         this.vol = vol;
+        this.clickListener = onItemClickListener;
+        this.type = type;
 
     }
 
@@ -57,11 +71,36 @@ public class OxygenAdapter extends RecyclerView.Adapter<OxygenAdapter.OxygenHold
             @Override
             public void onClick(View v) {
 
-                OxygenHelper myDB = new OxygenHelper(context.getApplicationContext());
-                myDB.deleteOneRow(String.valueOf(id.get(position)));
-                Intent intent = new Intent(context, OxygenFilling.class);
-                activity.startActivityForResult(intent, 1);
+                if (context instanceof OxygenFilling) {
+                    OxygenHelper myDB = new OxygenHelper(context.getApplicationContext());
+                    myDB.deleteOneRow(String.valueOf(id.get(position)));
+                    Intent intent = new Intent(context, OxygenFilling.class);
+                    activity.startActivityForResult(intent, 1);
 
+                } else if (context instanceof LaserScannerActivity) {
+                    if (type.equalsIgnoreCase("oxygen")) {
+                        OxygenHelper myDB = new OxygenHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(id.get(position)));
+                        clickListener.onItemClick(position);
+
+                    } else if (type.equalsIgnoreCase("no2")) {
+                        NitrogenHelper myDB = new NitrogenHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(id.get(position)));
+                        clickListener.onItemClick(position);
+
+                    } else if (type.equalsIgnoreCase("co2")) {
+                        Co2Helper myDB = new Co2Helper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(id.get(position)));
+                        clickListener.onItemClick(position);
+
+                    } else if (type.equalsIgnoreCase("air")) {
+                        ZeroAirHelper myDB = new ZeroAirHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(id.get(position)));
+                        clickListener.onItemClick(position);
+
+                    }
+
+                }
             }
         });
     }

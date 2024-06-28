@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,7 +34,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
+import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
@@ -44,6 +47,7 @@ import com.arnichem.arnichem_barcode.constant.constant;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.ItemCode;
 import com.arnichem.arnichem_barcode.view.LocationHandler;
+import com.arnichem.arnichem_barcode.view.VehicleHandler;
 import com.arnichem.arnichem_barcode.view.VolleySingleton;
 import com.arnichem.arnichem_barcode.view.fromloccodehandler;
 import com.arnichem.arnichem_barcode.view.syncHelper;
@@ -51,7 +55,9 @@ import com.example.easywaylocation.EasyWayLocation;
 import com.example.easywaylocation.GetLocationDetail;
 import com.example.easywaylocation.Listener;
 import com.example.easywaylocation.LocationData;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
 import org.json.JSONArray;
@@ -65,13 +71,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Main extends AppCompatActivity implements Listener, LocationData.AddressCallBack {
+public class Main extends AppCompatActivity implements Listener, LocationData.AddressCallBack, OnItemClickListener {
     static JSONObject object = null;
     public int poslocfixdel;
     GetLocationDetail getLocationDetail;
     ArrayList<String> cylIdList, cyclinderNameList, fillwith;
     RecyclerView recyclerView, Filled_with_Recycle_View;
-    FloatingActionButton add_button;
+   // FloatingActionButton add_button;
     ImageView empty_imageview;
     TextView no_data, vehiclevalue, usernamevalue, Totalscanvalue, date;
     MyDatabaseHelper myDB;
@@ -91,6 +97,19 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
     List<String> is_scan;
     syncHelper synchelper;
     private EasyWayLocation easyWayLocation;
+    Boolean isAllFabsVisible;
+
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+
+    public  int pos;
+    Spinner spinner;
+    ArrayAdapter<String> dataAdapterVehicle;
+
+    public String selected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +117,12 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
         setContentView(R.layout.activity_main);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Outward");
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
         getLocationDetail = new GetLocationDetail(this, this);
         easyWayLocation = new EasyWayLocation(this, false, true, this);
         cylinder = new ArrayList<String>();
@@ -111,6 +136,9 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
         vehiclevalue = findViewById(R.id.vno);
         usernamevalue = findViewById(R.id.usernametxtvalue);
         button = findViewById(R.id.OutwardMainPost);
+        spinner=findViewById(R.id.dynamic_spinner);
+        fetchDataVehicle();
+
         button.setEnabled(true);
         Totalscanvalue = findViewById(R.id.Totalscanvalue);
         pref = getSharedPreferences(constant.TAG, MODE_PRIVATE);
@@ -121,7 +149,7 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
         Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
-        add_button = findViewById(R.id.outwardscan);
+        //add_button = findViewById(R.id.add_fab);
         outprintbutton = findViewById(R.id.outwardprintbtn);
         outprintbutton.setVisibility(View.GONE);
         empty_imageview = findViewById(R.id.empty_imageview);
@@ -138,15 +166,8 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
                 startActivity(intent);
             }
         });
-        add_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                status = true;
-                Intent intent = new Intent(Main.this, NewScanner.class);
-                intent.putExtra("type", "outward");
-                startActivity(intent);
-            }
-        });
+//
+
         myDB = new MyDatabaseHelper(Main.this);
         fromloccodehandler = new fromloccodehandler(Main.this);
         cylIdList = new ArrayList<>();
@@ -158,7 +179,7 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
         storeDataInArrays();
         Totalscanvalue.setText(count);
         check();
-        customAdapter = new CustomAdapter(Main.this, this, cylIdList, cyclinderNameList, fillwith);
+        customAdapter = new CustomAdapter(Main.this, this, cylIdList, cyclinderNameList, fillwith,this,"outward");
         filledWithAdapter = new FilledWithAdapter(Main.this, this, name, tot);
         Filled_with_Recycle_View.setAdapter(filledWithAdapter);
         Filled_with_Recycle_View.setLayoutManager(new LinearLayoutManager(Main.this));
@@ -199,6 +220,100 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
 
             }
         });
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selected = dataAdapterVehicle.getItem(position);
+                pos=position;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+
+        });
+
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(Main.this, LaserScannerActivity.class);
+                        intent.putExtra("type", "outward");
+                        startActivity(intent);
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(Main.this, NewScanner.class);
+                        intent.putExtra("type", "outward");
+                        startActivity(intent);
+                    }
+                });
+
+
+
 
 
     }
@@ -240,6 +355,18 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
     public void locationData(LocationData locationData) {
         address = locationData.getFull_address();
     }
+    private void fetchDataVehicle() {
+        VehicleHandler db = new VehicleHandler(getApplicationContext());
+        List<String> labels = db.getAllLabels();
+        dataAdapterVehicle= new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        // Creating adapter for spinner
+        // Drop down layout style - list view with radio button
+        dataAdapterVehicle.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // attaching data adapter to spinner
+        spinner.setAdapter(dataAdapterVehicle);
+    }
+
+
 
     private void fetchData() {
         fromloccodehandler db = new fromloccodehandler(getApplicationContext());
@@ -269,6 +396,9 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
             button.setEnabled(true);
             MDToast.makeText(Main.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
+        } if(pos==0) {
+            dialog.dismiss();
+            MDToast.makeText(Main.this, "कृपया वाहन क्रमांक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
         } else {
             StringBuilder str = new StringBuilder();
             for (String eachstring : cylinder) {
@@ -296,7 +426,7 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
                                         Intent intent = new Intent(Main.this, OutwardPrint.class);
                                         intent.putExtra("durano", String.valueOf(cylinder));
                                         intent.putExtra("custname", to_warehouse);
-                                        intent.putExtra("empb", "1001");
+                                        intent.putExtra("empb", srno);
                                         intent.putExtra("count", count);
                                         intent.putExtra("cylinder", String.valueOf(cylinder));
                                         button.setEnabled(true);
@@ -331,11 +461,12 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
                     params.put("dura_code", String.valueOf(cylinder));
                     params.put("to_warehouse", to_warehouse);
                     params.put("transport_type", "ARNICHEM");
+                    params.put("is_scan",String.valueOf(is_scan));
                     params.put("to_code", to_code);
                     params.put("lati", latitude);
                     params.put("logi", logitude);
                     params.put("addr", address);
-                    params.put("transport_no", SharedPref.getInstance(Main.this).getVehicleNo());
+                    params.put("transport_no", selected);
                     params.put("driver", SharedPref.getInstance(Main.this).getID());
                     params.put("email", SharedPref.getInstance(Main.this).getEmail());
                     params.put("count", count);
@@ -372,7 +503,7 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
                         String col1 = cursor.getString(1);
                         if (col1.contentEquals(outwardcylindernumber.getText().toString())) {
                             name.add(Fillwith);
-                            myDB.addBook(outwardcylindernumber.getText().toString(), Fillwith, volume,"no");
+                            myDB.addBook(outwardcylindernumber.getText().toString(), Fillwith, volume,"N");
                             finish();
                             startActivity(getIntent());
                         }
@@ -456,6 +587,7 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(this, Transactions.class);
         startActivity(intent);
     }
@@ -475,4 +607,8 @@ public class Main extends AppCompatActivity implements Listener, LocationData.Ad
     }
 
 
+    @Override
+    public void onItemClick(int position) {
+
+    }
 }

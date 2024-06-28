@@ -73,6 +73,19 @@ public class Co2Helper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor readAllDataWithoutOrder(){
+        // Remove the ORDER BY clause
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+
     void updateData(String row_id, String title){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -99,7 +112,7 @@ public class Co2Helper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    void deleteOneRow(String row_id){
+    public void deleteOneRow(String row_id){
         SQLiteDatabase db = this.getWritableDatabase();
         long result = db.delete(TABLE_NAME, "_id=?", new String[]{row_id});
         if(result == -1){

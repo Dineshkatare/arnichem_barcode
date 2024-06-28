@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -57,7 +58,6 @@ public class ammoniaMain extends AppCompatActivity {
     int count=0;
     distnameadapter distna;
     boolean status = false;
-
     AutoCompleteTextView cylindernumber,cylindernumber1,cylinderfull,cylindervolume;
     Button print,submit,adddata;
     Spinner spinnerDistributor,spinnermanifold;
@@ -235,9 +235,9 @@ public class ammoniaMain extends AppCompatActivity {
                     }
                     else
                     {
-                        int fullcheck=Integer.parseInt(cylinderfull.getText().toString());
-                        int emptycheck=Integer.parseInt(cylindervolume.getText().toString());
-                        int res=fullcheck-emptycheck;
+                        Double fullcheck=Double.parseDouble(cylinderfull.getText().toString());
+                        Double emptycheck=Double.parseDouble(cylindervolume.getText().toString());
+                        Double res=fullcheck-emptycheck;
                         String finalres= String.valueOf(res);
                         oxygenHelper.addBook(cylindernumber1.getText().toString(), distributorname,manifoldval,finalres,cylinderfull.getText().toString(),cylindervolume.getText().toString());
                         finish();
@@ -334,6 +334,8 @@ oxygenHelper = new ammoniaHelper(this);
 
 
     }
+
+
 
 
 
@@ -581,6 +583,7 @@ oxygenHelper = new ammoniaHelper(this);
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         Intent intent = new Intent(this, Producation_Main.class);
         startActivity(intent);
     }

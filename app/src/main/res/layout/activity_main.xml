@@ -8,8 +8,8 @@
   <ScrollView
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:paddingRight="40dp"
-      android:paddingLeft="40dp"
+      android:paddingRight="20dp"
+      android:paddingLeft="20dp"
       android:scrollbars="none"
       >
   <LinearLayout
@@ -53,6 +53,25 @@
         android:textSize="16dp"
         android:textStyle="bold"
         android:gravity="center_horizontal" />
+    <TextView
+        android:id="@+id/vehicleno1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Select Vehicle No:/गाडी क्र निवडा"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16dp"
+        android:textStyle="bold"
+        android:gravity="center_horizontal" />
+    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+        android:id="@+id/dynamic_spinner"
+        android:layout_width="250dp"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:background="@drawable/editbox"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/vehicleno"
@@ -62,6 +81,7 @@
         android:text="Vehicle NO:"
         android:textAlignment="center"
         android:textColor="@color/black"
+        android:visibility="gone"
         android:textSize="16dp"
         android:textStyle="bold"
         android:gravity="center_horizontal" />
@@ -69,6 +89,7 @@
         android:id="@+id/vno"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_marginTop="10dp"
         android:text=""
         android:textAlignment="center"
@@ -142,6 +163,7 @@
           android:id="@+id/recyclerView"
           android:paddingTop="20dp"
           android:layout_width="409dp"
+          app:reverseLayout="true"
           android:layout_height="match_parent"
           android:nestedScrollingEnabled="false"
           android:layout_gravity="center_horizontal"
@@ -241,16 +263,56 @@
 
 
   </ScrollView>
+<!--  <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--      android:id="@+id/outwardscan"-->
+<!--      android:layout_width="wrap_content"-->
+<!--      android:layout_height="wrap_content"-->
+<!--      android:layout_alignParentBottom="true"-->
+<!--      android:layout_alignParentRight="true"-->
+<!--      android:layout_marginRight="30dp"-->
+<!--      android:layout_marginBottom="28dp"-->
+<!--      android:clickable="true"-->
+<!--      android:focusable="true"-->
+<!--      app:srcCompat="@drawable/barcode" />-->
+
   <com.google.android.material.floatingactionbutton.FloatingActionButton
-      android:id="@+id/outwardscan"
+      android:id="@+id/camera_scan"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_alignParentBottom="true"
       android:layout_alignParentRight="true"
-      android:layout_marginRight="30dp"
+      android:layout_marginRight="20dp"
       android:layout_marginBottom="28dp"
       android:clickable="true"
       android:focusable="true"
+      android:layout_above="@+id/barcode_scan"
+      app:srcCompat="@drawable/ic_photo_camera_black_24dp" />
+
+  <com.google.android.material.floatingactionbutton.FloatingActionButton
+      android:id="@+id/barcode_scan"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignParentRight="true"
+      android:layout_marginRight="20dp"
+      android:layout_marginBottom="28dp"
+      android:clickable="true"
+      android:focusable="true"
+      android:layout_above="@+id/add_fab"
       app:srcCompat="@drawable/barcode" />
+
+
+  <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+      android:id="@+id/add_fab"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="end"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentBottom="true"
+      android:layout_marginEnd="16dp"
+      android:layout_marginBottom="16dp"
+      android:backgroundTint="@color/scanner_line"
+      app:icon="@drawable/baseline_add_24"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+
 
 </RelativeLayout>
