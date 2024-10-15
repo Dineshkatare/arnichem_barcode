@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:focusable="true"
         android:layout_height="20dp"
+        android:textColor="@android:color/transparent"
         android:background="@null"/>
     <ImageView
         android:id="@+id/flash"

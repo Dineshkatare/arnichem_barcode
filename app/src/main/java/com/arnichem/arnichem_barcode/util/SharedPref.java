@@ -14,6 +14,8 @@ public class SharedPref {
     //Username
     public static final String from_loc = "from_loc";
     public static final String cutomer_sel = "cutomer_sel";
+    public static final String report_status = "report_status";
+
     public static final String item_Sel = "item_Sel";
 
     public static final String distshare = "dist";
@@ -48,6 +50,7 @@ public class SharedPref {
     public static final String before_tank_pressure = "before_tank_pressure";
     public static final String before_tank_liquid_liter = "before_tank_liquid_liter";
 
+    public static final String fill_gap_pressure = "fill_gap_pressure";
 
     public static final String PRINT_UPI = "PRINT_UPI";
     public static final String double_entry = "double_entry";
@@ -175,6 +178,18 @@ public class SharedPref {
     public String getcustomersel() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(cutomer_sel, "0");
+
+    }
+
+    public void store_report_status(String email) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(report_status, email);
+        editor.commit();
+    }
+    public String get_report_status() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(report_status, "0");
 
     }
 
@@ -578,6 +593,16 @@ public class SharedPref {
     }
 
 
+    public void setFillGapPressure(String sta) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(fill_gap_pressure, sta);
+        editor.commit();
+    }
+    public String getFillGapPressure() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(fill_gap_pressure, "");
+    }
 
 }
 

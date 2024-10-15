@@ -2,12 +2,16 @@ package com.arnichem.arnichem_barcode.TransactionsView.Outward;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -15,8 +19,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,6 +36,7 @@ import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.FilledWithAdap
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncBluetoothEscPosPrint;
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncEscPosPrinter;
 import com.arnichem.arnichem_barcode.finalprint.finalprint;
+import com.arnichem.arnichem_barcode.util.BluetoothPrinterUtil;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.dantsu.escposprinter.connection.DeviceConnection;
 import com.dantsu.escposprinter.connection.bluetooth.BluetoothConnection;
@@ -40,6 +47,8 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class OutwardPrint extends AppCompatActivity {
     public static final int PERMISSION_BLUETOOTH = 1;
@@ -56,9 +65,10 @@ public class OutwardPrint extends AppCompatActivity {
     RecyclerView Filled_with_Recycle_View, cyclinderNames;
     CylinderNamePrintAdapter cylinderNamePrintAdapter;
     private BluetoothConnection selectedDevice;
-    Bitmap printLogoDr,phoneNumberDr;
-    ImageView printImg,phoneImg;
-    TextView arnichemsignTxt,termsTxt;
+    Bitmap printLogoDr, phoneNumberDr;
+    ImageView printImg, phoneImg;
+    TextView arnichemsignTxt, termsTxt;
+    private BluetoothPrinterUtil bluetoothPrinterUtil;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -67,10 +77,11 @@ public class OutwardPrint extends AppCompatActivity {
         setContentView(R.layout.activity_outward_print);
         empbid = findViewById(R.id.empbid);
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        bluetoothPrinterUtil = new BluetoothPrinterUtil();
         dateid = findViewById(R.id.dateid);
         addClymyDB = new MyDatabaseHelper(OutwardPrint.this);
         custnameid = findViewById(R.id.custnameid);
-   //     cylindernumberempty = findViewById(R.id.cylindernumberempty);
+        //     cylindernumberempty = findViewById(R.id.cylindernumberempty);
         arnichemdignprint = findViewById(R.id.arnichemdignprint);
         vehicleno = findViewById(R.id.vehicleno);
         Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
@@ -100,7 +111,7 @@ public class OutwardPrint extends AppCompatActivity {
         custnameid.setText(custname);
         counttxt.setText(count);
         String joined = TextUtils.join(",", newlist);
- //       cylindernumberempty.setText(joined);
+        //       cylindernumberempty.setText(joined);
         dateid.setText(DateFormat.getDateTimeInstance().format(new Date()));
         vehicleno.setText(SharedPref.getInstance(this).getVehicleNo());
         filledWithAdapter = new FilledWithAdapter(OutwardPrint.this, this, name, tot);
@@ -118,41 +129,120 @@ public class OutwardPrint extends AppCompatActivity {
             }
         });
         String print_logo = SharedPref.mInstance.getPrintLogo();
-        File imgFile = new  File(print_logo);
-        if(imgFile.exists()){
+        File imgFile = new File(print_logo);
+        if (imgFile.exists()) {
             printLogoDr = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
             printImg.setImageBitmap(printLogoDr);
         }
 
         String phoneNumber = SharedPref.mInstance.getPhoneNumber();
-        File imgFilePhoneNumber = new  File(phoneNumber);
-        if(imgFile.exists()){
+        File imgFilePhoneNumber = new File(phoneNumber);
+        if (imgFile.exists()) {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For "+SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText("For " + SharedPref.mInstance.getCompanyFullName());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
-
+       // selectBluetoothDevice();
 
     }
 
+//  2222222222222222222222222222222
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            switch (requestCode) {
-                case finalprint.PERMISSION_BLUETOOTH:
-                    this.printBluetooth();
+
+        if (requestCode == finalprint.PERMISSION_BLUETOOTH) {
+            boolean allPermissionsGranted = true;
+
+            // Check if all requested permissions were granted
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false;
                     break;
+                }
+            }
+
+            if (allPermissionsGranted) {
+                // Permissions granted, proceed with Bluetooth printing
+                new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+            } else {
+                // Permissions denied, handle the case (show a message, etc.)
+                Toast.makeText(this, "Bluetooth permissions denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+
     public void printBluetooth() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
+        if (selectedDevice == null) {
+            selectBluetoothDevice();
+            
+            return;
+        }
+
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    // Android 12 (API 31) and above
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                finalprint.PERMISSION_BLUETOOTH);
+    } else {
+        new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+    }
+} else {
+    // Below Android 12
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
+    } else {
+        new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+    }
+}
+
+    }
+
+
+
+    public void selectBluetoothDevice() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) and above
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 1);
+                return;
+            }
+        }
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Toast.makeText(this, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            final List<BluetoothDevice> deviceList = new ArrayList<>(pairedDevices);
+            final CharSequence[] deviceNames = new CharSequence[deviceList.size()];
+
+            for (int i = 0; i < deviceList.size(); i++) {
+                deviceNames[i] = deviceList.get(i).getName();
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Select a Bluetooth Device");
+            builder.setItems(deviceNames, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    BluetoothDevice device = deviceList.get(which);
+                    selectedDevice = new BluetoothConnection(device);
+
+                    printBluetooth();
+                    // Toast.makeText(getApplicationContext(), "Selected Device: " + device.getName(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.show();
         } else {
-            new AsyncBluetoothEscPosPrint(this).execute(this.getAsyncEscPosPrinter(selectedDevice));
+            Toast.makeText(this, "No paired Bluetooth devices found", Toast.LENGTH_SHORT).show();
         }
     }
 

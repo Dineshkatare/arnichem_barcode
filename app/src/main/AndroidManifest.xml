@@ -12,6 +12,9 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -26,15 +29,25 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <uses-feature android:name="android.hardware.camera.autofocus" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
 
     <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- Android 12 and above -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:required="false" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADVERTISE"
+        android:required="false" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        android:required="false" />
 
     <permission
         android:name="com.example.permission.MAPS_RECEIVE"
@@ -47,6 +60,9 @@
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
     </queries>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".util.MyApplication"
@@ -62,6 +78,24 @@
         android:theme="@style/Theme.Arnichem"
         android:usesCleartextTraffic="true"
         tools:node="merge">
+        <activity
+            android:name=".leave.LeaveApplyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionsView.DryIce.ViewDryIcePrintActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PrintReceipt.DuraEmptyPrint.ViewDuraEmptyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PrintReceipt.DuraDeliveyPrint.ViewDuraDeliveryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".report.ReportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CallLogs"
+            android:exported="false" />
         <activity
             android:name=".Barcode.ProductionLaserScannerActivity"
             android:exported="false" />
@@ -550,7 +584,6 @@
             android:name=".Barcode.registration"
             android:parentActivityName=".view.Dashboard"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".TransactionsView.InWard.InWardMain"
             android:parentActivityName=".TransactionsView.Transactions"
@@ -587,16 +620,16 @@
             android:name=".TransactionsView.Transactions"
             android:parentActivityName=".view.Dashboard"
             android:screenOrientation="fullSensor" />
+        <activity
+            android:name=".leave.LeaveApplicationActivity"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="fullSensor" />
+
         <activity android:name=".view.Dashboard" />
         <activity
             android:name=".view.SplashScreen"
             android:exported="true"
             android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -619,7 +652,7 @@
         <activity
             android:name=".view.LoginActivity"
             android:exported="true"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
@@ -647,6 +680,33 @@
         <receiver
             android:name=".view.AlarmReceiver"
             android:exported="true" />
+        <receiver
+            android:name="androidx.work.impl.background.systemalarm.RescheduleReceiver"
+            android:enabled="true"
+            android:exported="false"
+            tools:replace="android:enabled">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+<!--        <service-->
+<!--            android:name=".CallLogSyncService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false" />-->
+
+<!--        <receiver-->
+<!--            android:name=".CallLogSyncReceiver"-->
+<!--            android:exported="false" /> &lt;!&ndash; Handle alarms after device boot &ndash;&gt;-->
+        <receiver
+            android:name=".BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -123,5 +123,7 @@ dependencies {
     implementation 'com.github.yalantis:ucrop:2.2.8'
     implementation files('libs/barcode.aar')
 
+    implementation 'com.github.wickerlabs:CallLogs:1.09@aar'
+    implementation "androidx.work:work-runtime:2.7.1"
 
 }

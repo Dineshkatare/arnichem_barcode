@@ -9,6 +9,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,13 +19,16 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.TransactionsView.Outward.OutwardPrint;
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncBluetoothEscPosPrint;
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncEscPosPrinter;
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncTcpEscPosPrint;
@@ -42,7 +47,10 @@ import com.dantsu.escposprinter.exceptions.EscPosParserException;
 import com.dantsu.escposprinter.textparser.PrinterTextParserImg;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class finalprint extends AppCompatActivity {
 
@@ -91,11 +99,22 @@ public class finalprint extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            switch (requestCode) {
-                case finalprint.PERMISSION_BLUETOOTH:
-                    this.printBluetooth();
-                    break;
+        if (requestCode == finalprint.PERMISSION_BLUETOOTH) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted for Bluetooth, continue with the Bluetooth operation
+                new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+            } else {
+                // Permission denied, inform the user
+                Toast.makeText(this, "Bluetooth permission denied. Cannot print.", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == 1) {
+            // This handles the Bluetooth device selection permission for Android 12 and above
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed to select Bluetooth device
+                selectBluetoothDevice();
+            } else {
+                // Permission denied, inform the user
+                Toast.makeText(this, "Bluetooth connect permission denied.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -110,6 +129,16 @@ public class finalprint extends AppCompatActivity {
             items[0] = "Default printer";
             int i = 0;
             for (BluetoothConnection device : bluetoothDevicesList) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                }
                 items[++i] = device.getDevice().getName();
             }
 
@@ -136,13 +165,35 @@ public class finalprint extends AppCompatActivity {
         }
     }
 
-    public void printBluetooth() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
-        } else {
-            new AsyncBluetoothEscPosPrint(this).execute(this.getAsyncEscPosPrinter(selectedDevice));
+        public void printBluetooth() {
+        if (selectedDevice == null) {
+            selectBluetoothDevice();
+            
+            return;
         }
+
+       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    // Android 12 (API 31) and above
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                finalprint.PERMISSION_BLUETOOTH);
+    } else {
+        new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
     }
+} else {
+    // Below Android 12
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
+    } else {
+        new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+    }
+}
+
+    }
+
 
     /*==============================================================================================
     ===========================================USB PART=============================================
@@ -180,7 +231,7 @@ public class finalprint extends AppCompatActivity {
             return;
         }
 
-        PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(finalprint.ACTION_USB_PERMISSION), 0);
+        PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(finalprint.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
         IntentFilter filter = new IntentFilter(finalprint.ACTION_USB_PERMISSION);
         registerReceiver(this.usbReceiver, filter);
         usbManager.requestPermission(usbConnection.getDevice(), permissionIntent);
@@ -318,4 +369,46 @@ public class finalprint extends AppCompatActivity {
                         "[C]<qrcode size='20'>http://www.developpeur-web.dantsu.com/</qrcode>\n"
         );
     }
+
+    public void selectBluetoothDevice() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) and above
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 1);
+                return;
+            }
+        }
+
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Toast.makeText(this, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            final List<BluetoothDevice> deviceList = new ArrayList<>(pairedDevices);
+            final CharSequence[] deviceNames = new CharSequence[deviceList.size()];
+
+            for (int i = 0; i < deviceList.size(); i++) {
+                deviceNames[i] = deviceList.get(i).getName();
+            }
+
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+            builder.setTitle("Select a Bluetooth Device");
+            builder.setItems(deviceNames, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    BluetoothDevice device = deviceList.get(which);
+                    selectedDevice = new BluetoothConnection(device);
+
+                    printBluetooth();
+                    // Toast.makeText(getApplicationContext(), "Selected Device: " + device.getName(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.show();
+        } else {
+            Toast.makeText(this, "No paired Bluetooth devices found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }

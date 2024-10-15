@@ -66,6 +66,7 @@ public class Test extends AppCompatActivity {
         dialog = new ProgressDialog(Test.this);
         dialog.setTitle("Loading Data");
         dialog.setMessage("Please wait....");
+        dialog.setCancelable(false);
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         apiInterface = APIClient.getClient().create(APIInterface.class);

@@ -1,6 +1,7 @@
 package com.arnichem.arnichem_barcode.PrintReceipt.DeliveryPrint;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -9,6 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,6 +20,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.TextUtils;
@@ -35,13 +40,16 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.arnichem.arnichem_barcode.PaymentReceipt.GasTypeResponse;
 import com.arnichem.arnichem_barcode.PrintReceipt.EmptyPrint.ViewEmptyPrint;
 import com.arnichem.arnichem_barcode.PrintReceipt.MainAdapter;
 import com.arnichem.arnichem_barcode.PrintReceipt.MainPrintActivity;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.Reset.APIInterface;
 import com.arnichem.arnichem_barcode.TransactionsView.Transactions;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
+import com.arnichem.arnichem_barcode.data.response.FetchItemAndQuantityVolume;
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncBluetoothEscPosPrint;
 import com.arnichem.arnichem_barcode.finalprint.aysnc.AsyncEscPosPrinter;
 import com.arnichem.arnichem_barcode.finalprint.finalprint;
@@ -69,15 +77,26 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
+
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 
 public class ViewDeliveryPrint extends AppCompatActivity {
     public static final int PERMISSION_BLUETOOTH = 1;
     static JSONObject object = null;
     Button duradelprint;
-    String pos,custname,dcno,type,custcode,username,totalQuan,delidate,strVehicleNo;
+    APIInterface apiInterface;
+    private List<String> gasTypes = new ArrayList<>();
+
+    String pos,custname,dcno,type,custcode,username,totalQuan,delidate,strVehicleNo,itemName="",quantity_vol="";
     TextView empbid,dateid,custnameid,cylindernumberempty,vehicleno,arnichemdignprint,counttxt,tvcode;
     ArrayList<String> newlist;
     ProgressDialog dialog;
@@ -85,7 +104,9 @@ public class ViewDeliveryPrint extends AppCompatActivity {
     private BluetoothConnection selectedDevice;
     Bitmap printLogoDr,phoneNumberDr,digital_sign;
     ImageView printImg,phoneImg,signedImg;
-    TextView arnichemsignTxt,termsTxt;
+    TextView arnichemsignTxt,termsTxt,cylinder_number_txt,total_quantity_txt;
+
+    boolean isOxygen = true;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -93,6 +114,8 @@ public class ViewDeliveryPrint extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_delivery_print);
         empbid=findViewById(R.id.cdcnoid);
+        cylinder_number_txt= findViewById(R.id.cylinder_number_txt);
+        total_quantity_txt= findViewById(R.id.total_quantity_txt);
         dateid=findViewById(R.id.cddateid);
         signedImg = findViewById(R.id.custnamesign);
         newlist=new ArrayList<>();
@@ -109,14 +132,15 @@ public class ViewDeliveryPrint extends AppCompatActivity {
         arnichemsignTxt = findViewById(R.id.arnichemsignTxt);
         termsTxt = findViewById(R.id.termsTxt);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        apiInterface = APIClient.getClient().create(APIInterface.class);
 
         StrictMode.setThreadPolicy(policy);
         Intent i=getIntent();
         dcno = i.getStringExtra("no");
         type = i.getStringExtra("type");
         empbid.setText(dcno);
-        postrequ();
-
+      //  postrequ();
+        fetchGasTypes();
         duradelprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,55 +176,134 @@ public class ViewDeliveryPrint extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+           if (requestCode == finalprint.PERMISSION_BLUETOOTH) {
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            switch (requestCode) {
-                case finalprint.PERMISSION_BLUETOOTH:
-                    this.printBluetooth();
-                    break;
-            }
+            // Permission granted for Bluetooth, continue with the Bluetooth operation
+            new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+        } else {
+            // Permission denied, inform the user
+            Toast.makeText(this, "Bluetooth permission denied. Cannot print.", Toast.LENGTH_SHORT).show();
         }
+    } else if (requestCode == 1) {
+        // This handles the Bluetooth device selection permission for Android 12 and above
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Permission granted, proceed to select Bluetooth device
+            selectBluetoothDevice();
+        } else {
+            // Permission denied, inform the user
+            Toast.makeText(this, "Bluetooth connect permission denied.", Toast.LENGTH_SHORT).show();
+        }
+    }
     }
 
     public void printBluetooth() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
-        } else {
-            new AsyncBluetoothEscPosPrint(this).execute(this.getAsyncEscPosPrinter(selectedDevice));
-            secondPrint();
+        if (selectedDevice == null) {
+            selectBluetoothDevice();
+            
+            return;
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12 (API 31) and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                        finalprint.PERMISSION_BLUETOOTH);
+            } else {
+                new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+              //  secondPrint();
+            }
+        } else {
+            // Below Android 12
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
+            } else {
+                new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+              //  secondPrint();
+            }
+        }
+
     }
+
     public void secondPrint() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
-        } else {
-            new AsyncBluetoothEscPosPrint(this).execute(this.getAsyncEscPosPrinter(selectedDevice));
+        if (selectedDevice == null) {
+            selectBluetoothDevice();
+            
+            return;
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12 (API 31) and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT},
+                        finalprint.PERMISSION_BLUETOOTH);
+            } else {
+                new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+            }
+        } else {
+            // Below Android 12
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
+            } else {
+                new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
+            }
+        }
+
     }
-
-
     @SuppressLint("SimpleDateFormat")
     public AsyncEscPosPrinter getAsyncEscPosPrinter(DeviceConnection printerConnection) {
         AsyncEscPosPrinter printer = new AsyncEscPosPrinter(printerConnection, 203, 48f, 5);
-        return printer.setTextToPrint(
-                "[R]Delivery challan  [R]\n" +
-                        "[C]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,phoneNumberDr)+"</img>\n" +
-                        "[C]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,printLogoDr)+"</img>\n\n" +
-                        "[C]<font size='small'>DCNO -  "+dcno+"</font>\n" +
-                        "[C]<font size='small'>Date -  "+delidate+"</font>\n" +
-                        "[C]<font size='small'>Code -  "+custcode+"</font>\n" +
-                        "[C]<font size='small'>Name -  "+custname+"</font>\n" +
-                        "[C]<font size='small'>       Cylinder Details </font>\n" +
-                        "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
-                        "[C]<font size='small'><b>            "+foreaching()+"</b></font>\n" +
-                        "[C]<font size='small'>Total Quantity : "+totalQuan+"</font>\n" +
-                        "[C]<font size='small'>Vehicle No    :  "+ strVehicleNo+"</font>\n" +
-                        "[C]<font size='small'>Invoice No    :  "+"  "+"</font>\n\n\n" +
-                        "[L]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,digital_sign)+"</img>\n" +
-                        "[R]               [R]"+username+"\n" +
-                        "[R]Customer Sign [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
-                        "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
-        );
+
+        // Check if isOxygen is true or false and set the text to print accordingly
+        if (isOxygen) {
+            // Set text to print for oxygen case
+            return printer.setTextToPrint(
+                    "[R]Delivery challan  [R]\n" +
+                            "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, phoneNumberDr) + "</img>\n" +
+                            "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, printLogoDr) + "</img>\n\n" +
+                            "[C]<font size='small'>DCNO -  " + dcno + "</font>\n" +
+                            "[C]<font size='small'>Date -  " + delidate + "</font>\n" +
+                            "[C]<font size='small'>Code -  " + custcode + "</font>\n" +
+                            "[C]<font size='small'>Name -  " + custname + "</font>\n" +
+                            "[C]<font size='small'>       Cylinder Details </font>\n" +
+                            "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
+                            "[C]<font size='small'><b>            " + foreaching() + "</b></font>\n" +
+                            "[C]<font size='small'>Total Quantity : " + totalQuan + "</font>\n" +
+                            "[C]<font size='small'>Vehicle No    :  " + strVehicleNo + "</font>\n" +
+                            "[C]<font size='small'>Invoice No    :  " + "  " + "</font>\n\n\n" +
+                            "[L]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, digital_sign) + "</img>\n" +
+                            "[R]               [R]" + username + "\n" +
+                            "[R]Customer Sign [R]" + "For " + SharedPref.getInstance(this).getCompanyFullName() + "\n\n" +
+                            "[R]" + SharedPref.getInstance(this).getTermsText() + "\n"
+            );
+        } else {
+            // Set text to print for non-oxygen case
+            return printer.setTextToPrint(
+                    "[R]Delivery challan  [R]\n" +
+                            "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, phoneNumberDr) + "</img>\n" +
+                            "[C]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, printLogoDr) + "</img>\n\n" +
+                            "[C]<font size='small'>DCNO -  " + dcno + "</font>\n" +
+                            "[C]<font size='small'>Date -  " + delidate + "</font>\n" +
+                            "[C]<font size='small'>Code -  " + custcode + "</font>\n" +
+                            "[C]<font size='small'>Name -  " + custname + "</font>\n" +
+                            "[C]<font size='small'>       Cylinder Details </font>\n" +
+                            "[C]<font size='small'>Item            : " + itemName + "</font>\n" +
+                            "[C]<font size='small'>Quantity Volume : " + quantity_vol + "</font>\n" +
+                            "[C]<font size='small'>Vehicle No    :  " + strVehicleNo + "</font>\n" +
+                            "[C]<font size='small'>Invoice No    :  " + "  " + "</font>\n\n\n" +
+                            "[L]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, digital_sign) + "</img>\n" +
+                            "[R]               [R]" + username + "\n" +
+                            "[R]Customer Sign [R]" + "For " + SharedPref.getInstance(this).getCompanyFullName() + "\n\n" +
+                            "[R]" + SharedPref.getInstance(this).getTermsText() + "\n"
+            );
+        }
     }
+
     public Serializable foreaching() {
         StringBuffer text = new StringBuffer();
 
@@ -220,7 +323,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
 
 
         dialog = new ProgressDialog(ViewDeliveryPrint.this);
-        dialog.setTitle("Data Inserting");
+        dialog.setTitle("Data Fetching");
         dialog.setMessage("Please wait....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
@@ -250,16 +353,21 @@ public class ViewDeliveryPrint extends AppCompatActivity {
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            String joined = TextUtils.join(",", newlist);
+
+                            if(isOxygen) {
+                                String joined = TextUtils.join(",", newlist);
                                 cylindernumberempty.setText(joined);
+                            }
                                 dialog.dismiss();
 
-
                             }
+                        if(isOxygen) {
+
                             String joined = TextUtils.join(",", newlist);
-                            totalQuan = String.valueOf(newlist.size());
+                              totalQuan = String.valueOf(newlist.size());
                             cylindernumberempty.setText(joined);
                             counttxt.setText(totalQuan);
+                        }
 
                     }
                 },
@@ -357,6 +465,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
 
 
 
+
         StringRequest stringRequest2 = new StringRequest(Request.Method.POST, APIClient.fetch_sign,
                 new Response.Listener<String>() {
                     @SuppressLint("WrongConstant")
@@ -380,7 +489,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
 
                             try {
                                 setImage(object.getString("path"));
-                                Toast.makeText(ViewDeliveryPrint.this, ""+object.getString("path"), Toast.LENGTH_SHORT).show();
+                             //   Toast.makeText(ViewDeliveryPrint.this, ""+object.getString("path"), Toast.LENGTH_SHORT).show();
 
                             } catch (JSONException e) {
                                 dialog.dismiss();
@@ -418,8 +527,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
 
     private void setImage(String path) {
 
-        String base_url =  SharedPref.getInstance(ViewDeliveryPrint.this).getBaseUrl();
-
+        String base_url =  "/public_html/arnichem.co.in/intranet";
         String new_base_url = base_url.replace("/public_html/","");// this will contain "Fruit"
 
 
@@ -427,7 +535,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
         logoUrl.append("/barcode/APP/images/digital_sign/").append(path);
 
         String finalLogoUrl = logoUrl.toString();
-        Toast.makeText(this, ""+finalLogoUrl, Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(this, ""+finalLogoUrl, Toast.LENGTH_SHORT).show();
         digital_sign = Util.getBitmapFromURL(finalLogoUrl);
         if(digital_sign!=null){
             digital_sign = Bitmap.createScaledBitmap(digital_sign,200, 200, true);
@@ -541,7 +649,150 @@ public class ViewDeliveryPrint extends AppCompatActivity {
         VolleySingleton.getInstance(ViewDeliveryPrint.this).addToRequestQueue(stringRequest1);
     }
 
+    public void selectBluetoothDevice() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) and above
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 1);
+                return;
+            }
+        }
 
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Toast.makeText(this, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices.size() > 0) {
+            final List<BluetoothDevice> deviceList = new ArrayList<>(pairedDevices);
+            final CharSequence[] deviceNames = new CharSequence[deviceList.size()];
+
+            for (int i = 0; i < deviceList.size(); i++) {
+                deviceNames[i] = deviceList.get(i).getName();
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Select a Bluetooth Device");
+            builder.setItems(deviceNames, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    BluetoothDevice device = deviceList.get(which);
+                    selectedDevice = new BluetoothConnection(device);
+
+                    printBluetooth();
+                    // Toast.makeText(getApplicationContext(), "Selected Device: " + device.getName(), Toast.LENGTH_SHORT).show();
+                }
+            });
+            builder.show();
+        } else {
+            Toast.makeText(this, "No paired Bluetooth devices found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void fetchDeliveryItems(String dcno) {
+        // Replace with your actual values
+        String dbHost = SharedPref.mInstance.getDBHost();
+        String dbUsername = SharedPref.mInstance.getDBUsername();
+        String dbPassword = SharedPref.mInstance.getDBPassword();
+        String dbName = SharedPref.mInstance.getDBName();
+
+        Call<FetchItemAndQuantityVolume> call = apiInterface.getDeliveryItems(dbHost, dbUsername, dbPassword, dbName, dcno);
+        call.enqueue(new Callback<FetchItemAndQuantityVolume>() {
+
+            @Override
+            public void onResponse(Call<FetchItemAndQuantityVolume> call, retrofit2.Response<FetchItemAndQuantityVolume> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    FetchItemAndQuantityVolume apiResponse = response.body();
+
+                    // Handle the response data
+                    if (apiResponse.getItems().isEmpty()) {
+                        Log.d("API", "No items found for this dcno");
+                    } else {
+                        boolean isQuantity = false;
+
+                        for (FetchItemAndQuantityVolume.Item item : apiResponse.getItems()) {
+                            Log.d("API", "Item: " + item.getItem() + ", Quantity Volume: " + item.getQuantity_volume());
+                            if(quantity_vol.isEmpty()) {
+                                quantity_vol = String.valueOf(item.getQuantity_volume());
+                            }
+
+                            if(itemName.isEmpty()) {
+                                itemName = item.getItem();
+                            }
+                            if (gasTypes.contains(item.getItem())) {
+                                isQuantity = true;
+                            }
+
+                        }
+
+                        // Log the result
+                        if (!isQuantity) {
+                            isOxygen = true;
+                            cylinder_number_txt.setText("Cylinder No      :");
+                            total_quantity_txt.setText("Total Quantity  :");
+                            postrequ();
+                            Log.d("API", "MEDOX7 is present in the response");
+                        }else {
+                            postrequ();
+                            isOxygen = false;
+                            cylinder_number_txt.setText("Item          :");
+                            total_quantity_txt.setText("Quantity Volume :");
+                            Log.d("API", "not isIndox7Present");
+                            counttxt.setText(quantity_vol);
+                            cylindernumberempty.setText(itemName);
+
+                        }
+                    }
+                } else {
+                    Log.d("API", "Failed to fetch data");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FetchItemAndQuantityVolume> call, Throwable t) {
+                // Handle failure
+                Toast.makeText(ViewDeliveryPrint.this, "API Request Failed", Toast.LENGTH_SHORT).show();
+                Log.e("API", t.getMessage(), t);
+            }
+        });
+    }
+
+
+    private void fetchGasTypes() {
+
+        dialog = new ProgressDialog(ViewDeliveryPrint.this);
+        dialog.setTitle("Data Fetching");
+        dialog.setMessage("Please wait....");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.show();
+
+
+        Call<GasTypeResponse> call = apiInterface.fetchGasTypes(SharedPref.mInstance.getDBHost(), SharedPref.mInstance.getDBUsername(), SharedPref.mInstance.getDBPassword(), SharedPref.mInstance.getDBName());
+        call.enqueue(new Callback<GasTypeResponse>() {
+
+            @Override
+            public void onResponse(Call<GasTypeResponse> call, retrofit2.Response<GasTypeResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    gasTypes.clear();
+                    gasTypes.addAll(response.body().getData().getGasTypes());
+                    fetchDeliveryItems(dcno);
+
+                    //  response.body().getData().getGasTypes()
+                } else {
+                    Toast.makeText(ViewDeliveryPrint.this, "Error: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+                dialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GasTypeResponse> call, @NonNull Throwable t) {
+                Toast.makeText(ViewDeliveryPrint.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
+            }
+        });
+    }
 
 
 }

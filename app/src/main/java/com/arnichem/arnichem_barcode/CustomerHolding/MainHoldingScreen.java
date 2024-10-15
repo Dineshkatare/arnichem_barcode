@@ -99,4 +99,10 @@ public class MainHoldingScreen extends AppCompatActivity {
             customerspinnerdelivery.setSelection(poscustfixdel);
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
 }

@@ -4,7 +4,11 @@ package com.arnichem.arnichem_barcode.Reset;
 import com.arnichem.arnichem_barcode.FileUpload.ApiResponse;
 import com.arnichem.arnichem_barcode.FileUpload.FileUploadData;
 import com.arnichem.arnichem_barcode.GetData.GetDataResponse;
+import com.arnichem.arnichem_barcode.PaymentReceipt.GasTypeResponse;
 import com.arnichem.arnichem_barcode.attendance.MyResponseModel;
+import com.arnichem.arnichem_barcode.data.response.FetchItemAndQuantityVolume;
+import com.arnichem.arnichem_barcode.data.response.ReportResponse;
+import com.arnichem.arnichem_barcode.leave.LeaveResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -182,6 +186,67 @@ public interface APIInterface {
             @Part("username") RequestBody username,
             @Part MultipartBody.Part file
     );
+
+
+
+    @FormUrlEncoded
+    @POST("fetch_report.php")
+    Call<ReportResponse> postReport(
+            @Field("user") String user,
+            @Field("company") String company,
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName
+    );
+
+    @FormUrlEncoded
+    @POST("fetch_delivery_item_quantity_volume.php") // Replace with your actual API URL
+    Call<FetchItemAndQuantityVolume> getDeliveryItems(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("dcno") String dcno
+
+    );
+
+    @FormUrlEncoded
+    @POST("upload_call_logs.php")
+    Call<ApiResponse> uploadCallLogs(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("call_logs") String callLogsJson
+    );
+
+
+    @FormUrlEncoded
+    @POST("apply_leave.php") // Example: "leave/submit_leave.php"
+    Call<LeaveResponse> submitLeaveApplication(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("emp_id") String empId,
+            @Field("from_date") String fromDate,
+            @Field("to_date") String toDate,
+            @Field("type") String leaveType,
+            @Field("reason") String reason,
+            @Field("joining_date") String joiningDate
+    );
+
+
+    @FormUrlEncoded
+    @POST("print_setting.php") // Update with your PHP API endpoint
+    Call<GasTypeResponse> fetchGasTypes(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName
+    );
+
 
 
 }

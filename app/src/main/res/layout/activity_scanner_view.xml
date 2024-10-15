@@ -14,14 +14,6 @@
         android:layout_height="match_parent"
 
         android:orientation="vertical">
-        <EditText
-            android:id="@+id/newScan"
-            android:layout_width="match_parent"
-            android:focusable="true"
-            android:layout_height="20dp"
-            android:textColor="@android:color/transparent"
-            app:layout_constraintBottom_toTopOf="@+id/Totalscan"
-            android:background="@null"/>
 
         <Button android:id="@+id/button"
             android:layout_width="150dp"

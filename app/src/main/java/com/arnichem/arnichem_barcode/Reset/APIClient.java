@@ -34,6 +34,7 @@ public  class APIClient {
     public static final String O2_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/O2_entry_5.6.php";
     public static final String ammonia_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_entry_5.6.php";
     public static final String zero_air_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/zero_air_entry_5.6.php";
+
     public  static  final  String ammonia_delivery="http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_delivery_v6.2.php";
     public  static  final  String ammonia_del_update="http://arnichem.co.in/intranet/barcode/APP/app_apis/ammonia_get_details.php";
     public static final String fill_dura_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fill_dura_entry_4.7.php";

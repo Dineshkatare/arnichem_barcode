@@ -313,7 +313,7 @@
                 android:layout_weight="9"
                 android:background="@drawable/editbox"
                 android:hint="सिलेंडर नंबर टाका "
-                android:inputType="numberDecimal|numberSigned"
+                android:inputType="numberDecimal"
                 android:textAlignment="center" />
 
 

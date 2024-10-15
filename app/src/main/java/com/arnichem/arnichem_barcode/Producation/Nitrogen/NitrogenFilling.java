@@ -132,14 +132,13 @@ public class NitrogenFilling extends AppCompatActivity {
         {
             spinnermanifold.setSelection(manifoldpos);
         }
-        Intent i=getIntent();
-        sm=i.getStringExtra("sm");
-        em=i.getStringExtra("em");
-        after_tank_pressure= i.getStringExtra("after_tank_pressure");
-        after_tank_liquid_liter=i.getStringExtra("after_tank_liquid_liter");
-        before_tank_pressure=i.getStringExtra("before_tank_pressure");
-        before_tank_liquid_liter= i.getStringExtra("before_tank_liquid_liter");
-        fillingp=i.getStringExtra("fillingp");
+        sm=SharedPref.getInstance(this).getSm();
+        em=SharedPref.getInstance(this).getEm();
+        after_tank_pressure= SharedPref.getInstance(this).getAfter_tank_pressure();
+        after_tank_liquid_liter=SharedPref.getInstance(this).getAfter_tank_liquid_liter();
+        before_tank_pressure=SharedPref.getInstance(this).getBefore_tank_pressure();
+        before_tank_liquid_liter= SharedPref.getInstance(this).getBefore_tank_liquid_liter();
+        fillingp=SharedPref.getInstance(this).getFillGapPressure();
         recyclerView=findViewById(R.id.oxygenfillrecyle);
         recyclerView1=findViewById(R.id.distnamerecycle);
         spinnermanifold.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -207,7 +206,7 @@ public class NitrogenFilling extends AppCompatActivity {
                     MDToast.makeText(NitrogenFilling.this, "कृपया सिलेंडर व्हॉल्युम टाका !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
                 } else {
-                    oxygenHelper.addBook(cylindernumber1.getText().toString(), distributorname, cylindervolume.getText().toString(),"no");
+                    oxygenHelper.addBook(cylindernumber1.getText().toString(), distributorname, cylindervolume.getText().toString(),"N");
                     finish();
                     startActivity(getIntent());
                 }
@@ -524,7 +523,7 @@ public class NitrogenFilling extends AppCompatActivity {
                         }
                     }
 
-                    oxygenHelper.addBook(cylindernumber.getText().toString(), distributorname, tempvol,"no");
+                    oxygenHelper.addBook(cylindernumber.getText().toString(), distributorname, tempvol,"N");
                     finish();
                     startActivity(getIntent());
 

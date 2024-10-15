@@ -98,14 +98,13 @@ public class FirstZeroAir extends AppCompatActivity {
                 else {
 
                     Intent intent = new Intent(FirstZeroAir.this, ZeroAirFilling.class);
-                    intent.putExtra("sm", starttime);
-                    intent.putExtra("em", endtime);
-                    intent.putExtra("after_tank_pressure", after_tank_pressure.getText().toString());
-                    intent.putExtra("after_tank_liquid_liter", after_tank_liquid_liter.getText().toString());
-                    intent.putExtra("before_tank_pressure", before_tank_pressure.getText().toString());
-                    intent.putExtra("before_tank_liquid_liter", before_tank_liquid_liter.getText().toString());
-                    intent.putExtra("fillingp", fillingpessure.getText().toString());
-
+                    SharedPref.getInstance(getApplicationContext()).setSm(starttime);
+                    SharedPref.getInstance(getApplicationContext()).setEm(endtime);
+                    SharedPref.getInstance(getApplicationContext()).setAfter_tank_liquid_liter(after_tank_pressure.getText().toString());
+                    SharedPref.getInstance(getApplicationContext()).setAfter_tank_pressure(after_tank_liquid_liter.getText().toString());
+                    SharedPref.getInstance(getApplicationContext()).setBefore_tank_liquid_liter(before_tank_pressure.getText().toString());
+                    SharedPref.getInstance(getApplicationContext()).setBefore_tank_pressure(before_tank_liquid_liter.getText().toString());
+                    SharedPref.getInstance(getApplicationContext()).setFillGapPressure(fillingpessure.getText().toString());
                     startActivity(intent);
                 }
             }

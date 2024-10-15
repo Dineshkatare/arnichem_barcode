@@ -73,7 +73,7 @@ public class MainPrintActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_print2);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Print History Version 7.6");
+        getSupportActionBar().setTitle("Print History Version 7.96");
         spinnermanifold=findViewById(R.id.spinermanifold);
         etDcEmpNo = findViewById(R.id.etvDcEmpNo);
         button=findViewById(R.id.printRequest);

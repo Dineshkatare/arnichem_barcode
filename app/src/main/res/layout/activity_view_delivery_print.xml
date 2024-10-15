@@ -197,6 +197,7 @@
                 android:layout_weight="2">
 
                 <TextView
+                    android:id="@+id/cylinder_number_txt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Cylinder No      :"
@@ -220,6 +221,7 @@
                 </TextView>
             </LinearLayout>
             <LinearLayout
+
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -227,6 +229,7 @@
                 android:layout_weight="2">
 
                 <TextView
+                    android:id="@+id/total_quantity_txt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Total Quantity  :"

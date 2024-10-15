@@ -43,7 +43,7 @@ public class Transactions extends AppCompatActivity implements Listener, Locatio
         easyWayLocation = new EasyWayLocation(this, false,true,this);
         outward=findViewById(R.id.outward);
         addClymyDB=new AddClyHelper(Transactions.this);
-        addClymyDB.deleteAllData();
+      //  addClymyDB.deleteAllData();
         inward=findViewById(R.id.inward);
         delivery=findViewById(R.id.delivery);
         empty=findViewById(R.id.empty);

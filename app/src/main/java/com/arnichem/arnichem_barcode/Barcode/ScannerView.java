@@ -88,7 +88,6 @@ public class ScannerView extends AppCompatActivity {
     public static final int CAMERA_REQUEST_CODE = 102;
     String currentPhotoPath;
     private Uri imageUri;
-    EditText editText;
 
     private String inputHolder = "";
 
@@ -123,9 +122,6 @@ public class ScannerView extends AppCompatActivity {
 
         checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
         button=findViewById(R.id.button);
-        editText = findViewById(R.id.newScan);
-        editText.requestFocus();
-        closeKeypad(this);
         textView=findViewById(R.id.textView);
         serialno=findViewById(R.id.edserialnumber);
         weight=findViewById(R.id.edenterweight);
@@ -396,68 +392,6 @@ public void onBackPressed() {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event == null) {
-            return false;
-        }
-
-        int action = event.getAction();
-
-        try {
-            if (action == KeyEvent.ACTION_DOWN) {
-                Log.d("KEYDOWN", event.getKeyCode() + "");
-            } else if (action == KeyEvent.ACTION_UP) {
-                char pressedKey = (char) event.getUnicodeChar();
-                Log.d("pressedKey != 0", pressedKey + "");
-                if (pressedKey != 0) {
-                    if (pressedKey == ',' || pressedKey == 10) {
-                        Log.d("pressedKey != ','", "inputHolder " + this.inputHolder);
-                        // Perform action based on inputHolder value
-                        // registerID(this.inputHolder); // Replace with your actual method call
-                        this.inputHolder = "";
-                    } else {
-                        this.inputHolder += pressedKey;
-                        Log.d("pressedKey", pressedKey + "");
-                    }
-                }
-                Log.d("KEYUP", event.getKeyCode() + "");
-            }
-
-            Log.d("load", editText.getText().toString() + "");
-            android.os.Handler handler = new Handler();
-
-            // Create a runnable that will be executed after 1000 milliseconds (1 second)
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    // Do something here
-
-                    String text = editText.getText().toString();
-                    if (!text.isEmpty()) {
-                        // Replace with your actual method call
-                        textView.setText("");
-                        textView.setText(text);
-                        Log.d("load1", editText.getText().toString() + text);
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-                }
-            };
-
-            // Schedule the runnable to be executed after 1000 milliseconds
-            handler.postDelayed(runnable, 500);
-            // Delay the call to the `call()` method by 1000 milliseconds
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("DispatchKeyEvent", "An exception occurred: " + e.getMessage());
-        }
-
-        Log.d("KEY", event.getKeyCode() + "");
-        return false;
-    }
 
 
 

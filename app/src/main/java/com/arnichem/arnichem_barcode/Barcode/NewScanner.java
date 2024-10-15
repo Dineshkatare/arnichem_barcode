@@ -98,7 +98,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
                 onBackPressed();
             }
         });
-         editText = findViewById(R.id.newScan);
+        editText = findViewById(R.id.newScan);
         editText.requestFocus();
 
         flashImg.setOnClickListener(new View.OnClickListener() {
@@ -321,7 +321,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
         dis =  intent.getExtras().getString("dis","");
 
         if(type.equalsIgnoreCase("barcode_register")) {
-            finishBtn.setVisibility(View.GONE);
+           // finishBtn.setVisibility(View.GONE);
         }
 
     }
@@ -355,6 +355,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
             Intent intent = new Intent("barcode_register");
             // You can also include some extra data.
             intent.putExtra("val",displayValue);
+            editText.setText("");
             LocalBroadcastManager.getInstance(NewScanner.this).sendBroadcast(intent);
             finish();
         }

@@ -236,7 +236,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
                         String col = cursor.getString(1);
                         String col1 = cursor.getString(2);
                         String tempvol = cursor.getString(4);
-                        Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
+                        Log.e("col1", "An exception occurred: " + col1 + " " + col);
 
                         if (col1.contentEquals(displayValue)) {
                             status = false;

@@ -9,6 +9,8 @@ import android.widget.Toast;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
+import androidx.work.Configuration;
+import androidx.work.WorkManager;
 
 import com.arnichem.arnichem_barcode.Company.SelectCompanyActivity;
 import com.arnichem.arnichem_barcode.Settings.newPassword;
@@ -91,6 +93,9 @@ public class MyApplication extends Application implements LifecycleObserver {
 
         }
         Log.i("dinesh", "I\'m inside Observer of MainActivity START");
+
     }
+
+
 
 }
