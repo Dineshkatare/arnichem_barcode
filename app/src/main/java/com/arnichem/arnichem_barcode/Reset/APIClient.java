@@ -1,5 +1,7 @@
 package com.arnichem.arnichem_barcode.Reset;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -9,16 +11,14 @@ public  class APIClient {
 
 
     private static Retrofit retrofit = null;
-    public static final String data_fetch = "data_fetch_v6.2.php";
+    public static final String data_fetch = "data_fetch_v8.3.php";
     public static final String sync_bp_contact = "sync_bp_contact.php";
-
     public static final String vehicle_login = "http://arnichem.co.in/intranet/barcode/APP/app_apis/vehicle_login.php";
-    public static final String getCompanies = "http://arnichem.co.in/intranet/barcode/APP/app_apis/getCompanies.php";
+    public static final String getCompanies = "http://arnichem.co.in/intranet/barcode/APP/app_apis/getCompanies1.php";
     public static final String access_login = "http://arnichem.co.in/intranet/barcode/APP/app_apis/access_login.php";
     public static final String barcode_registration = "http://arnichem.co.in/intranet/barcode/APP/app_apis/barcode_registration_v4.5.php"; //DONE
     public static final String crm_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/crm_entry.php";
     public static final String bpcontact_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/bpcontact_entry.php";
-
 
     public static final String diesel_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/diesel_entry.php";
     public static final String closing_stock_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/closing_stock_entry.php";
@@ -58,7 +58,7 @@ public  class APIClient {
     public static final String fetch_username = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_username.php";
     public static final String get_dura_fill_details = "http://arnichem.co.in/intranet/barcode/APP/app_apis/get_dura_fill_details.php";
     public static final String fetch_sign = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_digital_sign.php";
-    public static final String hydro_test = "http://arnichem.co.in/intranet/barcode/APP/app_apis/hydrotest_v6.2.php"; //DONE
+    public static final String hydro_test = "http://arnichem.co.in/intranet/barcode/APP/app_apis/hydrotest_app_entry.php"; //DONE
 
     public static final String dry_ice_production_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/dry_ice_production.php";
 
@@ -68,7 +68,11 @@ public  class APIClient {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
+                .connectTimeout(2, TimeUnit.MINUTES)
+                .writeTimeout(2, TimeUnit.MINUTES) // write timeout
+                .readTimeout(2, TimeUnit.MINUTES)
+                .build();
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("http://arnichem.co.in/intranet/barcode/APP/app_apis/")

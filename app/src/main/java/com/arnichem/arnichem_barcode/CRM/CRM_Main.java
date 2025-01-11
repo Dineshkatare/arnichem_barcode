@@ -1,21 +1,11 @@
 package com.arnichem.arnichem_barcode.CRM;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,6 +20,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -41,12 +34,11 @@ import com.android.volley.toolbox.Volley;
 import com.arnichem.arnichem_barcode.GetData.BpContact;
 import com.arnichem.arnichem_barcode.GetData.Data;
 import com.arnichem.arnichem_barcode.GetData.GetDataResponse;
-import com.arnichem.arnichem_barcode.GetData.Test;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
 import com.arnichem.arnichem_barcode.Reset.APIInterface;
-import com.arnichem.arnichem_barcode.TransactionsView.Outward.AddActivity;
-import com.arnichem.arnichem_barcode.constant.constant;
+import com.arnichem.arnichem_barcode.order.OrderMainActivity;
+import com.arnichem.arnichem_barcode.order.OrderViewActivity;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 import com.arnichem.arnichem_barcode.view.DatabaseHandler;
@@ -57,12 +49,11 @@ import com.valdesekamdem.library.mdtoast.MDToast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -72,18 +63,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 public class CRM_Main extends AppCompatActivity {
-    TextView usernamevalue,date,new_contact_tv;
+    TextView usernamevalue, date, new_contact_tv;
     ArrayAdapter<String> dataAdapter;
     ArrayAdapter<String> customerdataAdapter;
-    Spinner nameOfContactVal,spinnercust,meeting_type;
+    Spinner nameOfContactVal, spinnercust, meeting_type;
     Button button;
     ProgressDialog dialog;
-    String to_warehouse,cust_code="",designation="";
-    String bp_conatc_name,bp_contact_code,meeting_type_name;
+    String to_warehouse, cust_code = "", designation = "";
+    String bp_conatc_name, bp_contact_code, meeting_type_name;
     DatabaseHandler databaseHandlercustomer;
     bp_contact_handler bp_contac;
-    public  int poscustfixdel,pos_bp_contact,pos_meeting_type,new_contact_pos;
-    static JSONObject object =null;
+    public int poscustfixdel, pos_bp_contact, pos_meeting_type, new_contact_pos;
+    static JSONObject object = null;
     LinearLayout add_spinner_ll;
     EditText discussionVal;
     ArrayAdapter<CharSequence> adapter;
@@ -98,25 +89,25 @@ public class CRM_Main extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("CRM");
-        final RequestQueue requestQueue= Volley.newRequestQueue(this);
-        nameOfContactVal=findViewById(R.id.nameOfContactVal);
-        spinnercust=findViewById(R.id.custnamespingodowndel);
-        add_person=findViewById(R.id.person_add);
-        meeting_type=findViewById(R.id.meetingTypeVal);
-        discussionVal=findViewById(R.id.discussionVal);
-        new_contact_tv=findViewById(R.id.new_contact_tv);
-        add_spinner_ll=findViewById(R.id.add_spinner_ll);
+        final RequestQueue requestQueue = Volley.newRequestQueue(this);
+        nameOfContactVal = findViewById(R.id.nameOfContactVal);
+        spinnercust = findViewById(R.id.custnamespingodowndel);
+        add_person = findViewById(R.id.person_add);
+        meeting_type = findViewById(R.id.meetingTypeVal);
+        discussionVal = findViewById(R.id.discussionVal);
+        new_contact_tv = findViewById(R.id.new_contact_tv);
+        add_spinner_ll = findViewById(R.id.add_spinner_ll);
         apiInterface = APIClient.getClient().create(APIInterface.class);
 
-        databaseHandlercustomer=new DatabaseHandler(CRM_Main.this);
-        bp_contac=new bp_contact_handler(CRM_Main.this);
+        databaseHandlercustomer = new DatabaseHandler(CRM_Main.this);
+        bp_contac = new bp_contact_handler(CRM_Main.this);
 
         loadSpinnerData();
         loadSpinnerData1();
-        usernamevalue=findViewById(R.id.usernametxtvalue);
-        button=findViewById(R.id.GodownDelMainPost);
-        usernamevalue.setText(SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName());
-        date=findViewById(R.id.date);
+        usernamevalue = findViewById(R.id.usernametxtvalue);
+        button = findViewById(R.id.GodownDelMainPost);
+        usernamevalue.setText(SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
+        date = findViewById(R.id.date);
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         date.setText(currentDateTimeString);
 
@@ -127,7 +118,7 @@ public class CRM_Main extends AppCompatActivity {
                 postUsingVolley();
             }
         });
-        adapter= ArrayAdapter.createFromResource(this,R.array.metting_type, android.R.layout.simple_spinner_item);
+        adapter = ArrayAdapter.createFromResource(this, R.array.metting_type, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         meeting_type.setAdapter(adapter);
         meeting_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -135,8 +126,8 @@ public class CRM_Main extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
                 ///  Log.v("item", (String) parent.getItemAtPosition(position));
-                meeting_type_name=(String) parent.getItemAtPosition(position);
-                pos_meeting_type=position;
+                meeting_type_name = (String) parent.getItemAtPosition(position);
+                pos_meeting_type = position;
 
             }
 
@@ -145,12 +136,11 @@ public class CRM_Main extends AppCompatActivity {
                 // TODO Auto-generated method stub
             }
         });
-        spinnercust.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinnercust.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 to_warehouse = customerdataAdapter.getItem(position);
-                poscustfixdel=position;
+                poscustfixdel = position;
                 SharedPref.getInstance(getApplicationContext()).store_customersel(String.valueOf(poscustfixdel));
                 Cursor cursor = databaseHandlercustomer.readAllData();
                 if (cursor.getCount() == 0) {
@@ -158,18 +148,16 @@ public class CRM_Main extends AppCompatActivity {
                     //      no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
-                        String col=cursor.getString(1);
-                        String col1 =cursor.getString(2);
-                        if(col.contentEquals(to_warehouse))
-                        {
-                            cust_code=col1;
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
+                        if (col.contentEquals(to_warehouse)) {
+                            cust_code = col1;
                         }
                     }
                 }
-                bp_conatc_name ="";
+                bp_conatc_name = "";
                 bp_contact_code = "";
                 loadSpinnerData1();
-
 
 
             }
@@ -184,17 +172,16 @@ public class CRM_Main extends AppCompatActivity {
             public void onClick(View v) {
                 if (poscustfixdel == 0) {
                     MDToast.makeText(CRM_Main.this, "Please Select Customer Name !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-                }else {
+                } else {
                     customerDetails();
                 }
             }
         });
-        nameOfContactVal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        nameOfContactVal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 bp_conatc_name = dataAdapter.getItem(position);
-                pos_bp_contact=position;
+                pos_bp_contact = position;
                 SharedPref.getInstance(getApplicationContext()).store_customersel(String.valueOf(poscustfixdel));
                 Cursor cursor = bp_contac.readAllData();
                 if (cursor.getCount() == 0) {
@@ -202,16 +189,13 @@ public class CRM_Main extends AppCompatActivity {
                     //      no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
-                        String col=cursor.getString(1);
-                        String col1 =cursor.getString(2);
-                        if(cust_code.contentEquals(col1)&&col.contentEquals(bp_conatc_name))
-                        {
-                            bp_contact_code=col1;
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
+                        if (cust_code.contentEquals(col1) && col.contentEquals(bp_conatc_name)) {
+                            bp_contact_code = col1;
                         }
                     }
                 }
-
-
 
 
             }
@@ -221,11 +205,11 @@ public class CRM_Main extends AppCompatActivity {
 
             }
         });
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            public void run() {
-                bp_contac.deleteAllData();
-            }
-        });
+//        Executors.newSingleThreadExecutor().execute(new Runnable() {
+//            public void run() {
+//                bp_contac.deleteAllData();
+//            }
+//        });
 
         getData();
     }
@@ -290,17 +274,16 @@ public class CRM_Main extends AppCompatActivity {
 
 
 // Set up the Spinner with data (e.g., an array of options)
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.designations, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
-              cust_code_tv.setText(cust_code);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.designations, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        cust_code_tv.setText(cust_code);
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 designation = parent.getItemAtPosition(position).toString();
-                new_contact_pos=position;
+                designation = parent.getItemAtPosition(position).toString();
+                new_contact_pos = position;
 
             }
 
@@ -310,49 +293,49 @@ public class CRM_Main extends AppCompatActivity {
             }
         });
 // Create the custom dialog without positive/negative buttons
-            AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setView(dialogView)
-                    .create();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
 
 // Set custom button click actions
-            Button btnSubmit = dialogView.findViewById(R.id.save_customer);
-            Button btnCancel = dialogView.findViewById(R.id.cancel_button);
+        Button btnSubmit = dialogView.findViewById(R.id.save_customer);
+        Button btnCancel = dialogView.findViewById(R.id.cancel_button);
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (new_contact_pos == 0) {
-                        MDToast.makeText(CRM_Main.this, "Please Select Designation !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            @Override
+            public void onClick(View view) {
+                if (new_contact_pos == 0) {
+                    MDToast.makeText(CRM_Main.this, "Please Select Designation !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
 
-                    } else if (cust_name_et.getText().toString().isEmpty()) {
-                        MDToast.makeText(CRM_Main.this, "Please Enter Person Name!", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                } else if (cust_name_et.getText().toString().isEmpty()) {
+                    MDToast.makeText(CRM_Main.this, "Please Enter Person Name!", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
 
-                    } else if (mobile_et.getText().toString().isEmpty()) {
-                        MDToast.makeText(CRM_Main.this, "Please Enter Mobile No!", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                } else if (mobile_et.getText().toString().isEmpty()) {
+                    MDToast.makeText(CRM_Main.this, "Please Enter Mobile No!", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
 
-                    } else {
-                        dialog.dismiss(); // Close the dialog
-                        post_customer_details(cust_code_tv.getText().toString().trim(),cust_name_et.getText().toString().trim(),email_et.getText().toString().trim(),mobile_et.getText().toString().trim(),phone_no_et.getText().toString().trim(),remarks_et.getText().toString().trim(),designation);
-                    }
-
-                    // Handle the "Submit" button click
-                    // Process the input data as needed
-
-                }
-            });
-
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Handle the "Cancel" button click
+                } else {
                     dialog.dismiss(); // Close the dialog
+                    post_customer_details(cust_code_tv.getText().toString().trim(), cust_name_et.getText().toString().trim(), email_et.getText().toString().trim(), mobile_et.getText().toString().trim(), phone_no_et.getText().toString().trim(), remarks_et.getText().toString().trim(), designation);
                 }
-            });
 
-            dialog.show();
+                // Handle the "Submit" button click
+                // Process the input data as needed
+
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle the "Cancel" button click
+                dialog.dismiss(); // Close the dialog
+            }
+        });
+
+        dialog.show();
 
     }
 
@@ -362,135 +345,66 @@ public class CRM_Main extends AppCompatActivity {
         List<String> labels = db.getAllLabels();
 
         // Creating adapter for spinner
-        customerdataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        customerdataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
         customerdataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinnercust.setAdapter(customerdataAdapter);
-        if(poscustfixdel!=0)
-        {
+        if (poscustfixdel != 0) {
             spinnercust.setSelection(poscustfixdel);
         }
     }
+
     private void loadSpinnerData1() {
         bp_contact_handler db = new bp_contact_handler(getApplicationContext());
         List<String> labels = db.getAllLabels(cust_code);
 
-        // Creating adapter for spinner
-        dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        // Clear previous spinner data
+        if (dataAdapter != null) {
+            dataAdapter.clear();
+        }
+
+        // Creating a new adapter with updated labels
+        dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        // attaching data adapter to spinner
+        // Attaching data adapter to spinner
         nameOfContactVal.setAdapter(dataAdapter);
-        if(pos_bp_contact!=0)
-        {
+
+        // Set selected position if applicable
+        if (pos_bp_contact != 0) {
             nameOfContactVal.setSelection(pos_bp_contact);
         }
     }
 
     private void postUsingVolley() {
 
-            dialog = new ProgressDialog(CRM_Main.this);
-            dialog.setTitle("Data Inserting");
-            dialog.setMessage("Please wait....");
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.show();
-            if (poscustfixdel == 0) {
-                dialog.dismiss();
-                MDToast.makeText(CRM_Main.this, "Please Select Customer Name !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-
-            }else if (pos_bp_contact == 0) {
-               dialog.dismiss();
-               MDToast.makeText(CRM_Main.this, "Please Select Name Of Contact !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-            }
-            else if (pos_meeting_type == 0) {
-                dialog.dismiss();
-                MDToast.makeText(CRM_Main.this, "Please Select Meeting Type !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-            }
-            else if (discussionVal.getText().toString().isEmpty()) {
-                dialog.dismiss();
-                MDToast.makeText(CRM_Main.this, "Please Enter Discussion !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-            } else {
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.crm_entry,
-                        new Response.Listener<String>() {
-                            @SuppressLint("WrongConstant")
-                            @Override
-                            public void onResponse(String response) {
-                                try {
-                                    JSONArray array = new JSONArray(response);
-                                    for (int i = 0; i < array.length(); i++) {
-                                        object = array.getJSONObject(i);
-                                        String status = object.getString("status");
-                                        String msg = object.getString("msg");
-
-                                        if (status.equals("success")) {
-
-                                            MDToast.makeText(CRM_Main.this, "CRM Entry Done!", MDToast.LENGTH_LONG, MDToast.TYPE_SUCCESS).show();
-                                            dialog.dismiss();
-                                            Intent intent=new Intent(CRM_Main.this, Dashboard.class);
-                                            startActivity(intent);
-
-
-
-                                        } else {
-                                            dialog.dismiss();
-
-                                        }
-
-                                        Log.e("JSON", "> " + status + msg);
-                                    }
-
-                                } catch (JSONException e) {
-                                    dialog.dismiss();
-                                    e.printStackTrace();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @SuppressLint("WrongConstant")
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                dialog.dismiss();
-                                error.printStackTrace();
-                            }
-                        }) {
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("bp_code",bp_contact_code);
-                        params.put("visit_type",meeting_type_name);
-                        params.put("name",bp_conatc_name);
-                        params.put("detail",discussionVal.getText().toString());
-                        params.put("email",SharedPref.getInstance(CRM_Main.this).getEmail());
-                        params.put("db_host",SharedPref.mInstance.getDBHost());
-                        params.put("db_username",SharedPref.mInstance.getDBUsername());
-                        params.put("db_password",SharedPref.mInstance.getDBPassword());
-                        params.put("db_name",SharedPref.mInstance.getDBName());
-                        return params;
-                    }
-                };
-                VolleySingleton.getInstance(CRM_Main.this).addToRequestQueue(stringRequest);
-
-
-            }
-        }
-
-    private void post_customer_details(String cust_code,String cust_name,String email,String mobile, String phone,String remaks,String designation) {
-
         dialog = new ProgressDialog(CRM_Main.this);
         dialog.setTitle("Data Inserting");
         dialog.setMessage("Please wait....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
+        if (poscustfixdel == 0) {
+            dialog.dismiss();
+            MDToast.makeText(CRM_Main.this, "Please Select Customer Name !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.bpcontact_entry,
+        } else if (pos_bp_contact == 0) {
+            dialog.dismiss();
+            MDToast.makeText(CRM_Main.this, "Please Select Name Of Contact !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+        } else if (pos_meeting_type == 0) {
+            dialog.dismiss();
+            MDToast.makeText(CRM_Main.this, "Please Select Meeting Type !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+        } else if (discussionVal.getText().toString().isEmpty()) {
+            dialog.dismiss();
+            MDToast.makeText(CRM_Main.this, "Please Enter Discussion !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+        } else {
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.crm_entry,
                     new Response.Listener<String>() {
                         @SuppressLint("WrongConstant")
                         @Override
@@ -504,24 +418,23 @@ public class CRM_Main extends AppCompatActivity {
 
                                     if (status.equals("success")) {
 
-                                        MDToast.makeText(CRM_Main.this, msg, MDToast.LENGTH_LONG, MDToast.TYPE_SUCCESS).show();
-
-                                                bp_conatc_name = cust_name;
-                                                bp_contact_code = cust_code;
-                                        new_contact_tv.setVisibility(View.VISIBLE);
-                                        pos_bp_contact = 1;
-                                        new_contact_tv.setText(cust_name);
-                                        add_spinner_ll.setVisibility(View.GONE);
-                                        spinnercust.setEnabled(false);
+                                        MDToast.makeText(CRM_Main.this, "CRM Entry Done!", MDToast.LENGTH_LONG, MDToast.TYPE_SUCCESS).show();
+                                        dialog.dismiss();
+                                        Intent intent = new Intent(CRM_Main.this, CRMViewActivity.class);
+                                        intent.putExtra("name", to_warehouse);
+                                        intent.putExtra("contact_name", bp_conatc_name);
+                                        intent.putExtra("meeting_type", meeting_type_name);
+                                        intent.putExtra("discussion",discussionVal.getText().toString());
+                                        intent.putExtra("link", "https://arnichem.co.in/intranet/bpview.php?code="+cust_code);
+                                        startActivity(intent);
 
                                     } else {
+                                        dialog.dismiss();
 
                                     }
 
                                     Log.e("JSON", "> " + status + msg);
                                 }
-                                dialog.dismiss();
-
 
                             } catch (JSONException e) {
                                 dialog.dismiss();
@@ -540,23 +453,99 @@ public class CRM_Main extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<>();
-                    params.put("cust_code",cust_code);
-                    params.put("name_of_contact",cust_name);
-                    params.put("mobile_no",mobile);
-                    params.put("phone_no",phone);
-                    params.put("contact_email",email);
-                    params.put("remarks",remaks);
-                    params.put("designation",designation);
-                    params.put("db_host",SharedPref.mInstance.getDBHost());
-                    params.put("db_username",SharedPref.mInstance.getDBUsername());
-                    params.put("db_password",SharedPref.mInstance.getDBPassword());
-                    params.put("db_name",SharedPref.mInstance.getDBName());
-                    params.put("email",SharedPref.mInstance.getEmail());
+                    params.put("bp_code", bp_contact_code);
+                    params.put("visit_type", meeting_type_name);
+                    params.put("name", bp_conatc_name);
+                    params.put("detail", discussionVal.getText().toString());
+                    params.put("email", SharedPref.getInstance(CRM_Main.this).getEmail());
+                    params.put("db_host", SharedPref.mInstance.getDBHost());
+                    params.put("db_username", SharedPref.mInstance.getDBUsername());
+                    params.put("db_password", SharedPref.mInstance.getDBPassword());
+                    params.put("db_name", SharedPref.mInstance.getDBName());
                     return params;
                 }
             };
             VolleySingleton.getInstance(CRM_Main.this).addToRequestQueue(stringRequest);
 
+
+        }
+    }
+
+    private void post_customer_details(String cust_code, String cust_name, String email, String mobile, String phone, String remaks, String designation) {
+
+        dialog = new ProgressDialog(CRM_Main.this);
+        dialog.setTitle("Data Inserting");
+        dialog.setMessage("Please wait....");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.show();
+
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.bpcontact_entry,
+                new Response.Listener<String>() {
+                    @SuppressLint("WrongConstant")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray array = new JSONArray(response);
+                            for (int i = 0; i < array.length(); i++) {
+                                object = array.getJSONObject(i);
+                                String status = object.getString("status");
+                                String msg = object.getString("msg");
+
+                                if (status.equals("success")) {
+
+                                    MDToast.makeText(CRM_Main.this, msg, MDToast.LENGTH_LONG, MDToast.TYPE_SUCCESS).show();
+
+                                    bp_conatc_name = cust_name;
+                                    bp_contact_code = cust_code;
+                                    new_contact_tv.setVisibility(View.VISIBLE);
+                                    pos_bp_contact = 1;
+                                    new_contact_tv.setText(cust_name);
+                                    add_spinner_ll.setVisibility(View.GONE);
+                                    spinnercust.setEnabled(false);
+
+                                } else {
+
+                                }
+
+                                Log.e("JSON", "> " + status + msg);
+                            }
+                            dialog.dismiss();
+
+
+                        } catch (JSONException e) {
+                            dialog.dismiss();
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @SuppressLint("WrongConstant")
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("cust_code", cust_code);
+                params.put("name_of_contact", cust_name);
+                params.put("mobile_no", mobile);
+                params.put("phone_no", phone);
+                params.put("contact_email", email);
+                params.put("remarks", remaks);
+                params.put("designation", designation);
+                params.put("db_host", SharedPref.mInstance.getDBHost());
+                params.put("db_username", SharedPref.mInstance.getDBUsername());
+                params.put("db_password", SharedPref.mInstance.getDBPassword());
+                params.put("db_name", SharedPref.mInstance.getDBName());
+                params.put("email", SharedPref.mInstance.getEmail());
+                return params;
+            }
+        };
+        VolleySingleton.getInstance(CRM_Main.this).addToRequestQueue(stringRequest);
 
 
     }
@@ -566,6 +555,7 @@ public class CRM_Main extends AppCompatActivity {
         super.onBackPressed();
         startActivity(new Intent(CRM_Main.this, Dashboard.class));
     }
+
     public static boolean isValidEmail(String email) {
         // Regular expression pattern for a valid email address
         String emailPattern = "^[A-Za-z0-9+_.-]+@(.+)$";
@@ -587,12 +577,12 @@ public class CRM_Main extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
 
-        Call<GetDataResponse> call = apiInterface.sync_bp_contact(SharedPref.mInstance.getDBHost(),SharedPref.mInstance.getDBUsername(),SharedPref.mInstance.getDBPassword(),SharedPref.mInstance.getDBName());
+        Call<GetDataResponse> call = apiInterface.sync_bp_contact(SharedPref.mInstance.getDBHost(), SharedPref.mInstance.getDBUsername(), SharedPref.mInstance.getDBPassword(), SharedPref.mInstance.getDBName());
         call.enqueue(new Callback<GetDataResponse>() {
             @Override
             public void onResponse(Call<GetDataResponse> call, retrofit2.Response<GetDataResponse> response) {
                 dialog.dismiss();
-                if(response.body().getData()!=null)
+                if (response.body().getData() != null)
                     loadData(response.body().getData());
             }
 
@@ -603,9 +593,10 @@ public class CRM_Main extends AppCompatActivity {
             }
         });
     }
+
     private void loadData(Data data) {
 
-        if(data.getBpContact().size()!=0&&data.getBpContact()!=null)
+        if (data.getBpContact().size() != 0 && data.getBpContact() != null)
             loadBPContact(data.getBpContact());
 
     }
@@ -613,9 +604,8 @@ public class CRM_Main extends AppCompatActivity {
     private void loadBPContact(List<BpContact> bpContact) {
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
-                for(int i=1;i<bpContact.size();i++)
-                {
-                    bp_contac.addcust(bpContact.get(i).getName(),bpContact.get(i).getCode());
+                for (int i = 1; i < bpContact.size(); i++) {
+                    bp_contac.addcust(bpContact.get(i).getName(), bpContact.get(i).getCode());
                 }
             }
         });

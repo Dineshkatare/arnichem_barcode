@@ -45,6 +45,7 @@ import androidx.core.content.FileProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -342,6 +343,12 @@ public class MainDieselEntry extends AppCompatActivity implements Listener, Loca
             };
             // below line is to make
             // a json object request.
+            request.setRetryPolicy(new DefaultRetryPolicy(
+                    60 * 1000, // 60 seconds timeout
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            ));
+
             VolleySingleton.getInstance(MainDieselEntry.this).addToRequestQueue(request);
 
         }

@@ -239,7 +239,11 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
                             }
                             cust_code = col1;
 
-
+                            if (cursor.getString(4) != null && !cursor.getString(4).isEmpty()) {
+                                String message = cursor.getString(4).replace("\\n", "\n"); // Replace literal "\n" with a newline
+                                showCustomMsg( message);
+                                Log.d("chech",""+message);
+                            }
                         }
                     }
                 }
@@ -415,6 +419,22 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
                 }
             }
         });
+    }
+    public void showCustomMsg(String msg) {
+        // setup the alert builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogStyle);
+        builder.setTitle("Instructions / सूचना");
+        builder.setMessage(msg);
+        // add a button
+        builder.setNegativeButton("Okay", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        // create and show the alert dialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 

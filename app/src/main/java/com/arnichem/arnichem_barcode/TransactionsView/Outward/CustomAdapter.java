@@ -3,6 +3,7 @@ package com.arnichem.arnichem_barcode.TransactionsView.Outward;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,8 +64,15 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
+
         holder.book_title_txt.setText(String.valueOf(cycNameList.get(position)));
         holder.fillwith.setText(String.valueOf(fillWithList.get(position)));
+        if (position == 0) {
+            holder.book_title_txt.setTypeface(null, Typeface.BOLD);
+        } else {
+            holder.book_title_txt.setTypeface(null, Typeface.NORMAL);
+        }
+
         holder.deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -176,6 +176,8 @@ public class SelectCompanyActivity extends AppCompatActivity {
                             String own_code = cursor.getString(10);
                             String batch_prefix = cursor.getString(11);
                             String cyc_prefix = cursor.getString(12);
+                            String login_msg = cursor.getString(13);
+
 
 
 
@@ -193,6 +195,8 @@ public class SelectCompanyActivity extends AppCompatActivity {
                                 SharedPref.getInstance(getApplicationContext()).setOwnCode(own_code);
                                 SharedPref.getInstance(getApplicationContext()).setBatchPrefix(batch_prefix);
                                 SharedPref.getInstance(getApplicationContext()).setCycPrefix(cyc_prefix);
+                                SharedPref.getInstance(getApplicationContext()).setLoginMsg(login_msg
+                                );
 
 
 
@@ -434,7 +438,7 @@ public class SelectCompanyActivity extends AppCompatActivity {
                                         e.printStackTrace();
                                     }
                                     try {
-                                        companyHelper.addCompany(ob1.getString("company_id"), ob1.getString("company_short_name"), ob1.getString("company_long_name"), ob1.getString("db_host"), ob1.getString("db_username"), ob1.getString("db_password"),ob1.getString("db_name"),ob1.getString("base_url"),ob1.getString("terms_text"),ob1.getString("own_cyl_code"),ob1.getString("batch_prefix"),ob1.getString("cyc_prefix"));
+                                        companyHelper.addCompany(ob1.getString("company_id"), ob1.getString("company_short_name"), ob1.getString("company_long_name"), ob1.getString("db_host"), ob1.getString("db_username"), ob1.getString("db_password"),ob1.getString("db_name"),ob1.getString("base_url"),ob1.getString("terms_text"),ob1.getString("own_cyl_code"),ob1.getString("batch_prefix"),ob1.getString("cyc_prefix"),ob1.getString("login_msg"));
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                     }

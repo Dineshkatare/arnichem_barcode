@@ -52,7 +52,7 @@ import java.util.Map;
 
 public class ammoniaMain extends AppCompatActivity {
     ArrayList<String> id, cylindername,dis,vol,disname,distot,iddist,distotvol,distfull,distnet,mani;
-    TextView Totalscanvalue,maniTv,FullTv,emptyTv,netTv,cylinderTv,sfuulwt,semwt,snetwt;
+    TextView Totalscanvalue,maniTv,FullTv,actual_wt,emptyTv,netTv,cylinderTv,sfuulwt,semwt,snetwt;
     RecyclerView recyclerView,recyclerView1;
     ammadaoter oxygenAdapter;
     int count=0;
@@ -73,6 +73,9 @@ public class ammoniaMain extends AppCompatActivity {
     List<String> cylinder;
     List<String> cubic;
     List<String> fullwts;
+
+    List<String> actual_wts;
+
     List<String> manifolds;
     List<String> netwts;
     List<String> Selected;
@@ -103,6 +106,7 @@ public class ammoniaMain extends AppCompatActivity {
         cylindernumber=findViewById(R.id.cylindernumber);
         cylindernumber1=findViewById(R.id.cylindernumber1);
         cylinderfull=findViewById(R.id.cylinderfullweight);
+        actual_wt =findViewById(R.id.actual_wt);
         maniTv=findViewById(R.id.mani);
         FullTv=findViewById(R.id.fuulwt);
         emptyTv=findViewById(R.id.emwt);
@@ -125,6 +129,7 @@ public class ammoniaMain extends AppCompatActivity {
         cylinder=new ArrayList<String>();
         cubic=new ArrayList<String>();
         fullwts=new ArrayList<String>();
+        actual_wts =new ArrayList<String>();
         manifolds=new ArrayList<String>();
         netwts=new ArrayList<String>();
         cylindervolume=findViewById(R.id.cylinderempty);
@@ -222,14 +227,15 @@ public class ammoniaMain extends AppCompatActivity {
 
                     MDToast.makeText(ammoniaMain.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
-                }   else {
+                }else {
                     if(distributorname.equals(SharedPref.getInstance(ammoniaMain.this).getOwnCode()))
                     {
+
                         Double fullcheck=Double.parseDouble(cylinderfull.getText().toString());
                         Double emptycheck=Double.parseDouble(cylindervolume.getText().toString());
                         Double res=fullcheck-emptycheck;
                         String finalres= String.valueOf(res);
-                        oxygenHelper.addBook(cylindernumber.getText().toString(), distributorname,manifoldval,finalres,cylinderfull.getText().toString(),cylindervolume.getText().toString());
+                        oxygenHelper.addBook(cylindernumber.getText().toString(), distributorname,manifoldval,finalres,cylinderfull.getText().toString(),cylindervolume.getText().toString(),actual_wt.getText().toString());
                         finish();
                         startActivity(getIntent());
                     }
@@ -239,7 +245,7 @@ public class ammoniaMain extends AppCompatActivity {
                         Double emptycheck=Double.parseDouble(cylindervolume.getText().toString());
                         Double res=fullcheck-emptycheck;
                         String finalres= String.valueOf(res);
-                        oxygenHelper.addBook(cylindernumber1.getText().toString(), distributorname,manifoldval,finalres,cylinderfull.getText().toString(),cylindervolume.getText().toString());
+                        oxygenHelper.addBook(cylindernumber1.getText().toString(), distributorname,manifoldval,finalres,cylinderfull.getText().toString(),cylindervolume.getText().toString(),actual_wt.getText().toString());
                         finish();
                         startActivity(getIntent());
 
@@ -293,6 +299,12 @@ oxygenHelper = new ammoniaHelper(this);
                 {
                     cylindernumber1.setVisibility(GONE);
                     cylindernumber.setVisibility(View.VISIBLE);
+                    if(distributorname.equalsIgnoreCase("WAPL")){
+                        actual_wt.setVisibility(View.VISIBLE);
+                    }else {
+                        actual_wt.setVisibility(GONE);
+
+                    }
                 }
                 else
                 {
@@ -375,6 +387,7 @@ oxygenHelper = new ammoniaHelper(this);
                 cubic.add(cursor.getString(4));
                 distfull.add(cursor.getString(3));
                 fullwts.add(cursor.getString(3));
+                actual_wts.add(cursor.getString(7));
                 mani.add(cursor.getString(5));
                 manifolds.add(cursor.getString(5));
                 distnet.add(cursor.getString(6));
@@ -551,6 +564,7 @@ oxygenHelper = new ammoniaHelper(this);
                 params.put("starttime",sm);
                 params.put("endtime", em);
                 params.put("full_wt",String.valueOf(fullwts));
+                params.put("actual_wt",String.valueOf(actual_wts));
                 params.put("emt_wt",String.valueOf(cubic));
                 params.put("net_wt",String.valueOf(netwts));
                 params.put("totcubic", String.valueOf(totvolume));

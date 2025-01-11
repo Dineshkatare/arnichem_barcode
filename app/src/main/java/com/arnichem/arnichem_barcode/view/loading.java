@@ -563,7 +563,7 @@ public class loading extends AppCompatActivity {
                                     }
 
                                     try {
-                                        databaseHandlercustomer.addcust(ob1.getString("name"),ob1.getString("code"),ob1.getString("invoice"));
+                                        databaseHandlercustomer.addcust(ob1.getString("name"),ob1.getString("code"),ob1.getString("invoice"),ob1.getString("del_instructions"));
 
 
                                     } catch (JSONException e) {

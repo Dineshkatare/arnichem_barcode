@@ -25,4 +25,15 @@
     </style>
 
 
+    <style name="CustomAlertDialog" parent="MaterialAlertDialog.MaterialComponents">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.Dialog.CornerSizeMedium</item>
+        <item name="backgroundColor">@color/white</item> <!-- Dialog background color -->
+        <item name="android:textColor">@color/black</item> <!-- Text color -->
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialComponents.Dialog.CornerSizeMedium" parent="">
+        <item name="cornerSize">16dp</item> <!-- Adjust corner radius -->
+    </style>
+
+
 </resources>

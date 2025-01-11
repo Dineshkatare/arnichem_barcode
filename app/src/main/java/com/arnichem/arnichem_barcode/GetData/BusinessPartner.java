@@ -16,6 +16,18 @@ public class BusinessPartner {
     @Expose
     private String invoice;
 
+    @SerializedName("del_instructions")
+    @Expose
+    private String del_instructions;
+
+    public String getDel_instructions() {
+        return del_instructions;
+    }
+
+    public void setDel_instructions(String del_instructions) {
+        this.del_instructions = del_instructions;
+    }
+
     public String getCode() {
         return code;
     }

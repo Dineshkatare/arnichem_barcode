@@ -13,7 +13,7 @@ public class deliDB extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DATABASE_NAME = "delidb.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_NAME = "my_library";
     private static final String COLUMN_ID = "_id";
@@ -21,6 +21,7 @@ public class deliDB extends SQLiteOpenHelper {
     private static final String COLUMN_Fill = "book_author";
     private static final String COLUMN_Volume= "book_pages";
     private static final String STATUS= "status";
+    private static final String COLUMN_TIMESTAMP = "timestamp"; // New column for timestamp
 
 
     public deliDB(@Nullable Context context) {
@@ -28,20 +29,24 @@ public class deliDB extends SQLiteOpenHelper {
         this.context = context;
     }
 
-    @Override
+
+       @Override
     public void onCreate(SQLiteDatabase db) {
         String query = "CREATE TABLE " + TABLE_NAME +
                 " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_TITLE + " TEXT UNIQUE, " +
                 COLUMN_Fill + " TEXT, " +
                 COLUMN_Volume + " TEXT, " +
-                STATUS + " TEXT);";
+                STATUS + " TEXT, " +
+                COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
         db.execSQL(query);
     }
+
     @Override
-    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        onCreate(db);
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP");
+        }
     }
 
     public void addBook(String title,String Fill,String Volume,String status){
@@ -74,17 +79,12 @@ public class deliDB extends SQLiteOpenHelper {
         }
         return cursor;
     }
-    public Cursor readAllDataWithoutOrder(){
-        // Remove the ORDER BY clause
-        String query = "SELECT * FROM " + TABLE_NAME;
+    public Cursor readAllDataInFIFOOrder() {
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_TIMESTAMP + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = null;
-        if(db != null){
-            cursor = db.rawQuery(query, null);
-        }
-        return cursor;
+        return db != null ? db.rawQuery(query, null) : null;
     }
+
 
     void updateData(String row_id, String title){
         SQLiteDatabase db = this.getWritableDatabase();

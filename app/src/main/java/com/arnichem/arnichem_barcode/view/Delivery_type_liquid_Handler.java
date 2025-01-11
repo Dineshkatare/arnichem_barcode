@@ -76,8 +76,6 @@ public class Delivery_type_liquid_Handler extends SQLiteOpenHelper {
      * */
     public List<String> getAllLabels(){
         List<String> list = new ArrayList<String>();
-        list.add("निवडा");
-        // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;
 
         SQLiteDatabase db = this.getReadableDatabase();

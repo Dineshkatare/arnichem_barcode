@@ -1,0 +1,9 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Solid color for the background -->
+    <solid android:color="@color/arnichem" /> <!-- You can change this color as per your need -->
+
+    <!-- Set rounded corners -->
+    <corners android:radius="16dp" /> <!-- Adjust the corner radius as needed -->
+
+    <!-- Optionally add a border if required -->
+  </shape>

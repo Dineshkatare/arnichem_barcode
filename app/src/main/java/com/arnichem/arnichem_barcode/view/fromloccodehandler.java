@@ -77,7 +77,6 @@ public class fromloccodehandler extends SQLiteOpenHelper {
      * */
     public List<String> getAllLabels(){
         List<String> list = new ArrayList<String>();
-        list.add("लोकेशन  निवडा ");
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_NAME;
 

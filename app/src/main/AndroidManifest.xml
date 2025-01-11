@@ -6,6 +6,7 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission
         android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
         tools:ignore="ProtectedPermissions" />
@@ -14,6 +15,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <uses-feature
@@ -78,6 +80,19 @@
         android:theme="@style/Theme.Arnichem"
         android:usesCleartextTraffic="true"
         tools:node="merge">
+        <activity
+            android:name=".CRM.CRMViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".report.ResourceActivity"
+            android:exported="false" />
+        <activity
+            android:name=".order.OrderViewActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard" />
+        <activity
+            android:name=".order.OrderMainActivity"
+            android:exported="false" />
         <activity
             android:name=".leave.LeaveApplyActivity"
             android:exported="false" />
@@ -624,7 +639,6 @@
             android:name=".leave.LeaveApplicationActivity"
             android:parentActivityName=".view.Dashboard"
             android:screenOrientation="fullSensor" />
-
         <activity android:name=".view.Dashboard" />
         <activity
             android:name=".view.SplashScreen"
@@ -689,16 +703,13 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
-        </receiver>
-
-<!--        <service-->
-<!--            android:name=".CallLogSyncService"-->
-<!--            android:enabled="true"-->
-<!--            android:exported="false" />-->
-
-<!--        <receiver-->
-<!--            android:name=".CallLogSyncReceiver"-->
-<!--            android:exported="false" /> &lt;!&ndash; Handle alarms after device boot &ndash;&gt;-->
+        </receiver> <!-- <service -->
+        <!-- android:name=".CallLogSyncService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="false" /> -->
+        <!-- <receiver -->
+        <!-- android:name=".CallLogSyncReceiver" -->
+        <!-- android:exported="false" /> &lt;!&ndash; Handle alarms after device boot &ndash;&gt; -->
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"

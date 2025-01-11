@@ -74,7 +74,7 @@ public class bp_contact_handler extends SQLiteOpenHelper {
      * */
     public List<String> getAllLabels(String bp_contact_code){
         List<String> list = new ArrayList<String>();
-        list.add("Select");
+        list.add("Select Contact Name");
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " where "+COLUMN_CODE+" LIKE ?",new String[]{"%"+bp_contact_code+"%"});//selectQuery,selectedArguments

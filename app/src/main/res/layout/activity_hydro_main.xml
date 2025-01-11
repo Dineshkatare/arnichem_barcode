@@ -306,17 +306,15 @@
             android:textSize="16dp"
             android:textStyle="bold"
             android:gravity="center_horizontal" />
-        <EditText
-            android:id="@+id/edowner"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+            android:id="@+id/spinnerDistributor"
+            android:layout_width="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_gravity="center"
             android:textAlignment="center"
-            android:inputType="text"
-            android:text="Arnichem"
-            android:background="@drawable/editbox" />
+            android:background="@drawable/editbox"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

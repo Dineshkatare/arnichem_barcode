@@ -3,6 +3,8 @@ package com.arnichem.arnichem_barcode.view;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
@@ -66,6 +68,8 @@ import java.util.Map;
 public class login extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
   Button login;
   EditText username;
+  private static final int PERMISSION_REQUEST_READ_CALL_LOG = 100;
+
   RelativeLayout layout;
   ProgressDialog dialog;
   SharedPreferences pref;
@@ -100,7 +104,17 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
     String strImage = SharedPref.mInstance.getLogo();
     String phoneNumber = SharedPref.mInstance.getPhoneNumber();
     Log.i("dinesh", "phone number"+phoneNumber);
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
+      // Request both permissions if they are not granted
+      ActivityCompat.requestPermissions(this,
+              new String[]{
+                      Manifest.permission.READ_CALL_LOG,
+                      Manifest.permission.READ_PHONE_STATE
+              },
+              PERMISSION_REQUEST_READ_CALL_LOG);
+    }
     File imgFile = new  File(strImage);
 
     if(imgFile.exists()){
@@ -221,7 +235,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
                       SharedPref.getInstance(getApplicationContext()).storeLName(object.getString("lname"));
                       SharedPref.getInstance(getApplicationContext()).storeEmail(object.getString("email"));
                       SharedPref.getInstance(getApplicationContext()).storesuperId(object.getString("id"));
-                      //  SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
+                      SharedPref.getInstance(getApplicationContext()).store_call_log_access(object.getString("call_log_access"));
                       closekey();
                       dialog.dismiss();
 
@@ -267,7 +281,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
         params.put("app_pin",pinvalue.toString());
         params.put("ipaddress",ipstr);
         params.put("imei",imeistr);
-        params.put("appversion","7.96");
+        params.put("appversion","8.3.1");
         params.put("lati",latitude);
         params.put("logi",logitude);
         params.put("addr",address);

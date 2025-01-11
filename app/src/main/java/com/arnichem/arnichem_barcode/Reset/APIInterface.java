@@ -1,6 +1,7 @@
 package com.arnichem.arnichem_barcode.Reset;
 
 
+import com.arnichem.arnichem_barcode.CallLogManager;
 import com.arnichem.arnichem_barcode.FileUpload.ApiResponse;
 import com.arnichem.arnichem_barcode.FileUpload.FileUploadData;
 import com.arnichem.arnichem_barcode.GetData.GetDataResponse;
@@ -10,8 +11,11 @@ import com.arnichem.arnichem_barcode.data.response.FetchItemAndQuantityVolume;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
 import com.arnichem.arnichem_barcode.leave.LeaveResponse;
 
+import java.util.List;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -211,6 +215,23 @@ public interface APIInterface {
 
     );
 
+
+    @FormUrlEncoded
+    @POST("vehicle_login.php") // Replace with the actual API endpoint
+    Call<ResponseBody> postVehicleDetails(
+            @Field("reading") String reading,
+            @Field("file_path") String filePath,
+            @Field("vehicle_no") String vehicleNo,
+            @Field("lati") String latitude,
+            @Field("logi") String longitude,
+            @Field("addr") String address,
+            @Field("username") String username,
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName
+    );
+
     @FormUrlEncoded
     @POST("upload_call_logs.php")
     Call<ApiResponse> uploadCallLogs(
@@ -229,6 +250,7 @@ public interface APIInterface {
             @Field("db_username") String dbUsername,
             @Field("db_password") String dbPassword,
             @Field("db_name") String dbName,
+            
             @Field("emp_id") String empId,
             @Field("from_date") String fromDate,
             @Field("to_date") String toDate,
@@ -247,6 +269,31 @@ public interface APIInterface {
             @Field("db_name") String dbName
     );
 
+
+    @FormUrlEncoded
+    @POST("upload_call_logs.php")
+    Call<ApiResponse> sendCallLogs(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("call_logs") String callLogsJson // Send JSON as a string
+    );
+
+    @FormUrlEncoded
+    @POST("order_main.php")
+    Call<LeaveResponse> submitOrder(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("cust_code") String custCode,
+            @Field("order_msg") String orderMsg,
+            @Field("user") String user,
+            @Field("remarks") String remarks,
+            @Field("date_added") String date_added
+
+    );
 
 
 }

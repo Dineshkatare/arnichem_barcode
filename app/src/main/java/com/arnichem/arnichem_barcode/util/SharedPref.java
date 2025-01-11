@@ -15,8 +15,14 @@ public class SharedPref {
     public static final String from_loc = "from_loc";
     public static final String cutomer_sel = "cutomer_sel";
     public static final String report_status = "report_status";
+    public static final String showed_msg_status = "msg_status";
+
+
 
     public static final String item_Sel = "item_Sel";
+
+    public static final String call_log_access = "call_log_access";
+
 
     public static final String distshare = "dist";
     public static final String manifold = "manifold";
@@ -41,6 +47,9 @@ public class SharedPref {
     public static final String BASE_URL = "BASE_URL";
     public static final String LOGO = "LOGO";
     public static final String PRINT_LOGO = "PRINT_LOGO";
+
+    public static final String LOGIN_MSG = "LOGIN_MSG";
+
     public static final String PRINT_NUMBER = "PRINT_NUMBER";
 
     public static final String SM = "sm";
@@ -193,6 +202,19 @@ public class SharedPref {
 
     }
 
+    public void store_show_msg_status(String status) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(showed_msg_status, status);
+        editor.commit();
+    }
+    public String get_show_msg_status() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(showed_msg_status, "0");
+
+    }
+
+
     public void store_item_sel(String email) {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -210,6 +232,19 @@ public class SharedPref {
         editor.putString(ID, id);
         editor.commit();
     }
+
+    public String get_call_log_access() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(call_log_access, "N");
+
+    }
+    public void store_call_log_access(String access) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(call_log_access, access);
+        editor.commit();
+    }
+
 
     public String getEmail() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
@@ -503,6 +538,18 @@ public class SharedPref {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(PRINT_LOGO, "");
     }
+
+    public void setLoginMsg(String sta) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(LOGIN_MSG, sta);
+        editor.commit();
+    }
+    public String getLoginMsg() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(LOGIN_MSG, "");
+    }
+
     //Logout user
     public void logout() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);

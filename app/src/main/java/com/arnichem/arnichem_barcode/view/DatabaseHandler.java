@@ -18,6 +18,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String COLUMN_NAME = "name";
     private static final String COLUMN_CODE = "code";
     private static final String COLUMN_INVOICE = "invoice";
+    private static final String MSG = "msg";
+
     private Context context;
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -30,7 +32,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NAME + " TEXT UNIQUE, " +
                 COLUMN_CODE + " TEXT, " +
-                COLUMN_INVOICE + " TEXT);";
+                COLUMN_INVOICE + " TEXT, " +
+                MSG + " TEXT);";
         db.execSQL(query);
     }
 
@@ -57,13 +60,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     /**
      * Inserting new lable into lables table
      * */
-    public void addcust(String title, String author, String invoice){
+    public void addcust(String title, String author, String invoice,String msg){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_NAME, title);
         cv.put(COLUMN_CODE, author);
         cv.put(COLUMN_INVOICE, invoice);
+        cv.put(MSG, msg);
+
         long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
         if(result == -1){
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();

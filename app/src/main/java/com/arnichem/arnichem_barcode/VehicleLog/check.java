@@ -49,6 +49,8 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
@@ -57,6 +59,7 @@ import com.android.volley.toolbox.Volley;
 import com.arnichem.arnichem_barcode.Barcode.NewCamerActivity;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.Reset.APIInterface;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.Main;
 import com.arnichem.arnichem_barcode.constant.constant;
 import com.arnichem.arnichem_barcode.util.SharedPref;
@@ -86,6 +89,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 public class check extends AppCompatActivity implements Spinner.OnItemSelectedListener, Listener, LocationData.AddressCallBack
 {
@@ -109,6 +117,7 @@ public class check extends AppCompatActivity implements Spinner.OnItemSelectedLi
     String ba1;
     ScrollView scrollView;
     ArrayAdapter<String> dataAdapter;
+    APIInterface apiInterface;
 
 
     @Override
@@ -119,6 +128,7 @@ public class check extends AppCompatActivity implements Spinner.OnItemSelectedLi
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mServiceReceiver,
                 new IntentFilter("camera_data"));
+        apiInterface = APIClient.getClient().create(APIInterface.class);
 
         getSupportActionBar().setTitle("Vehicle Login");
         getLocationDetail = new GetLocationDetail(this, this);
@@ -143,6 +153,7 @@ public class check extends AppCompatActivity implements Spinner.OnItemSelectedLi
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //postUsingRetrofit();
                 postUsingVolley();
 
 
@@ -328,7 +339,6 @@ public class check extends AppCompatActivity implements Spinner.OnItemSelectedLi
 
 
     private void postUsingVolley() {
-//        String url = "http://arnichem.co.in/intranet/barcode/APP/Vehicle_reading_insert.php";
         dialog = new ProgressDialog(check.this);
         dialog.setTitle("Uploading");
         dialog.setMessage("Please wait....");
@@ -392,7 +402,78 @@ public class check extends AppCompatActivity implements Spinner.OnItemSelectedLi
             };
             // below line is to make
             // a json object request.
+                request.setRetryPolicy(new DefaultRetryPolicy(
+                        60 * 1000, // 60 seconds timeout
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                ));
             VolleySingleton.getInstance(check.this).addToRequestQueue(request);
+        }
+    }
+    private void postUsingRetrofit() {
+        dialog = new ProgressDialog(check.this);
+        dialog.setTitle("Uploading");
+        dialog.setMessage("Please wait....");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.show();
+
+        if (pos == 0) {
+            dialog.dismiss();
+            Snackbar.make(scrollView, "कृपया वाहन क्रमांक निवडा !", Snackbar.LENGTH_LONG)
+                    .setBackgroundTint(Color.RED)
+                    .setTextColor(Color.WHITE)
+                    .show();
+        } else if (riding.getText().toString().isEmpty()) {
+            dialog.dismiss();
+            MDToast.makeText(check.this, "कृपया वाहन रिडींग टाका !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+        } else if (ba1 == null) {
+            dialog.dismiss();
+            MDToast.makeText(check.this, "कृपया वाहन रिडींग चा फोटो टाका !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+        } else {
+            Call<ResponseBody> call = apiInterface.postVehicleDetails(
+                    riding.getText().toString(),
+                    ba1,
+                    selected,
+                    latitude,
+                    logitude,
+                    address,
+                    SharedPref.getInstance(check.this).FirstName() + " " + SharedPref.getInstance(check.this).LastName(),
+                    SharedPref.mInstance.getDBHost(),
+                    SharedPref.mInstance.getDBUsername(),
+                    SharedPref.mInstance.getDBPassword(),
+                    SharedPref.mInstance.getDBName()
+            );
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        SharedPref.getInstance(getApplicationContext()).storeVStatus("success");
+                        SharedPref.getInstance(getApplicationContext()).storeVehicleNumber(selected);
+                        Snackbar.make(scrollView, SharedPref.getInstance(check.this).FirstName() + " " + SharedPref.getInstance(check.this).LastName() + " तुमचा  गाडी  नंबर " + selected + " सोबत रजिस्टर झाला आहे ", Snackbar.LENGTH_LONG)
+                                .setBackgroundTint(Color.GREEN)
+                                .setTextColor(Color.WHITE)
+                                .show();
+                        dialog.dismiss();
+                        startActivity(new Intent(check.this, Dashboard.class));
+                    } else {
+                        Snackbar.make(scrollView, "कृपया परत प्रयत्न करा!", Snackbar.LENGTH_LONG)
+                                .setBackgroundTint(Color.RED)
+                                .setTextColor(Color.WHITE)
+                                .show();
+                        dialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Snackbar.make(scrollView, "कृपया परत प्रयत्न करा!", Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(Color.RED)
+                            .setTextColor(Color.WHITE)
+                            .show();
+                    dialog.dismiss();
+                }
+            });
         }
     }
 

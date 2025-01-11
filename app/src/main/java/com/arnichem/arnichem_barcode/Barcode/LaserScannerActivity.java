@@ -32,6 +32,7 @@ import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
 import com.arnichem.arnichem_barcode.view.syncHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LaserScannerActivity extends AppCompatActivity implements OnItemClickListener {
@@ -42,6 +43,7 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
 
     ArrayList<String> book_id, book_title;
     TextView Totalscanvalue;
+
     InWardCustomAdapter customAdapter;
     InWardDatabaseHelper myDB;
 
@@ -141,6 +143,10 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             storedOutwardValues();
             Totalscanvalue.setText(count);
             check();
+            Collections.reverse(cylIdList);
+            Collections.reverse(cyclinderNameList);
+            Collections.reverse(fillwith);
+
             outwardCustomAdapter = new CustomAdapter(LaserScannerActivity.this, this, cylIdList, cyclinderNameList, fillwith,this,type);
             filledWithAdapter = new FilledWithAdapter(LaserScannerActivity.this, this, name, tot);
             Filled_with_Recycle_View.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
@@ -200,7 +206,7 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         Cursor cursor = null;
 
         if (type.equalsIgnoreCase("delivery")) {
-            cursor = delidb.readAllDataWithoutOrder();
+            cursor = delidb.readAllDataInFIFOOrder();
         } else if (type.equalsIgnoreCase("outward")) {
             cursor = outwatdMyDB.readAllDataWithoutOrder();
         }
@@ -249,7 +255,7 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         Cursor cursor = null;
 
         if (type.equalsIgnoreCase("delivery")) {
-            cursor = delidb.readAllData();
+            cursor = delidb.readAllDataInFIFOOrder();
         } else if (type.equalsIgnoreCase("outward")) {
             cursor = outwatdMyDB.readAllData();
         }

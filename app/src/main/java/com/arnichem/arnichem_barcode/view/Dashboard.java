@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -16,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
@@ -23,12 +25,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
@@ -38,6 +42,7 @@ import androidx.work.WorkManager;
 
 import com.arnichem.arnichem_barcode.Barcode.ScannerView;
 import com.arnichem.arnichem_barcode.CRM.CRM_Main;
+import com.arnichem.arnichem_barcode.CallLogManager;
 import com.arnichem.arnichem_barcode.CallLogSyncReceiver;
 import com.arnichem.arnichem_barcode.CallLogSyncService;
 
@@ -66,18 +71,24 @@ import com.arnichem.arnichem_barcode.constant.constant;
 import com.arnichem.arnichem_barcode.data.ReportAccess;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
 import com.arnichem.arnichem_barcode.leave.LeaveApplicationActivity;
+import com.arnichem.arnichem_barcode.order.OrderMainActivity;
 import com.arnichem.arnichem_barcode.other_entries.OtherEntryActivity;
 import com.arnichem.arnichem_barcode.report.ReportActivity;
+import com.arnichem.arnichem_barcode.report.ResourceActivity;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.example.easywaylocation.EasyWayLocation;
 import com.example.easywaylocation.GetLocationDetail;
 import com.example.easywaylocation.Listener;
 import com.example.easywaylocation.LocationData;
 import com.example.myapplication.reset.ApiClient;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
 import java.io.File;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.MediaType;
@@ -90,11 +101,12 @@ import retrofit2.Response;
 public class Dashboard extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
-    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,logout,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,logCL,otherCl,report,leave;
+    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,logout,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,logCL,otherCl,report,leave,order,resource;
     SharedPreferences pref;
     ScrollView scrollView;
     boolean doubleBackToExitPressedOnce = false;
     ProgressDialog dialog;
+    private static final int PERMISSION_REQUEST_READ_CALL_LOG = 100;
 
     String status;
     ImageView vehiclelogimageview;
@@ -138,9 +150,23 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         logCL = findViewById(R.id.log_cl);
         CRM=findViewById(R.id.CRM);
         leave = findViewById(R.id.leave);
+        order = findViewById(R.id.order);
+        resource =findViewById(R.id.resource);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if(SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")){
             report.setVisibility(View.VISIBLE);
+        }
+
+        Log.d("chech","0"+SharedPref.getInstance(Dashboard.this).get_show_msg_status());
+        if(SharedPref.getInstance(Dashboard.this).get_show_msg_status().equalsIgnoreCase("0")){
+                SharedPref.getInstance(Dashboard.this).store_show_msg_status("1");
+            if (SharedPref.getInstance(Dashboard.this).getLoginMsg() != null && !SharedPref.getInstance(Dashboard.this).getLoginMsg().isEmpty()) {
+                String message = SharedPref.getInstance(Dashboard.this).getLoginMsg(); // Replace literal "\n" with a newline
+                String message1 = message.replace("\\n", "\n"); // Replace literal "\n" with a newline
+
+                showCustomMsg( message1);
+                Log.d("chech","1"+message);
+            }
         }
 //        Toast.makeText(Dashboard.this, ""+SharedPref.getInstance(Dashboard.this).getCompanyFullName(), Toast.LENGTH_SHORT).show();
 
@@ -183,6 +209,9 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             public void onClick(View v) {
                 Intent i=new Intent(Dashboard.this, MainSettings.class);
                 startActivity(i);
+
+
+
             }
         });
         Godown.setOnClickListener(new View.OnClickListener() {
@@ -282,6 +311,14 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             }
         });
 
+
+        resource.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(Dashboard.this, ResourceActivity.class);
+                startActivity(i);
+            }
+        });
         file_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -312,13 +349,9 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 if (isGpsEnabled) {
                     Intent i=new Intent(Dashboard.this, Attendance_log.class);
                     startActivity(i);
-
-                    // GPS is enabled, perform your action here
                 } else {
                     Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     startActivity(intent);
-
-                    // GPS is not enabled, show a message or request activation
                     Toast.makeText(getApplicationContext(), "Please enable GPS", Toast.LENGTH_SHORT).show();
                 }
 
@@ -339,6 +372,14 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 startActivity(i);
             }
         });
+        order.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(Dashboard.this, OrderMainActivity.class);
+                startActivity(i);
+
+            }
+        });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
 
@@ -347,11 +388,26 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             }
         }
         getReport();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            fetchAndUploadCallLogs(this);
+
+        } else {
+            retrieveAndUploadLogs(this);
+
+            // Permission already granted
+        }
+
+
 // Set the second alarm at 3:30 PM
 
         // Schedule the call log sync worker to run every 5 hours
 //        Intent serviceIntent = new Intent(this, CallLogSyncService.class);
 //        startService(serviceIntent);
+
+
+
 
     }
     @Override
@@ -420,7 +476,15 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 Toast.makeText(Dashboard.this, "Camera Permission Denied", Toast.LENGTH_SHORT) .show();
             }
         }
-
+        if (requestCode == PERMISSION_REQUEST_READ_CALL_LOG) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed with fetching and uploading call logs
+                retrieveAndUploadLogs(this);
+            } else {
+                // Permission denied, show a message to the user
+                Toast.makeText(this, "Permission denied to read call logs.", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 
@@ -505,22 +569,106 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 Toast.makeText(Dashboard.this, "Error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
-        scheduleCallLogSync();
+
     }
 
 
-    private void scheduleCallLogSync() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, CallLogSyncReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Set the alarm to trigger every minute (60000 ms)
-        long interval = 9000L;
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + interval,
-                interval,
-                pendingIntent);
+    private void fetchAndUploadCallLogs(Context context) {
+        // Check if permission to read call logs is granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+            // Request permission if it's not granted
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_CALL_LOG},
+                    PERMISSION_REQUEST_READ_CALL_LOG);
+        } else {
+            // Permission already granted, fetch and upload call logs
+            retrieveAndUploadLogs(context);
+        }
     }
 
+    // Method to fetch and upload the call logs
+    private void retrieveAndUploadLogs(Context context) {
+        // Create a background thread pool
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        // Run the task in the background
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                CallLogManager callLogManager = new CallLogManager(Dashboard.this);
+                List<CallLogManager.CallLogEntry> callLogs = callLogManager.getCallLogs();
+
+                if(SharedPref.getInstance(context).get_call_log_access().equalsIgnoreCase("Y")) {
+                    if (!callLogs.isEmpty()) {
+                        // This method will run on a background thread
+                        callLogManager.sendCallLogsToServer(callLogs);
+                    }
+                    Log.d("call log","sync");
+                }else {
+                    Log.d("call log","not sync");
+
+                }
+            }
+        });
+
+        // Shutdown the executor once done
+        executorService.shutdown();
+    }
+
+    public void showCustomMsg(String msg) {
+        // Create the MaterialAlertDialogBuilder for Material Design styling
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.CustomAlertDialog);
+
+        // Create the dialog and get the reference of the button
+        builder.setMessage(msg);
+        builder.setCancelable(false);  // Disable dismissing the dialog with back button or touch
+        builder.setNegativeButton("Okay", (dialog, which) -> dialog.dismiss());  // The default "Okay" button
+
+        // Create the dialog
+        AlertDialog dialog = builder.create();
+
+        // Show the dialog
+        dialog.show();
+
+        // Get the "Okay" button from the dialog and make it initially show the countdown value
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        negativeButton.setVisibility(View.VISIBLE); // Ensure the button is visible
+        negativeButton.setText("5 sec");
+
+        // Set the button text color to white
+        negativeButton.setTextColor(getResources().getColor(android.R.color.white));  // White text color
+
+        // Apply the background drawable with rounded corners to the dialog window
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_dialog_background);
+
+
+        TextView messageTextView = dialog.findViewById(android.R.id.message); // This accesses the dialog's message TextView
+        if (messageTextView != null) {
+            messageTextView.setTextColor(getResources().getColor(android.R.color.white)); // Set message text color to white
+        }
+
+        // Countdown timer logic (5 seconds)
+        final int[] countdown = {5};  // Array to hold the countdown value so it's accessible inside the Runnable
+        final Handler handler = new Handler();
+
+        // Run a countdown on the UI thread
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (countdown[0] > 0) {
+                    // Update the button text to show the countdown
+                    negativeButton.setText(countdown[0] + " sec");
+                    countdown[0]--;
+                    handler.postDelayed(this, 1000);  // Run every second
+                } else {
+                    // After countdown ends, change the button text to "Okay"
+                    negativeButton.setText("Okay");
+                }
+            }
+        }, 1000);  // Start the countdown with a delay of 1 second
+    }
+
+    // Handle the result of the permission request
 
 }
+

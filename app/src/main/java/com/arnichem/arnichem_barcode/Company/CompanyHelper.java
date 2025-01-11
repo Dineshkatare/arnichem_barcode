@@ -27,6 +27,9 @@ public class CompanyHelper extends SQLiteOpenHelper {
     private static final String DB_BATCH_PREMIX = "batch_premix";
     private static final String DB_CYC_PREMIX = "cyc_premix";
 
+    private static final String LOGIN_MSG = "login_msg";
+
+
 
 
     private Context context;
@@ -50,7 +53,8 @@ public class CompanyHelper extends SQLiteOpenHelper {
                 DB_TERMS_TEXT + " TEXT, " +
                 DB_OWN_CODE + " TEXT, " +
                 DB_BATCH_PREMIX + " TEXT, " +
-                DB_CYC_PREMIX + " TEXT);";
+                DB_CYC_PREMIX + " TEXT, " +
+                LOGIN_MSG + " TEXT);";
         db.execSQL(query);
     }
 
@@ -67,7 +71,7 @@ public class CompanyHelper extends SQLiteOpenHelper {
     /**
      * Inserting new lable into lables table
      * */
-    public void addCompany(String company_id,String company_short_name,String company_full_name,String db_host,String db_username,String db_password,String db_name,String base_url,String terms_text,String own_code,String batch_premix,String cyc_prefix){
+    public void addCompany(String company_id,String company_short_name,String company_full_name,String db_host,String db_username,String db_password,String db_name,String base_url,String terms_text,String own_code,String batch_premix,String cyc_prefix,String login_msg){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -83,6 +87,7 @@ public class CompanyHelper extends SQLiteOpenHelper {
         cv.put(DB_OWN_CODE,own_code);
         cv.put(DB_BATCH_PREMIX,batch_premix);
         cv.put(DB_CYC_PREMIX,cyc_prefix);
+        cv.put(LOGIN_MSG,login_msg);
 
 
         long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);

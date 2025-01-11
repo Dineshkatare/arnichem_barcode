@@ -191,7 +191,11 @@ public class MainPaymentReceipt extends AppCompatActivity {
                                 showAlertDialogButtonClicked(view);
                             }
                             cust_code=col1;
-
+//                            if (cursor.getString(4) != null && !cursor.getString(4).isEmpty()) {
+//                                String message = cursor.getString(4).replace("\\n", "\n"); // Replace literal "\n" with a newline
+//                                showCustomMsg( message);
+//                                Log.d("chech",""+message);
+//                            }
 
                         }
                     }

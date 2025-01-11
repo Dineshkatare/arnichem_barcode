@@ -123,6 +123,19 @@
                 android:hint="सिलेंडर एमटी वेट टाका"
                 android:inputType="numberDecimal|numberSigned"
                 android:textAlignment="center" />
+            <AutoCompleteTextView
+                android:id="@+id/actual_wt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="9"
+                android:background="@drawable/editbox"
+                android:hint="Actual Wt"
+                android:visibility="gone"
+                android:inputType="numberDecimal|numberSigned"
+                android:textAlignment="center" />
 
             <AutoCompleteTextView
                 android:id="@+id/cylinderfullweight"

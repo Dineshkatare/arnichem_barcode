@@ -23,6 +23,9 @@ public class ammoniaHelper extends SQLiteOpenHelper {
     private static final String COLUMN_net = "net";
     private static final String COLUMN_mani = "mani";
 
+    private static final String COLUMN_Actual = "actual";
+
+
     ammoniaHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -37,7 +40,8 @@ public class ammoniaHelper extends SQLiteOpenHelper {
                 COLUMN_full + " TEXT, " +
                 COLUMN_net + " TEXT, " +
                 COLUMN_mani + " TEXT, " +
-                COLUMN_vol + " TEXT);";
+                COLUMN_vol + " TEXT, " +
+                COLUMN_Actual+ " TEXT);";
         db.execSQL(query);
     }
     @Override
@@ -46,7 +50,7 @@ public class ammoniaHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    void addBook(String cyname,String dis,String mani,String vol,String full,String net){
+    void addBook(String cyname,String dis,String mani,String vol,String full,String net,String actual){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -56,6 +60,8 @@ public class ammoniaHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_net, net);
         cv.put(COLUMN_mani, mani);
         cv.put(COLUMN_vol, vol);
+        cv.put(COLUMN_Actual, actual);
+
         long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
 
         if(result == -1){

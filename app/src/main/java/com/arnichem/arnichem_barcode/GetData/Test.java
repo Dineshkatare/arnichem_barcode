@@ -239,7 +239,7 @@ public class Test extends AppCompatActivity {
     private void loadBusinessPartners(List<BusinessPartner> businessPartners, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
             for (BusinessPartner partner : businessPartners) {
-                databaseHandlercustomer.addcust(partner.getName(), partner.getCode(), partner.getInvoice());
+                databaseHandlercustomer.addcust(partner.getName(), partner.getCode(), partner.getInvoice(),partner.getDel_instructions());
             }
             latch.countDown();
         });

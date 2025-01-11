@@ -1,5 +1,7 @@
 package com.arnichem.arnichem_barcode.Producation.HydroTest;
 
+import static android.view.View.GONE;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
@@ -10,9 +12,12 @@ import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
@@ -27,18 +32,26 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.arnichem.arnichem_barcode.PrintReceipt.DeliveryPrint.DeliveryPrintDB;
 import com.arnichem.arnichem_barcode.Producation.DryIce.DryIceFIrstScreen;
+import com.arnichem.arnichem_barcode.Producation.NewAmmonia.ammoniaMain;
+import com.arnichem.arnichem_barcode.Producation.Oxygen.OxygenFilling;
+import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.DatabaseHandler;
+import com.arnichem.arnichem_barcode.view.DistributorHelper;
 import com.arnichem.arnichem_barcode.view.InventoryGases;
+import com.arnichem.arnichem_barcode.view.ItemCode;
+import com.arnichem.arnichem_barcode.view.syncHelper;
 import com.google.android.material.snackbar.Snackbar;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,26 +60,29 @@ public class HydroMain extends AppCompatActivity {
 
 
     private EditText serialNumberEditText;
-    private EditText cylinderIdEditText;
+    private AutoCompleteTextView cylinderIdEditText,cylindernumber1;
     private EditText manufacturerEditText;
     private Spinner gasTypeSpinner;
+    ArrayAdapter<String> distributordataAdapter;
+    DistributorHelper distributorHelper;
+    syncHelper sync;
 
+    public int distributorpos;
+    String temp="";
     private EditText waterCapcityEditText;
 
-
-    private EditText ownerEditText;
-    private EditText tareWeightEditText;
+    String distributorname="",distributorcode="";
+   private EditText tareWeightEditText;
     private EditText actualWeightEditText;
     private Spinner internalSpinner;
     private EditText c1EditText;
     private EditText c2EditText;
     private EditText c3EditText;
-    private EditText weightOfCylinderEditText;
-    private EditText waterTempEditText;
+  //  private EditText weightOfCylinderEditText;
     private Button saveButton;
 
      private ScrollView scannerviewmain;
-
+    SearchAdapter searchAdapter;
      private ProgressDialog dialog;
     public Spinner spinmm;
     public Spinner spinyyyy;
@@ -80,7 +96,7 @@ public class HydroMain extends AppCompatActivity {
     private String gasItemCode = "";
 
     private InventoryGases inventoryGases;
-
+    Spinner spinnerDistributor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,25 +105,27 @@ public class HydroMain extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("HydroTest");
         serialNumberEditText = findViewById(R.id.edserialnumber);
+        sync=new syncHelper(this);
         cylinderIdEditText = findViewById(R.id.edcylinderid);
+        cylindernumber1 = findViewById(R.id.cylindernumber1);
+
         manufacturerEditText = findViewById(R.id.manufacturerval);
         waterCapcityEditText = findViewById(R.id.waterCapcityEdt);
         gasTypeSpinner = findViewById(R.id.edgastype);
-        ownerEditText = findViewById(R.id.edowner);
+        spinnerDistributor=findViewById(R.id.spinnerDistributor);
         tareWeightEditText = findViewById(R.id.edtarewt);
         actualWeightEditText = findViewById(R.id.edactualwt);
         internalSpinner = findViewById(R.id.spininternal);
         c1EditText = findViewById(R.id.edc1);
         c2EditText = findViewById(R.id.edc2);
         c3EditText = findViewById(R.id.edc3);
-        waterTempEditText = findViewById(R.id.water_temp_val);
-        weightOfCylinderEditText = findViewById(R.id.weight_of_cylinder_val);
         saveButton = findViewById(R.id.savebutton);
-        scannerviewmain= findViewById(R.id.scannerviewmain);
         spinmm = findViewById(R.id.spinmm);
         spinyyyy = findViewById(R.id.spinyyyy);
         inventoryGases=new InventoryGases(this);
+        distributorHelper=new DistributorHelper(this);
 
+        loadata();
 
         String[] items1= new String[]{"00","01", "02", "03", "04", "05", "06","07", "08", "09", "10", "11", "12"};
 
@@ -140,7 +158,47 @@ public class HydroMain extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         internalSpinner.setAdapter(spinnerAdapter);
 
+        spinnerDistributor.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                distributorname = distributordataAdapter.getItem(position);
+                distributorpos=position;
 
+                SharedPref.getInstance(getApplicationContext()).store_dist(String.valueOf(distributorpos));
+                Cursor cursor = distributorHelper.readAllData();
+                if (cursor.getCount() == 0) {
+                    //      empty_imageview.setVisibility(View.VISIBLE);
+                    //      no_data.setVisibility(View.VISIBLE);
+                } else {
+                    while (cursor.moveToNext()) {
+                        String col=cursor.getString(1);
+                        String col1 =cursor.getString(2);
+                        if(col.contentEquals(distributorname))
+                        {
+                            if(distributorname.equalsIgnoreCase(SharedPref.getInstance(HydroMain.this).getOwnCode())){
+                                distributorcode  = SharedPref.getInstance(HydroMain.this).getOwnCode();
+                                cylindernumber1.setVisibility(GONE);
+                                cylinderIdEditText.setVisibility(View.VISIBLE);
+
+                            }else {
+                                distributorcode=col1;
+                                cylindernumber1.setVisibility(View.VISIBLE);
+                                cylinderIdEditText.setVisibility(GONE);
+                            }
+
+                        }
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         spinyyyy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
@@ -167,6 +225,9 @@ public class HydroMain extends AppCompatActivity {
                 // Handle case when nothing is selected
             }
         });
+        loadSpinnerData();
+        loadSpinnerDataDist();
+
 
         gasTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -216,26 +277,28 @@ public class HydroMain extends AppCompatActivity {
                 }
             }
         });
-        loadSpinnerData();
 
         // Add your logic and event handlers here
 
     }
 
     private boolean validateInputFields() {
-
+        String cylinderId ="";
         String serialNumber = serialNumberEditText.getText().toString().trim();
-        String cylinderId = cylinderIdEditText.getText().toString().trim();
+        if(distributorname.equalsIgnoreCase(SharedPref.getInstance(HydroMain.this).getOwnCode())) {
+            cylinderId = cylinderIdEditText.getText().toString().trim();
+        }else {
+            cylinderId = cylindernumber1.getText().toString().trim();
+
+        }
         String manufacturer = manufacturerEditText.getText().toString().trim();
         String waterCapcity = waterCapcityEditText.getText().toString().trim();
-        String owner = ownerEditText.getText().toString().trim();
+        String owner = distributorcode;
         String tareWeight = tareWeightEditText.getText().toString().trim();
         String actualWeight = actualWeightEditText.getText().toString().trim();
         String c1 = c1EditText.getText().toString().trim();
         String c2 = c2EditText.getText().toString().trim();
         String c3 = c3EditText.getText().toString().trim();
-        String weight_of_cylinder = weightOfCylinderEditText.getText().toString().trim();
-        String water_temp = waterTempEditText.getText().toString().trim();
 
 
 
@@ -294,16 +357,7 @@ public class HydroMain extends AppCompatActivity {
             return false;
         }
 
-        if (weight_of_cylinder.isEmpty()) {
-            showToast("Please enter the weight of cylinder with water value");
-            return false;
-        }
 
-
-        if (water_temp.isEmpty()) {
-            showToast("Please enter the water temperature value");
-            return false;
-        }
 
 
         if(selectedItem.isEmpty()){
@@ -334,9 +388,28 @@ public class HydroMain extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
         dialog.show();
+        String waterCapacity = waterCapcityEditText.getText().toString();
+        String tareWeight = tareWeightEditText.getText().toString();
+
+
+// Parse the values to numbers
+        double waterCapacityValue = waterCapacity.isEmpty() ? 0 : Double.parseDouble(waterCapacity);
+        double tareWeightValue = tareWeight.isEmpty() ? 0 : Double.parseDouble(tareWeight);
+
+// Compute the sum
+        double waterWeight = waterCapacityValue + tareWeightValue;
+
+        String cylinderId1 ="";
+        if(distributorname.equalsIgnoreCase(SharedPref.getInstance(HydroMain.this).getOwnCode())) {
+            cylinderId1 = cylinderIdEditText.getText().toString().trim();
+        }else {
+            cylinderId1 = cylindernumber1.getText().toString().trim();
+
+        }
 
         // Creating a new variable for our request queue
         RequestQueue queue = Volley.newRequestQueue(HydroMain.this);
+        String finalCylinderId = cylinderId1;
         StringRequest request = new StringRequest(Request.Method.POST, APIClient.hydro_test, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -364,15 +437,16 @@ public class HydroMain extends AppCompatActivity {
                 Toast.makeText(HydroMain.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
             }
         }) {
+
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("enterDate",Selectedyy+"-"+Selectedmm+"-"+"01");
                 params.put("serialNumber", serialNumberEditText.getText().toString());
-                params.put("cylinderId", cylinderIdEditText.getText().toString());
+                params.put("cylinderId", finalCylinderId);
                 params.put("manufacturer", manufacturerEditText.getText().toString());
                 params.put("gasType", gasItemCode);
-                params.put("owner", ownerEditText.getText().toString());
+                params.put("owner", distributorcode);
                 params.put("water_capcity", waterCapcityEditText.getText().toString());
                 params.put("tareWeight", tareWeightEditText.getText().toString());
                 params.put("actualWeight", actualWeightEditText.getText().toString());
@@ -380,8 +454,8 @@ public class HydroMain extends AppCompatActivity {
                 params.put("c1", c1EditText.getText().toString());
                 params.put("c2", c2EditText.getText().toString());
                 params.put("c3", c3EditText.getText().toString());
-                params.put("water_weight", weightOfCylinderEditText.getText().toString());
-                params.put("water_temp", waterTempEditText.getText().toString());
+                params.put("water_weight",String.valueOf(waterWeight));
+                params.put("water_temp", "30");
                 params.put("email", SharedPref.mInstance.getEmail());
                 params.put("db_host", SharedPref.mInstance.getDBHost());
                 params.put("db_username",SharedPref.mInstance.getDBUsername());
@@ -444,5 +518,62 @@ public class HydroMain extends AppCompatActivity {
         //  data adapter to spinner
         gasTypeSpinner.setAdapter(customerdataAdapter);
     }
+
+    private void loadSpinnerDataDist() {
+        DistributorHelper db = new DistributorHelper(getApplicationContext());
+        List<String> labels = db.getAllLabels();
+
+        // Creating adapter for spinner
+        distributordataAdapter= new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+
+        // Drop down layout style - list view with radio button
+        distributordataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // attaching data adapter to spinner
+
+        spinnerDistributor.setAdapter(distributordataAdapter);
+        spinnerDistributor.setSelection(1);
+        distributorname = SharedPref.getInstance(HydroMain.this).getOwnCode();
+        distributorpos = 1;
+       distributorcode = SharedPref.getInstance(HydroMain.this).getOwnCode();
+
+        if(distributorpos!=0)
+        {
+            spinnerDistributor.setSelection(distributorpos);
+        }
+
+
+    }
+    private  void  loadata()
+    {
+        List<ItemCode>  itemCodes=new ArrayList<>();
+        searchAdapter =new SearchAdapter(getApplicationContext(),itemCodes);
+        cylinderIdEditText.setThreshold(1);
+        cylinderIdEditText.setAdapter(searchAdapter);
+        cylinderIdEditText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                               Cursor cursor = sync.readAllData() ;
+                    if (cursor.getCount() == 0) {
+                        //      empty_imageview.setVisibility(View.VISIBLE);
+                        //      no_data.setVisibility(View.VISIBLE);
+                    } else {
+                        while (cursor.moveToNext()) {
+                            String col = cursor.getString(1);
+                            String col1 = cursor.getString(2);
+                            String fill = cursor.getString(5);
+                            String vol = cursor.getString(4);
+                            if (col.contentEquals(cylinderIdEditText.getText().toString())) {
+                                tareWeightEditText.setText(cursor.getString(3));
+                            }
+                        }
+                      //  cylindervolume.setText(tempvol);
+                    }
+
+
+            }
+        });
+    }
+
 
 }
