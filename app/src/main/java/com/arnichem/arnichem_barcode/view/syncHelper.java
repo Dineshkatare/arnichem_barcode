@@ -16,7 +16,7 @@ public class syncHelper extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DATABASE_NAME = "sync.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String TABLE_NAME = "myscan";
     private static final String COLUMN_ID = "_id";
@@ -31,6 +31,10 @@ public class syncHelper extends SQLiteOpenHelper {
     private static final String STATUS = "status";
     private static final String LOCATION = "location";
 
+
+    private static final String WATER_CAPACITY = "water_capacity";
+
+    private static final String MFG = "mfg";
 
 
 
@@ -52,6 +56,8 @@ public class syncHelper extends SQLiteOpenHelper {
                 HYDROTEST_DATE + " TEXT, " +
                 OWNER + " TEXT, " +
                 STATUS + " TEXT, " +
+                WATER_CAPACITY + " TEXT, " +
+                MFG + " TEXT, " +
                 LOCATION + " TEXT);";
         db.execSQL(query);
     }
@@ -64,7 +70,7 @@ public class syncHelper extends SQLiteOpenHelper {
 
 
 
-    public void addBook(String cyl_no, String barcode, String weight, String volume, String fillwith,String serial_no,String hydrotest_date,String owner,String status,String location){
+    public void addBook(String cyl_no, String barcode, String weight, String volume, String fillwith,String serial_no,String hydrotest_date,String owner,String status,String water_capacity,String mfg,String location){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -77,6 +83,8 @@ public class syncHelper extends SQLiteOpenHelper {
         cv.put(HYDROTEST_DATE, hydrotest_date);
         cv.put(OWNER, owner);
         cv.put(STATUS, status);
+        cv.put(WATER_CAPACITY, water_capacity);
+        cv.put(MFG, mfg);
         cv.put(LOCATION, location);
 
         long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);

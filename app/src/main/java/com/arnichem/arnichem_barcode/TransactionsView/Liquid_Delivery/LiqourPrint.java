@@ -129,7 +129,7 @@ public class LiqourPrint extends AppCompatActivity {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For "+SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText(SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
 
 
@@ -234,10 +234,9 @@ public class LiqourPrint extends AppCompatActivity {
                         "[C]<font size='small'>Full Weight  = "+fullwt+"</font>\n" +
                         "[C]<font size='small'>Empty Weight = "+emptywt+"</font>\n" +
                         "[C]<font size='small'>Net Weight   = "+netwt+"</font>\n" +
-                        "[C]<font size='small'>Invoice No    :  "+"  "+"</font>\n\n\n" +
                         "[L]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,digital_sign)+"</img>\n" +
                         "[R]               [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]Customer Sign [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
+                        "[R]Customer  [R]"+" "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
                         "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
         );
     }

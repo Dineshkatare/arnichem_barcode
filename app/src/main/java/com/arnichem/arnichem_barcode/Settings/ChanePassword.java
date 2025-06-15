@@ -225,7 +225,7 @@ public class ChanePassword extends AppCompatActivity implements Listener, Locati
                 params.put("app_pin", pinvalue.toString());
                 params.put("ipaddress", ipstr);
                 params.put("imei", imeistr);
-                params.put("appversion", "8.3.1");
+                params.put("appversion", "8.6.1");
                 params.put("lati", latitude);
                 params.put("logi", logitude);
                 params.put("addr", address);

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class bp_contact_handler extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "bp_contact_handler";
     private static final String TABLE_NAME = "labels";
     private static final String COLUMN_ID = "id";

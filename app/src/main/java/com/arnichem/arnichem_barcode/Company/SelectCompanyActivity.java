@@ -42,8 +42,12 @@ import com.androidnetworking.interfaces.DownloadListener;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
 import com.arnichem.arnichem_barcode.util.SharedPref;
+import com.arnichem.arnichem_barcode.view.CompanyUpdatedEvent;
 import com.arnichem.arnichem_barcode.view.login;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,20 +83,20 @@ public class SelectCompanyActivity extends AppCompatActivity {
     String  upi_payment = "upi_payment.jpeg";
 
     private int EXTERNAL_STORAGE_PERMISSION_CODE = 23;
-    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            loadSpinnerData();
-        }
-    };
+//    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            loadSpinnerData();
+//        }
+//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_company);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                new IntentFilter("custom-event-name"));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
+//                new IntentFilter("custom-event-name"));
         companyHelper = new CompanyHelper(SelectCompanyActivity.this);
         // Initialization Of DownLoad Button
         AndroidNetworking.initialize(getApplicationContext());
@@ -386,13 +390,6 @@ public class SelectCompanyActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onDestroy() {
-        // Unregister since the activity is about to be closed.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-        super.onDestroy();
-    }
-
     private void loadSpinnerData() {
         CompanyHelper db = new CompanyHelper(getApplicationContext());
         List<String> newlabels = db.getAllLabels();
@@ -428,26 +425,39 @@ public class SelectCompanyActivity extends AppCompatActivity {
                     JSONObject ob = response.getJSONObject(0);
                     String msg = ob.getString("status");
                     if (msg.equalsIgnoreCase("success")) {
-                        Executors.newSingleThreadExecutor().execute(new Runnable() {
-                            public void run() {
-                                for (int i = 1; i < response.length(); i++) {
-                                    JSONObject ob1 = null;
-                                    try {
-                                        ob1 = response.getJSONObject(i);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    try {
-                                        companyHelper.addCompany(ob1.getString("company_id"), ob1.getString("company_short_name"), ob1.getString("company_long_name"), ob1.getString("db_host"), ob1.getString("db_username"), ob1.getString("db_password"),ob1.getString("db_name"),ob1.getString("base_url"),ob1.getString("terms_text"),ob1.getString("own_cyl_code"),ob1.getString("batch_prefix"),ob1.getString("cyc_prefix"),ob1.getString("login_msg"));
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
+                        runOnUiThread(() -> {
+                            for (int i = 0; i < response.length(); i++) {
+                                try {
+                                    JSONObject ob1 = response.getJSONObject(i);
+
+                                    companyHelper.addCompany(
+                                            ob1.getString("company_id"),
+                                            ob1.getString("company_short_name"),
+                                            ob1.getString("company_long_name"),
+                                            ob1.getString("db_host"),
+                                            ob1.getString("db_username"),
+                                            ob1.getString("db_password"),
+                                            ob1.getString("db_name"),
+                                            ob1.getString("base_url"),
+                                            ob1.getString("terms_text"),
+                                            ob1.getString("own_cyl_code"),
+                                            ob1.getString("batch_prefix"),
+                                            ob1.getString("cyc_prefix"),
+                                            ob1.optString("login_msg", "") // optional in case it’s missing
+                                    );
+
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
-                                Intent intent = new Intent("custom-event-name");
-                                // You can also include some extra data.
-                                LocalBroadcastManager.getInstance(SelectCompanyActivity.this).sendBroadcast(intent);
                             }
+
+                            onCompanyUpdated(new CompanyUpdatedEvent(""));
+
+//                            Intent intent = new Intent("custom-event-name");
+//                            // You can also include some extra data.
+//                            LocalBroadcastManager.getInstance(SelectCompanyActivity.this).sendBroadcast(intent);
                         });
+
 
                     }
                 } catch (Exception e) {
@@ -470,5 +480,23 @@ public class SelectCompanyActivity extends AppCompatActivity {
 
         return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCompanyUpdated(CompanyUpdatedEvent event) {
+        loadSpinnerData(); // Your method to update the spinner
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
 
 }

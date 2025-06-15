@@ -13,13 +13,16 @@ public class GodownDeliveryHelper extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DATABASE_NAME = "GodownDeliveryHelper.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String TABLE_NAME = "my_library";
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_TITLE = "book_title";
     private static final String COLUMN_Fill = "book_author";
     private static final String COLUMN_Volume= "book_pages";
+
+    private static final String STATUS= "status";
+
 
     public GodownDeliveryHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,6 +35,7 @@ public class GodownDeliveryHelper extends SQLiteOpenHelper {
                 " (" + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_TITLE + " TEXT UNIQUE, " +
                 COLUMN_Fill + " TEXT, " +
+                STATUS + " TEXT, " +
                 COLUMN_Volume + " TEXT);";
         db.execSQL(query);
     }
@@ -41,13 +45,16 @@ public class GodownDeliveryHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addBook(String title, String Fill, String Volume){
+
+    public void addBook(String title, String Fill, String Volume,String status){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_TITLE, title);
         cv.put(COLUMN_Fill, Fill);
         cv.put(COLUMN_Volume, Volume);
+        cv.put(STATUS, status);
+
         long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
 
         if(result == -1){
@@ -68,6 +75,18 @@ public class GodownDeliveryHelper extends SQLiteOpenHelper {
         }
         return cursor;
     }
+    public Cursor readAllDataWithoutOrder(){
+        // Remove the ORDER BY clause
+        String query = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if(db != null){
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
 
     Cursor readcount(){
         String query = "SELECT "+COLUMN_ID+",SUM("+COLUMN_Volume+"),COUNT("+COLUMN_Fill+"),"+COLUMN_Fill+","+COLUMN_Volume+" FROM " + TABLE_NAME+" GROUP BY "+COLUMN_Fill;

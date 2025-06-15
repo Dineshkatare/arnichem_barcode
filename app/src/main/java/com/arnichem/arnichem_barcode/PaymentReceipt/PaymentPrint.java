@@ -121,7 +121,7 @@ public class PaymentPrint extends AppCompatActivity {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For "+SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText(SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
 
     }
@@ -242,9 +242,8 @@ public class PaymentPrint extends AppCompatActivity {
                         "[C]<font size='small'>Amount       :  " + amountstr + "</font>\n" +
                         "[C]<font size='small'>In Words     : " + inwords + "</font>\n" +
 //                        "[C]<font size='small'>Vehicle No    :  " + SharedPref.getInstance(this).getVehicleNo() + "</font>\n" +
-                        "[C]<font size='small'>Invoice No   :  " + "  " + "</font>\n\n\n" +
                         "[R]               [R]" + SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName() + "\n" +
-                        "[R]Customer Sign [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
+                        "[R]Customer  [R]"+" "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
                         "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
 
         );

@@ -149,7 +149,7 @@ public class FullRecPrint extends AppCompatActivity {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For " + SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText("For " + SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
         if (!sign_path.isEmpty()) {
             File signFile = new File(sign_path);
@@ -266,10 +266,9 @@ public class FullRecPrint extends AppCompatActivity {
                         "[C]<font size='small'>        " + foreachname() + "</font>\n" +
                         "[C]<font size='small'>Total Quantity : " + count + "</font>\n" +
                         "[C]<font size='small'>Vehicle No    :  " + SharedPref.getInstance(this).getVehicleNo() + "</font>\n" +
-                        "[C]<font size='small'>Invoice No    :  " + "  " + "</font>\n\n\n" +
                         "[L]<img>" + PrinterTextParserImg.bitmapToHexadecimalString(printer, digital_sign) + "</img>\n" +
                         "[R]               [R]" + SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName() + "\n" +
-                        "[R]Customer Sign [R]" + "For " + SharedPref.getInstance(this).getCompanyFullName() + "\n\n" +
+                        "[R]Customer  [R]" + SharedPref.getInstance(this).getOwnCode() + "\n\n" +
                         "[R]" + SharedPref.getInstance(this).getTermsText() + "\n"
         );
     }

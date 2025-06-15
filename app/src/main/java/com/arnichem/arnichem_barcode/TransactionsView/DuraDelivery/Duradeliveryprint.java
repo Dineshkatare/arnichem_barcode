@@ -130,7 +130,7 @@ public class Duradeliveryprint extends AppCompatActivity {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For "+SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText(SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
 
 
@@ -228,10 +228,9 @@ public class Duradeliveryprint extends AppCompatActivity {
                         "[C]<font size='small'>Net Weight    :  "+NetWt+"</font>\n" +
                         "[C]<font size='small'>Gas           :  "+cubic+"</font>\n" +
                         "[C]<font size='small'>Vehicle Number:  "+ SharedPref.getInstance(this).getVehicleNo()+"</font>\n\n" +
-                        "[C]<font size='small'>Invoice No    :  "+"  "+"</font>\n\n\n" +
                         "[L]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,digital_sign)+"</img>\n" +
                         "[R]               [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]Customer Sign [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
+                        "[R]Customer  [R]"+" "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
                         "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
         );
     }

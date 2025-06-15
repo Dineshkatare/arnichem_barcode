@@ -240,7 +240,7 @@ public class closing_stock_print extends AppCompatActivity {
                         "[C]<font size='small'><b>            "+foreaching()+"</b></font>\n" +
                         "[C]<font size='small'>Total Quantity : "+count+"</font>\n\n\n" +
                         "[R]                [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]             [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
+                        "[R]             [R]"+" "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
                         "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
         );
     }

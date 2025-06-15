@@ -35,6 +35,31 @@ public class InventoryCylinder {
     @Expose
     private String hydrotest_date;
 
+    @SerializedName("water_capacity")
+    @Expose
+    private String water_capacity;
+
+    public String getWater_capacity() {
+        return water_capacity;
+    }
+
+    public void setWater_capacity(String water_capacity) {
+        this.water_capacity = water_capacity;
+    }
+
+    public String getMfg() {
+        return mfg;
+    }
+
+    public void setMfg(String mfg) {
+        this.mfg = mfg;
+    }
+
+    @SerializedName("mfg")
+    @Expose
+    private String mfg;
+
+
     public String getSerial_no() {
         return serial_no;
     }

@@ -46,6 +46,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
 import com.arnichem.arnichem_barcode.GodownView.GOdownMainActivity;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
@@ -53,6 +54,7 @@ import com.arnichem.arnichem_barcode.Producation.SearchAdapter;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
 import com.arnichem.arnichem_barcode.TransactionsView.DuraDelivery.DuraDeliveryMain;
+import com.arnichem.arnichem_barcode.TransactionsView.Empty.EmptyMain;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.AddActivity;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.constant.constant;
@@ -70,6 +72,7 @@ import com.example.easywaylocation.Listener;
 import com.example.easywaylocation.LocationData;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.valdesekamdem.library.mdtoast.MDToast;
 import org.json.JSONArray;
@@ -94,7 +97,6 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
     ImageView closeImg,signedImg;
     ArrayList<String> book_id, book_title;
     RecyclerView recyclerView;
-    FloatingActionButton add_button;
     ImageView empty_imageview;
     boolean status = false;
     TextView no_data,usernamevalue,Totalscanvalue,date;
@@ -113,6 +115,15 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
     public  int poslocfixdel,poscustfixdel;
     static JSONObject object =null;
     List<String> cylinder;
+    List<String> is_scan;
+
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+    Boolean isAllFabsVisible;
+
 
     String from_warehouse,to_warehouse,cust_code,from_code,srno,count,latitude="0",logitude="0",address="0";
     @Override
@@ -121,6 +132,14 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
         setContentView(R.layout.activity_godown_empty_main);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Godown Empty");
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
+        is_scan = new ArrayList<>();
+
         getLocationDetail = new GetLocationDetail(this, this);
         easyWayLocation = new EasyWayLocation(this, false,true,this);
         spinnerloc=findViewById(R.id.spinlocgodown);
@@ -151,18 +170,9 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
-        add_button = findViewById(R.id.godownempscan);
         empty_imageview = findViewById(R.id.empty_imageview);
         no_data = findViewById(R.id.no_data);
-        add_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                status =true;
-                Intent intent =new Intent(GodownEmptyMainActivity.this, NewScanner.class);
-                intent.putExtra("type", "godown_empty");
-                startActivity(intent);
-            }
-        });
+
         myDB = new GodownEmptyHelper(GodownEmptyMainActivity.this);
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
@@ -270,6 +280,87 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
                 new IntentFilter("digital_sign"));
 
 
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(GodownEmptyMainActivity.this, LaserScannerActivity.class);
+                        intent.putExtra("type", "godown_empty");
+                        startActivity(intent);
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(GodownEmptyMainActivity.this, NewScanner.class);
+                        intent.putExtra("type", "godown_empty");
+                        startActivity(intent);
+                    }
+                });
+
+
+
+
+
     }
 
     @Override
@@ -353,7 +444,7 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
         godownemptycylindernumber.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                myDB.addBook(godownemptycylindernumber.getText().toString(),"no");
+                myDB.addBook(godownemptycylindernumber.getText().toString(),"N");
                 finish();
                 startActivity(getIntent());
             }
@@ -379,6 +470,8 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
                 book_id.add(cursor.getString(0));
                 book_title.add(cursor.getString(1));
                 cylinder.add(cursor.getString(1));
+                is_scan.add(cursor.getString(4));
+
 //                book_author.add(cursor.getString(2));
 //                book_pages.add(cursor.getString(3));
             }
@@ -515,6 +608,7 @@ public class GodownEmptyMainActivity  extends AppCompatActivity implements Liste
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<>();
                     params.put("dura_code", String.valueOf(cylinder));
+                    params.put("is_scan", String.valueOf(is_scan));
                     params.put("from_warehouse", from_warehouse);
                     params.put("to_warehouse", to_warehouse);
                     params.put("transport_type", "OWN");

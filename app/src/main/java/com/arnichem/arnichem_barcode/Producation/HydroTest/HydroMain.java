@@ -70,6 +70,7 @@ public class HydroMain extends AppCompatActivity {
     public int distributorpos;
     String temp="";
     private EditText waterCapcityEditText;
+    List<String> labels;
 
     String distributorname="",distributorcode="";
    private EditText tareWeightEditText;
@@ -506,7 +507,7 @@ public class HydroMain extends AppCompatActivity {
 
     private void loadSpinnerData() {
         InventoryGases db = new InventoryGases(getApplicationContext());
-        List<String> labels = db.getAllLabels();
+        labels = db.getAllLabels();
         labels.add(0,"gas type निवडा");
 
         // Creating adapter for spinner
@@ -553,24 +554,48 @@ public class HydroMain extends AppCompatActivity {
         cylinderIdEditText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                               Cursor cursor = sync.readAllData() ;
-                    if (cursor.getCount() == 0) {
-                        //      empty_imageview.setVisibility(View.VISIBLE);
-                        //      no_data.setVisibility(View.VISIBLE);
-                    } else {
-                        while (cursor.moveToNext()) {
-                            String col = cursor.getString(1);
-                            String col1 = cursor.getString(2);
-                            String fill = cursor.getString(5);
-                            String vol = cursor.getString(4);
-                            if (col.contentEquals(cylinderIdEditText.getText().toString())) {
-                                tareWeightEditText.setText(cursor.getString(3));
+                Cursor cursor = sync.readAllData();
+                if (cursor.getCount() == 0) {
+                    // Handle empty data case
+                } else {
+                    while (cursor.moveToNext()) {
+                        String col = cursor.getString(1);
+                        String serial_number = cursor.getString(6);
+                        String gas_type = cursor.getString(5);
+                        String water_capacity = cursor.getString(10);
+                        String mfg = cursor.getString(11);
+
+                        if (col.contentEquals(cylinderIdEditText.getText().toString())) {
+                            tareWeightEditText.setText(cursor.getString(3));
+                            waterCapcityEditText.setText(water_capacity);
+                            serialNumberEditText.setText(serial_number);
+                            manufacturerEditText.setText(mfg);
+
+                            // Set Gas Type dynamically in Spinner
+                            if (!gas_type.isEmpty()) {
+                                int index = labels.indexOf(gas_type);
+                                if (index != -1) {
+                                    gasTypeSpinner.setSelection(index);
+                                    gasTypeString = gas_type;
+                                    Cursor cursorinventoryGases = inventoryGases.readAllData();
+                                    if (cursorinventoryGases.getCount() == 0) {
+                                        //      empty_imageview.setVisibility(View.VISIBLE);
+                                        //      no_data.setVisibility(View.VISIBLE);
+                                    } else {
+                                        while (cursorinventoryGases.moveToNext()) {
+                                                String gascol = cursorinventoryGases.getString(0);
+                                                String gascol1 = cursorinventoryGases.getString(1);
+                                                if (gascol.contentEquals(gasTypeString)) {
+                                                    gasItemCode = gascol1;
+                                                }
+                                        }
+                                    }
+
+                                }
                             }
                         }
-                      //  cylindervolume.setText(tempvol);
                     }
-
-
+                }
             }
         });
     }

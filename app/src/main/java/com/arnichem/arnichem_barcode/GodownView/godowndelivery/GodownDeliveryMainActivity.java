@@ -38,6 +38,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
 import com.arnichem.arnichem_barcode.Barcode.NewScanner;
 import com.arnichem.arnichem_barcode.GodownView.Closing_stock.Closing_stock;
 import com.arnichem.arnichem_barcode.GodownView.GOdownMainActivity;
@@ -64,6 +65,7 @@ import com.example.easywaylocation.EasyWayLocation;
 import com.example.easywaylocation.GetLocationDetail;
 import com.example.easywaylocation.Listener;
 import com.example.easywaylocation.LocationData;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.valdesekamdem.library.mdtoast.MDToast;
 import org.json.JSONArray;
@@ -89,7 +91,6 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
     DatabaseHandler databaseHandlercustomer;
     RecyclerView recyclerView, Filled_with_Recycle_View;
     FilledWithAdapter filledWithAdapter;
-    FloatingActionButton add_button;
     ImageView empty_imageview;
     TextView no_data, vehiclevalue, usernamevalue, Totalscanvalue, date;
     String from_warehouse, to_warehouse, cust_code, srno, count, from_code, latitude = "0", logitude = "0", address = "0";
@@ -99,6 +100,8 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
     ArrayAdapter<String> customerdataAdapter;
     Spinner spinner, spinnercust;
     SharedPreferences pref;
+    List<String> is_scan;
+
     Button button, cyadd, godowndelprint;
     ProgressDialog dialog;
     AutoCompleteTextView godowndelcylindernumber;
@@ -115,6 +118,16 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
     String digital_sign = "",digitalSignPath = "";
     boolean status = false;
 
+
+    FloatingActionButton mAddCameraScanFab, mAddBarcodeScanFab;
+
+    // Use the ExtendedFloatingActionButton to handle the
+    // parent FAB
+    ExtendedFloatingActionButton mAddFab;
+
+    Boolean isAllFabsVisible;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +139,8 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
         spinner = findViewById(R.id.spinfromgodel);
         godowndelcylindernumber = findViewById(R.id.godowndelcylindernumber);
         cylinder = new ArrayList<String>();
+        is_scan = new ArrayList<>();
+
         spinnercust = findViewById(R.id.custnamespingodowndel);
         cyadd = findViewById(R.id.addcylindergodowndel);
         godowndelprint = findViewById(R.id.Godowndelprintbtn);
@@ -153,18 +168,16 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
         Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
-        add_button = findViewById(R.id.godowndelscan);
+        mAddFab = findViewById(R.id.add_fab);
+        // FAB button
+        mAddCameraScanFab = findViewById(R.id.camera_scan);
+        mAddBarcodeScanFab =
+                findViewById(R.id.barcode_scan);
+        isAllFabsVisible = false;
+
         empty_imageview = findViewById(R.id.empty_imageview);
         no_data = findViewById(R.id.no_data);
-        add_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                status =true;
-                Intent intent =new Intent(GodownDeliveryMainActivity.this, NewScanner.class);
-                intent.putExtra("type", "godown_delivery");
-                startActivity(intent);
-            }
-        });
+
         button.setEnabled(true);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -306,6 +319,87 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
         LocalBroadcastManager.getInstance(this).registerReceiver(mServiceReceiver,
                 new IntentFilter("digital_sign"));
 
+        mAddCameraScanFab.setVisibility(View.GONE);
+        mAddBarcodeScanFab.setVisibility(View.GONE);
+
+        mAddFab.shrink();
+
+        // We will make all the FABs and action name texts
+        // visible only when Parent FAB button is clicked So
+        // we have to handle the Parent FAB button first, by
+        // using setOnClickListener you can see below
+        mAddFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (!isAllFabsVisible) {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs VISIBLE.
+                            mAddBarcodeScanFab.show();
+                            mAddCameraScanFab.show();
+
+                            mAddFab.extend();
+
+                            // make the boolean variable true as
+                            // we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = true;
+                        } else {
+
+                            // when isAllFabsVisible becomes
+                            // true make all the action name
+                            // texts and FABs GONE.
+                            mAddBarcodeScanFab.hide();
+                            mAddCameraScanFab.hide();
+
+                            // Set the FAB to shrink after user
+                            // closes all the sub FABs
+                            mAddFab.shrink();
+
+                            // make the boolean variable false
+                            // as we have set the sub FABs
+                            // visibility to GONE
+                            isAllFabsVisible = false;
+                        }
+                    }
+                });
+
+        // below is the sample action to handle add person
+        // FAB. Here it shows simple Toast msg. The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddBarcodeScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(GodownDeliveryMainActivity.this, LaserScannerActivity.class);
+                        intent.putExtra("type", "godown_delivery");
+                        startActivity(intent);
+                    }
+                });
+
+        // below is the sample action to handle add alarm
+        // FAB. Here it shows simple Toast msg The Toast
+        // will be shown only when they are visible and only
+        // when user clicks on them
+        mAddCameraScanFab.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        status = true;
+                        Intent intent = new Intent(GodownDeliveryMainActivity.this, NewScanner.class);
+                        intent.putExtra("type", "godown_delivery");
+                        startActivity(intent);
+                    }
+                });
+
+
+
+
+
     }
 
     @Override
@@ -411,7 +505,7 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
                         String Fillwith = cursor.getString(5);
                         String col1 = cursor.getString(1);
                         if (col1.contentEquals(godowndelcylindernumber.getText().toString())) {
-                            myDB.addBook(godowndelcylindernumber.getText().toString(), Fillwith, volume);
+                            myDB.addBook(godowndelcylindernumber.getText().toString(), Fillwith, volume,"N");
                             finish();
                             startActivity(getIntent());
                         }
@@ -449,6 +543,8 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
                 book_title.add(cursor.getString(1));
                 fillwith.add(cursor.getString(2));
                 cylinder.add(cursor.getString(1));
+                is_scan.add(cursor.getString(3));
+
 
             }
             int cou = cursor.getCount();
@@ -588,6 +684,7 @@ public class GodownDeliveryMainActivity extends AppCompatActivity implements Lis
                     params.put("from_warehouse", from_warehouse);
                     params.put("to_warehouse", to_warehouse);
                     params.put("transport_type", "OWN");
+                    params.put("is_scan",String.valueOf(is_scan));
                     params.put("cust_code", cust_code);
                     params.put("from_code", from_code);
                     params.put("lati", latitude);

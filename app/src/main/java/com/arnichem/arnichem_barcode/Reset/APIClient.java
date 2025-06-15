@@ -11,21 +11,23 @@ public  class APIClient {
 
 
     private static Retrofit retrofit = null;
-    public static final String data_fetch = "data_fetch_v8.3.php";
+    public static final String data_fetch = "data_fetch_v8.4.php";
+    public static final String sync_barcode = "inventory_cylinders_fetch.php";
+
     public static final String sync_bp_contact = "sync_bp_contact.php";
     public static final String vehicle_login = "http://arnichem.co.in/intranet/barcode/APP/app_apis/vehicle_login.php";
     public static final String getCompanies = "http://arnichem.co.in/intranet/barcode/APP/app_apis/getCompanies1.php";
     public static final String access_login = "http://arnichem.co.in/intranet/barcode/APP/app_apis/access_login.php";
-    public static final String barcode_registration = "http://arnichem.co.in/intranet/barcode/APP/app_apis/barcode_registration_v4.5.php"; //DONE
+    public static final String barcode_registration = "http://arnichem.co.in/intranet/barcode/APP/app_apis/barcode_registration_v8.5.php"; //DONE
     public static final String crm_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/crm_entry.php";
     public static final String bpcontact_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/bpcontact_entry.php";
 
     public static final String diesel_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/diesel_entry.php";
     public static final String closing_stock_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/closing_stock_entry.php";
-    public static final String godown_delivery_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_delivery_entry_v6.2.php";//DONE
+    public static final String godown_delivery_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_delivery_entry_v8.5.php";//DONE
     public static final String other_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/other_entry_v6.2.php";//DONE
 
-    public static final String godown_empty_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_empty_entry_v4.5.php";//DONE
+    public static final String godown_empty_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_empty_entry_v8.5.php";//DONE
     public static final String godown_fullrecipt_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_fullrecipt_entry_v4.5.php";//DONE
     public static final String payment_recipt_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/payment_recipt_entry.php";
 

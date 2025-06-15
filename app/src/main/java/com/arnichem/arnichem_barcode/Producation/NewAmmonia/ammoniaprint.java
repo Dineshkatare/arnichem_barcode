@@ -309,7 +309,6 @@ public class ammoniaprint extends AppCompatActivity {
                         "ll'>Batch ID  :"+batchID+"</font>\n" +
                         "[C]<font size='small'>Tank Start Volume :"+starttimevolume+"</font>\n" +
                         "[C]<font size='small'>Tank End Volume   :"+endtimevolume+"</font>\n" +
-                        "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
                         "[C]<font size='small'>cylinder No - Tare Wt - Net Wt </font>\n" +
                         "[L]<font size='small'>"+forlooping()+"</font>\n" +
                         "[C]<font size='small'>"+ SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"</font>\n"+

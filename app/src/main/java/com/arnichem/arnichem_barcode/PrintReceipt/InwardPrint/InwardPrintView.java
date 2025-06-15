@@ -215,13 +215,12 @@ public class InwardPrintView extends AppCompatActivity {
                         "[C]<font size='small'>InwardNo -  "+empb+"</font>\n" +
                         "[C]<font size='small'>Date -  "+delidate+"</font>\n" +
                         "[C]<font size='small'>From -  "+custname+"</font>\n" +
-                        "[C]<font size='small'>       Cylinder Details </font>\n" +
                         "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
                         "[C]<font size='small'><b>            "+foreaching()+"</b></font>\n" +
                         "[C]<font size='small'>Total Quantity : "+totalQuan+"</font>\n" +
                         "[C]<font size='small'>Vehicle No    :  "+ SharedPref.getInstance(this).getVehicleNo()+"</font>\n" +
                         "[R]                [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]                [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n"
+                        "[R]                [R]"+"For "+SharedPref.getInstance(this).getOwnCode()+"\n"
 
         );
     }

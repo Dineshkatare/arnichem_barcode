@@ -283,7 +283,6 @@ public class NitrogenPrint extends AppCompatActivity {
                         "[C]<font size='small'>Tank Start Volume :"+starttimevolume+"</font>\n" +
                         "[C]<font size='small'>Tank End Volume   :"+endtimevolume+"</font>\n" +
                         "[C]<font size='small'>Manifold No       :"+manifoldval+"</font>\n" +
-                        "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
                         "[C]<font size='small'>Owner - Cylinder Number - Volume </font>\n" +
                         "[L]<font size='small'>"+forlooping()+"</font>\n" +
                         "[C]<font size='small'>"+ SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"</font>\n"+

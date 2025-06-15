@@ -5,11 +5,14 @@ import com.arnichem.arnichem_barcode.CallLogManager;
 import com.arnichem.arnichem_barcode.FileUpload.ApiResponse;
 import com.arnichem.arnichem_barcode.FileUpload.FileUploadData;
 import com.arnichem.arnichem_barcode.GetData.GetDataResponse;
+import com.arnichem.arnichem_barcode.GetData.InventoryCylinder;
 import com.arnichem.arnichem_barcode.PaymentReceipt.GasTypeResponse;
 import com.arnichem.arnichem_barcode.attendance.MyResponseModel;
 import com.arnichem.arnichem_barcode.data.response.FetchItemAndQuantityVolume;
+import com.arnichem.arnichem_barcode.data.response.InventoryResponse;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
 import com.arnichem.arnichem_barcode.leave.LeaveResponse;
+import com.arnichem.arnichem_barcode.order.OrderResponse;
 
 import java.util.List;
 
@@ -46,6 +49,14 @@ public interface APIInterface {
                                                 @Field("db_username") String db_username,
                                                 @Field("db_password") String db_password,
                                                 @Field("db_name") String db_name);
+
+    @FormUrlEncoded
+    @POST(APIClient.sync_barcode)
+    Call<InventoryResponse> syncBarocde(@Field("db_host") String db_host,
+                                        @Field("db_username") String db_username,
+                                        @Field("db_password") String db_password,
+                                        @Field("db_name") String db_name);
+
 
     @FormUrlEncoded
     @POST(APIClient.sync_bp_contact)
@@ -292,8 +303,24 @@ public interface APIInterface {
             @Field("user") String user,
             @Field("remarks") String remarks,
             @Field("date_added") String date_added
+    );
+
+
+    @FormUrlEncoded
+    @POST("pick_entry.php")
+    Call<OrderResponse> submitPick(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("cust_code") String custCode,
+            @Field("pick_msg") String pickMsg,
+            @Field("user") String user,
+            @Field("remarks") String remarks,
+            @Field("date_added") String date_added
 
     );
+
 
 
 }

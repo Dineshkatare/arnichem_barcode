@@ -223,16 +223,14 @@ public class DuraDeliPrintView extends AppCompatActivity {
                         "[C]<font size='small'>Date  - "+delidate+"</font>\n" +
                         "[C]<font size='small'>Code -  "+cust_code+"</font>\n" +
                         "[C]<font size='small'>Name -  "+custname+"</font>\n" +
-                        "[C]<font size='small'>       Cylinder Details </font>\n" +
                         "[C]<font size='small'><b>Dura Number   :  "+durano+"</b></font>\n" +
                         "[C]<font size='small'>Full Weight   :  "+Fullwt+"</font>\n" +
                         "[C]<font size='small'>Tare Weight   :  "+tarewt+"</font>\n" +
                         "[C]<font size='small'>Net Weight    :  "+NetWt+"</font>\n" +
                         "[C]<font size='small'>Gas           :  "+cubic+"</font>\n" +
                         "[C]<font size='small'>Vehicle Number:  "+ SharedPref.getInstance(this).getVehicleNo()+"</font>\n\n" +
-                        "[C]<font size='small'>Invoice No    :  "+"  "+"</font>\n\n\n" +
                         "[R]               [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]Customer Sign [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n"
+                        "[R]Customer  [R]"+SharedPref.getInstance(this).getOwnCode()+"\n"
         );
     }
 

@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity;
+import com.arnichem.arnichem_barcode.GodownView.godownempty.GodownEmptyHelper;
 import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
@@ -91,6 +92,11 @@ public class InWardCustomAdapter extends RecyclerView.Adapter<com.arnichem.arnic
                     if(type.equalsIgnoreCase("empty")) {
 
                         AddClyHelper myDB = new AddClyHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(book_id.get(position)));
+                        clickListener.onItemClick(position);
+                    }if(type.equalsIgnoreCase("godown_empty")) {
+
+                        GodownEmptyHelper myDB = new GodownEmptyHelper(context.getApplicationContext());
                         myDB.deleteOneRow(String.valueOf(book_id.get(position)));
                         clickListener.onItemClick(position);
                     }else {

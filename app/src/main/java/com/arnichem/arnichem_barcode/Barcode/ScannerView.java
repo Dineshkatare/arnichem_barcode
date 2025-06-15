@@ -48,12 +48,14 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.Settings.SyncInventoryActivity;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.VehicleLog.check;
 import com.arnichem.arnichem_barcode.digital_signature.ActivityDigitalSignature;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.util.Util;
 import com.arnichem.arnichem_barcode.view.Dashboard;
+import com.arnichem.arnichem_barcode.view.syncHelper;
 import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,6 +74,8 @@ public class ScannerView extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_CODE = 100;
 
     Button button,upload;
+    syncHelper sync;
+
     TextView textView,serialno,weight,aicode,manufacturer;
     public String s;
     public Spinner spinmm;
@@ -121,6 +125,8 @@ public class ScannerView extends AppCompatActivity {
                 new IntentFilter("camera_data"));
 
         checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
+        sync = new syncHelper(ScannerView.this);
+
         button=findViewById(R.id.button);
         textView=findViewById(R.id.textView);
         serialno=findViewById(R.id.edserialnumber);
@@ -276,8 +282,22 @@ public void onBackPressed() {
             @Override
             public void onResponse(String response) {
                 dialog.dismiss();
-                Snackbar.make(scrollView,Selected+aicode.getText().toString().trim()+"हा सिलेंडर नंबर "+textView.getText().toString()+"या बारकोड सोबत रजिस्टर झाला आहे ", Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK).show();
                 try {
+                    Snackbar.make(scrollView,Selected+aicode.getText().toString().trim()+"हा सिलेंडर नंबर "+textView.getText().toString()+"या बारकोड सोबत रजिस्टर झाला आहे ", Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK).show();
+                    sync.addBook(
+                            Selected+aicode.getText().toString().trim(),
+                            textView.getText().toString().trim(),
+                            weight.getText().toString(),
+                            "",
+                            "",
+                            serialno.getText().toString(),
+                            Selectedmm+"/"+Selectedyy+"/"+"01",
+                            "",
+                            "",
+                            "",
+                            manufacturer.getText().toString(),
+                            ""
+                    );
                     JSONObject respObj = new JSONObject(response);
                     String status = respObj.getString("status");
                     String msg = respObj.getString("msg");

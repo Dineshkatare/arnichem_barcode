@@ -230,14 +230,12 @@ public class ActivityfullrccprintviewActivity extends AppCompatActivity {
                         "[C]<font size='small'>Date -  "+delidate+"</font>\n" +
                         "[C]<font size='small'>Code -  "+custcode+"</font>\n" +
                         "[C]<font size='small'>Name -  "+custname+"</font>\n" +
-                        "[C]<font size='small'>       Cylinder Details </font>\n" +
                         "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
                         "[C]<font size='small'><b>            "+foreaching()+"</b></font>\n" +
                         "[C]<font size='small'>Total Quantity : "+totalQuan+"</font>\n" +
                         "[C]<font size='small'>Vehicle No    :  "+ SharedPref.getInstance(this).getVehicleNo()+"</font>\n" +
-                        "[C]<font size='small'>Invoice No    :  "+"  "+"</font>\n\n\n" +
                         "[R]               [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]Customer Sign [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n"
+                        "[R]Customer  [R]"+" "+SharedPref.getInstance(this).getOwnCode()+"\n"
         );
     }
 

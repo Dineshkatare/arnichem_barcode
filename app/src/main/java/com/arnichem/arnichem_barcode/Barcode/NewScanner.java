@@ -246,7 +246,7 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
         }else if(type.equalsIgnoreCase("closing_stock")) {
             closingHelper.addBook(col,"C");
         }else if(type.equalsIgnoreCase("godown_delivery")) {
-            godownDeliveryHelper.addBook(col, fillwith, volume);
+            godownDeliveryHelper.addBook(col, fillwith, volume,"C");
         }else if(type.equalsIgnoreCase("godown_empty")) {
             godownEmptyHelper.addBook(col,"C");
         }else if(type.equalsIgnoreCase("godown_fullreceipt")) {
@@ -276,6 +276,8 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
     private void registerFun() {
          vibrate = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         businessPartnersHandler = new BusinessPartnersHandler(NewScanner.this);
+        godownDeliveryHelper = new GodownDeliveryHelper(NewScanner.this);
+
         barcodeReader = (BarcodeReader) getSupportFragmentManager().findFragmentById(R.id.barcode_fragment);
         assert barcodeReader != null;
         barcodeReader.setBeepSoundFile("beep.mp3");

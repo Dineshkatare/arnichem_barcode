@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OtherItemsHandler extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "OtherItems";
     private static final String TABLE_NAME = "OtherItemsTable";
     private static final String SHORT_NAME = "short_name";

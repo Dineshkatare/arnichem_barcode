@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 public class DuraDeliveryPrintDB  extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "DuraDeliveryPrintDB.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String TABLE_NAME = "my_library";
     private static final String COLUMN_ID = "_id";

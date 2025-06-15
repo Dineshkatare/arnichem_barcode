@@ -230,7 +230,7 @@ public class Test extends AppCompatActivity {
     private void loadInventoryCylinders(List<InventoryCylinder> inventoryCylinders, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
             for (InventoryCylinder cylinder : inventoryCylinders) {
-                sync.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith(), cylinder.getSerial_no(), cylinder.getHydrotest_date(), cylinder.getOwner(), cylinder.getStatus(), cylinder.getLocation());
+                sync.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith(), cylinder.getSerial_no(), cylinder.getHydrotest_date(), cylinder.getOwner(), cylinder.getStatus(),cylinder.getWater_capacity(),cylinder.getMfg(), cylinder.getLocation());
             }
             latch.countDown();
         });

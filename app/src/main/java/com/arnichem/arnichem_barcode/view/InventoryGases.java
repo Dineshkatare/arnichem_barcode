@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryGases extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Arnichem";
     private static final String TABLE_NAME = "InventoryGases";
     private static final String GAS_NAME = "gas_name";

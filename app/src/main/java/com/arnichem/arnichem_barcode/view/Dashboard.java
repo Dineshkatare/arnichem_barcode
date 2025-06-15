@@ -72,6 +72,7 @@ import com.arnichem.arnichem_barcode.data.ReportAccess;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
 import com.arnichem.arnichem_barcode.leave.LeaveApplicationActivity;
 import com.arnichem.arnichem_barcode.order.OrderMainActivity;
+import com.arnichem.arnichem_barcode.order.PickActivity;
 import com.arnichem.arnichem_barcode.other_entries.OtherEntryActivity;
 import com.arnichem.arnichem_barcode.report.ReportActivity;
 import com.arnichem.arnichem_barcode.report.ResourceActivity;
@@ -101,7 +102,7 @@ import retrofit2.Response;
 public class Dashboard extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
-    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,logout,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,logCL,otherCl,report,leave,order,resource;
+    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,logout,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,logCL,otherCl,report,leave,order,resource,pickup;
     SharedPreferences pref;
     ScrollView scrollView;
     boolean doubleBackToExitPressedOnce = false;
@@ -152,6 +153,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         leave = findViewById(R.id.leave);
         order = findViewById(R.id.order);
         resource =findViewById(R.id.resource);
+        pickup = findViewById(R.id.pick);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if(SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")){
             report.setVisibility(View.VISIBLE);
@@ -229,6 +231,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 startActivity(i);
             }
         });
+
 
 
         Barcode.setOnClickListener(new View.OnClickListener() {
@@ -376,6 +379,14 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             @Override
             public void onClick(View v) {
                 Intent i=new Intent(Dashboard.this, OrderMainActivity.class);
+                startActivity(i);
+
+            }
+        });
+        pickup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(Dashboard.this, PickActivity.class);
                 startActivity(i);
 
             }

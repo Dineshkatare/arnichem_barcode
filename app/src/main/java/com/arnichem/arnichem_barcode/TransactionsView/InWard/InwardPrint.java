@@ -115,7 +115,7 @@ public class InwardPrint extends AppCompatActivity {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For "+SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText(SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
 
 
@@ -213,13 +213,12 @@ public class InwardPrint extends AppCompatActivity {
                         "[C]<font size='small'>InwardNo -  "+empb+"</font>\n" +
                         "[C]<font size='small'>Date -  "+DateFormat.getDateTimeInstance().format(new Date())+"</font>\n" +
                         "[C]<font size='small'>From -  "+custname+"</font>\n" +
-                        "[C]<font size='small'>       Cylinder Details </font>\n" +
                         "[C]<font size='small'><b>       Cylinder Numbers </b></font>\n" +
                         "[C]<font size='small'><b>            "+foreaching()+"</b></font>\n" +
                         "[C]<font size='small'>Total Quantity : "+count+"</font>\n" +
                         "[C]<font size='small'>Vehicle No    :  "+ SharedPref.getInstance(this).getVehicleNo()+"</font>\n" +
                         "[R]                [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                                "[R]Customer Sign  [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
+                                "[R]Customer Sign  [R]"+"For "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
                                 "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
         );
     }

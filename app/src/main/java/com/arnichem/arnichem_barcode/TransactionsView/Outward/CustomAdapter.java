@@ -109,6 +109,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
                         myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                         clickListener.onItemClick(position);
 
+                    }if(type.equalsIgnoreCase("godown_delivery")){
+                        GodownDeliveryHelper myDB = new GodownDeliveryHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
+                        clickListener.onItemClick(position);
+
                     }else {
                         MyDatabaseHelper myDB = new MyDatabaseHelper(context.getApplicationContext());
                         myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));

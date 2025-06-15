@@ -18,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryHelper;
+import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
+import com.arnichem.arnichem_barcode.GodownView.godownempty.GodownEmptyHelper;
 import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
@@ -46,6 +49,11 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
 
     InWardCustomAdapter customAdapter;
     InWardDatabaseHelper myDB;
+
+    GodownDeliveryHelper godownDeliveryHelper;
+    GodownEmptyHelper godownEmptyHelper;
+
+
 
     AddClyHelper addClyHelper;
 
@@ -98,7 +106,12 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             getSupportActionBar().setTitle("Delivery Barcode Scan");
         } else if (type.contentEquals("empty")) {
             getSupportActionBar().setTitle("Empty Barcode Scan");
+        } else if (type.contentEquals("godown_delivery")) {
+            getSupportActionBar().setTitle("Godwon Delivery Barcode Scan");
+        }else if (type.contentEquals("godown_empty")) {
+            getSupportActionBar().setTitle("Godwon Empty Barcode Scan");
         }
+
 
 
 
@@ -106,6 +119,8 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         recyclerView = findViewById(R.id.recyclerView);
         synchelper = new syncHelper(LaserScannerActivity.this);
         addClyHelper=new AddClyHelper(LaserScannerActivity.this);
+        godownDeliveryHelper = new GodownDeliveryHelper(LaserScannerActivity.this);
+        godownEmptyHelper  = new GodownEmptyHelper(LaserScannerActivity.this);
 
         Totalscanvalue = findViewById(R.id.Totalscanvalue);
         Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
@@ -132,7 +147,7 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
             recyclerView.scrollToPosition(0);
 
-        } else if (type.equalsIgnoreCase("delivery")) {
+        } else if (type.equalsIgnoreCase("delivery")||type.equalsIgnoreCase("godown_delivery")) {
 
             cylIdList = new ArrayList<>();
             cyclinderNameList = new ArrayList<>();
@@ -157,7 +172,7 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
 
 
 
-        } else if (type.equalsIgnoreCase("empty")) {
+        } else if (type.equalsIgnoreCase("empty")||type.equalsIgnoreCase("godown_empty")) {
 
             storeDataInArrays();
             Totalscanvalue.setText(count);
@@ -207,6 +222,8 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
 
         if (type.equalsIgnoreCase("delivery")) {
             cursor = delidb.readAllDataInFIFOOrder();
+        } if (type.equalsIgnoreCase("godown_delivery")) {
+            cursor = godownDeliveryHelper.readAllDataWithoutOrder();
         } else if (type.equalsIgnoreCase("outward")) {
             cursor = outwatdMyDB.readAllDataWithoutOrder();
         }
@@ -230,6 +247,10 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             cursor = myDB.readAllDataWithoutOrder();
         } else if (type.equalsIgnoreCase("empty")) {
             cursor = addClyHelper.readAllDataWithoutOrder();
+        } else if (type.equalsIgnoreCase("godown_empty")) {
+            cursor = godownEmptyHelper.readAllData();
+        }else if (type.equalsIgnoreCase("godown_delivery")) {
+            cursor = godownDeliveryHelper.readAllDataWithoutOrder();
         }
 
         if (cursor != null) {
@@ -253,14 +274,21 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
 
     void storedOutwardValues() {
         Cursor cursor = null;
+        Log.d("TypeCheck", "Type received: " + type);
 
         if (type.equalsIgnoreCase("delivery")) {
+            Log.d("DBAccess", "Fetching data from delidb in FIFO order.");
             cursor = delidb.readAllDataInFIFOOrder();
+        } else if (type.equalsIgnoreCase("godown_delivery")) {
+            Log.d("DBAccess", "Fetching data from godownDeliveryHelper without order.");
+            cursor = godownDeliveryHelper.readAllDataWithoutOrder();
         } else if (type.equalsIgnoreCase("outward")) {
+            Log.d("DBAccess", "Fetching data from outwatdMyDB.");
             cursor = outwatdMyDB.readAllData();
+        } else {
+            Log.d("DBAccess", "Unknown type: " + type);
         }
-
-        if (cursor != null) {
+             if (cursor != null) {
             if (cursor.getCount() == 0) {
                 // no_data.setVisibility(View.VISIBLE);
             } else {
@@ -394,7 +422,31 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
                     editText.setText("");
                     editText.requestFocus();
                 }
-            } else if (type.equalsIgnoreCase("delivery")) {
+            }else if (type.equalsIgnoreCase("godown_empty")) {
+
+                Cursor cursor = synchelper.readAllData();
+                if (cursor.getCount() == 0) {
+                } else {
+                    while (cursor.moveToNext()) {
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
+                        Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
+
+                        if (col1.contentEquals(displayValue)) {
+                            status = false;
+                            godownEmptyHelper.addBook(col,"B");
+                            editText.setText("");
+                            editText.requestFocus();
+
+                            finish();
+                            startActivity(getIntent());
+                            break;
+                        }
+                    }
+                    editText.setText("");
+                    editText.requestFocus();
+                }
+            }  else if (type.equalsIgnoreCase("delivery")) {
                 Cursor cursor = synchelper.readAllData();
                 if (cursor.getCount() == 0) {
                     //      empty_imageview.setVisibility(View.VISIBLE);
@@ -409,6 +461,29 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
 
                         if (col1.contentEquals(displayValue)) {
                             delidb.addBook(col, Fillwith, volume,"B");
+                            finish();
+                            startActivity(getIntent());
+                            break;
+                        }
+                    }
+                    editText.setText("");
+                    editText.requestFocus();
+                }
+            }else if (type.equalsIgnoreCase("godown_delivery")) {
+                Cursor cursor = synchelper.readAllData();
+                if (cursor.getCount() == 0) {
+                    //      empty_imageview.setVisibility(View.VISIBLE);
+                    //      no_data.setVisibility(View.VISIBLE);
+                } else {
+                    while (cursor.moveToNext()) {
+                        String volume = cursor.getString(4);
+                        String Fillwith = cursor.getString(5);
+                        String col1 = cursor.getString(2);
+                        String col = cursor.getString(1);
+                        Log.e("col1", "An exception occurred: " + col1 + " " + col);
+
+                        if (col1.contentEquals(displayValue)) {
+                            godownDeliveryHelper.addBook(col, Fillwith, volume,"B");
                             finish();
                             startActivity(getIntent());
                             break;
@@ -503,6 +578,11 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             addClyHelper.close();
         if (delidb != null)
             delidb.close();
+        if (godownDeliveryHelper != null)
+            godownDeliveryHelper.close();
+        if (godownEmptyHelper != null)
+            godownEmptyHelper.close();
+
 
 
     }

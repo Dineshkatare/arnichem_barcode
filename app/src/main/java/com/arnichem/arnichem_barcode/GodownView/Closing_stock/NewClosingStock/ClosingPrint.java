@@ -127,7 +127,7 @@ public class ClosingPrint extends AppCompatActivity {
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
         }
-        arnichemsignTxt.setText("For "+SharedPref.mInstance.getCompanyFullName());
+        arnichemsignTxt.setText(SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
 
 
@@ -249,7 +249,7 @@ public class ClosingPrint extends AppCompatActivity {
                         "[C]<font size='small'><b>GasType  Total Full  Total Empty</b></font>\n\n"
                         +foreaching()+"\n\n"+
                         "[R]                [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]               [R]"+"For "+SharedPref.getInstance(this).getCompanyFullName()+"\n\n"+
+                        "[R]               [R]"+"For "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
                         "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
         );
     }

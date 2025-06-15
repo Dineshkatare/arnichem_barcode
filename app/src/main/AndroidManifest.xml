@@ -81,38 +81,71 @@
         android:usesCleartextTraffic="true"
         tools:node="merge">
         <activity
+            android:name=".order.PickViewActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".view.Dashboard"
+            android:exported="false" />
+        <activity
+            android:name=".order.PickActivity"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".Settings.SyncInventoryActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
             android:name=".CRM.CRMViewActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".report.ResourceActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".order.OrderViewActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:parentActivityName=".view.Dashboard" />
         <activity
             android:name=".order.OrderMainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            />
         <activity
             android:name=".leave.LeaveApplyActivity"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".TransactionsView.DryIce.ViewDryIcePrintActivity"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".PrintReceipt.DuraEmptyPrint.ViewDuraEmptyActivity"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".PrintReceipt.DuraDeliveyPrint.ViewDuraDeliveryActivity"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".report.ReportActivity"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".CallLogs"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".Barcode.ProductionLaserScannerActivity"
+            android:screenOrientation="portrait"
+
             android:exported="false" />
         <activity
             android:name=".Barcode.LaserScannerActivity"
@@ -120,10 +153,12 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".FileUpload.FIleUploadMainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".FileUpload.FileUploadSubActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".other_entries.OtherEntryPrintActivity"
             android:exported="false"
