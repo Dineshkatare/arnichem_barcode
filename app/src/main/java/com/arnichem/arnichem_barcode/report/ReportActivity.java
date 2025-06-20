@@ -1,11 +1,6 @@
-package com.arnichem.arnichem_barcode.CustomerHolding;
+package com.arnichem.arnichem_barcode.report;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,28 +10,24 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.arnichem.arnichem_barcode.R;
-import com.arnichem.arnichem_barcode.Settings.newPassword;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.github.ybq.android.spinkit.SpinKitView;
 
-public class WebViewActivity extends AppCompatActivity {
-
+public class ReportActivity extends AppCompatActivity {
     WebView mywebview;
-    String cust_code = "";
     SpinKitView spinKitView;
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
+        setContentView(R.layout.activity_report);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Customer Holding");
+        getSupportActionBar().setTitle("Reports");
         spinKitView = findViewById(R.id.spin_kit);
         mywebview = (WebView) findViewById(R.id.webView);
-        Intent intent = getIntent();
-        cust_code = intent.getExtras().getString("code","");
         spinKitView.setVisibility(View.VISIBLE);
 
         mywebview.getSettings().setJavaScriptEnabled(true); // enable javascript
@@ -59,10 +50,10 @@ public class WebViewActivity extends AppCompatActivity {
         });
 
 
-        String fullUrl = "http://arnisol.com/intranet/1239812038120831.php?code=" + cust_code + "&username=" + SharedPref.getInstance(WebViewActivity.this).getEmail();
+        String fullUrl = "https://www.arnisol.com/intranet/reports_app.php?username=" + SharedPref.getInstance(ReportActivity.this).getEmail() + "&company_name=" + SharedPref.getInstance(ReportActivity.this).getCompanyShortName();
 
         Log.d("url",""+fullUrl);
-         mywebview.loadUrl(fullUrl);
+        mywebview.loadUrl(fullUrl);
         mywebview.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 // do your stuff here
@@ -72,7 +63,17 @@ public class WebViewActivity extends AppCompatActivity {
         });
 
 
+
     }
+    @Override
+    public void onBackPressed() {
+        if (mywebview.canGoBack()) {
+            mywebview.goBack();  // Navigate back to the previous web page
+        } else {
+            super.onBackPressed();  // Exit the activity
+        }
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

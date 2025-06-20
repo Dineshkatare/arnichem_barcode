@@ -524,7 +524,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
 
     private void setImage(String path) {
 
-        String base_url =  "/public_html/arnichem.co.in/intranet";
+        String base_url =  "/public_html/arnisol.com/intranet";
         String new_base_url = base_url.replace("/public_html/","");// this will contain "Fruit"
 
 

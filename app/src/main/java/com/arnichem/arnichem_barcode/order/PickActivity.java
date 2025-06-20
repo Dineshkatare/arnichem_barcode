@@ -185,7 +185,7 @@ public class PickActivity extends AppCompatActivity {
                     intent.putExtra("name", to_warehouse);
                     intent.putExtra("message",orderMsgEditText.getText().toString() );
                     intent.putExtra("remarks", remarksEditText.getText().toString());
-                    intent.putExtra("link", "https://arnichem.co.in/intranet/bpview.php?code="+cust_code);
+                    intent.putExtra("link", "https://arnisol.com/intranet/bpview.php?code="+cust_code);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     Toast.makeText(PickActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();

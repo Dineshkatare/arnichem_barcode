@@ -48,7 +48,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.Reset.APIClient;
-import com.arnichem.arnichem_barcode.Settings.SyncInventoryActivity;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.VehicleLog.check;
 import com.arnichem.arnichem_barcode.digital_signature.ActivityDigitalSignature;
@@ -140,7 +139,7 @@ public class ScannerView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 type = "img1";
-                Intent intent = new Intent(ScannerView.this,NewCamerActivity.class);
+                Intent intent = new Intent(ScannerView.this, com.arnichem.arnichem_barcode.Barcode.NewCamerActivity.class);
                 intent.putExtra("type",type);
                 startActivity(intent);                // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for capture the image
             }
