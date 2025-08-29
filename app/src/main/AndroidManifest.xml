@@ -65,6 +65,7 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:name=".util.MyApplication"
@@ -81,72 +82,102 @@
         android:usesCleartextTraffic="true"
         tools:node="merge">
         <activity
-            android:name=".order.PickViewActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".view.Dashboard"
+            android:name=".TransactionsView.validate_dc.SecondValidateDcActivity"
             android:exported="false" />
+        <activity
+            android:name=".TransactionsView.validate_dc.FirstValidateDcActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionsView.validate_dc.EnterValidateActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PaymentReceipt.CashVoucherPrintHistoryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".driver.HrActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".driver.DriverInstructions"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PaymentReceipt.CashVoucherPrintActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PaymentReceipt.CashVoucherActivity"
+            android:exported="false"
+            android:parentActivityName=".VoucherActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VoucherActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".order.PickViewActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".order.PickActivity"
-            android:parentActivityName=".view.Dashboard"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".driver.DriverInstructions"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Settings.SyncInventoryActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CRM.CRMViewActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".report.ResourceActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".order.OrderViewActivity"
-            android:screenOrientation="portrait"
             android:exported="false"
-            android:parentActivityName=".view.Dashboard" />
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".order.OrderMainActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            />
+            android:parentActivityName=".driver.DriverInstructions"
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".leave.LeaveApplyActivity"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:name=".leave.LeaveApplicationActivity"
+            android:exported="false"
+            android:parentActivityName=".driver.HrActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".TransactionsView.DryIce.ViewDryIcePrintActivity"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PrintReceipt.DuraEmptyPrint.ViewDuraEmptyActivity"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PrintReceipt.DuraDeliveyPrint.ViewDuraDeliveryActivity"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".report.ReportActivity"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".CallLogs"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Barcode.ProductionLaserScannerActivity"
-            android:screenOrientation="portrait"
-
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Barcode.LaserScannerActivity"
             android:exported="false"
@@ -154,11 +185,11 @@
         <activity
             android:name=".FileUpload.FIleUploadMainActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".FileUpload.FileUploadSubActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".other_entries.OtherEntryPrintActivity"
             android:exported="false"
@@ -668,10 +699,6 @@
         <!-- <activity android:name=".view.Producation" /> -->
         <activity
             android:name=".TransactionsView.Transactions"
-            android:parentActivityName=".view.Dashboard"
-            android:screenOrientation="fullSensor" />
-        <activity
-            android:name=".leave.LeaveApplicationActivity"
             android:parentActivityName=".view.Dashboard"
             android:screenOrientation="fullSensor" />
         <activity android:name=".view.Dashboard" />

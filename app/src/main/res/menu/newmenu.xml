@@ -9,4 +9,10 @@
         android:icon="@drawable/ic_baseline_sync_24"
         app:showAsAction="always"/>
 
+    <item
+        android:id="@+id/menu"
+        android:title="Menu"
+        android:icon="@drawable/dots"
+        app:showAsAction="always"/>
+
 </menu>

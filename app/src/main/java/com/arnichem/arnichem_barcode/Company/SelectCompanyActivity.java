@@ -416,7 +416,7 @@ public class SelectCompanyActivity extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
- //       String url = "http://arnisol.com/intranet/barcode/APP/getCompanies.php";
+ //       String url = "http://arnichem.co.in/intranet/barcode/APP/getCompanies.php";
         final JsonArrayRequest request = new JsonArrayRequest(APIClient.getCompanies, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {

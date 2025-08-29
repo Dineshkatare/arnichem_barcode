@@ -59,7 +59,7 @@ public class WebViewActivity extends AppCompatActivity {
         });
 
 
-        String fullUrl = "http://arnisol.com/intranet/1239812038120831.php?code=" + cust_code + "&username=" + SharedPref.getInstance(WebViewActivity.this).getEmail();
+        String fullUrl = "http://arnichem.co.in/intranet/1239812038120831.php?code=" + cust_code + "&username=" + SharedPref.getInstance(WebViewActivity.this).getEmail();
 
         Log.d("url",""+fullUrl);
          mywebview.loadUrl(fullUrl);

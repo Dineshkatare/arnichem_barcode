@@ -10,6 +10,7 @@ import com.arnichem.arnichem_barcode.PaymentReceipt.GasTypeResponse;
 import com.arnichem.arnichem_barcode.attendance.MyResponseModel;
 import com.arnichem.arnichem_barcode.data.response.FetchItemAndQuantityVolume;
 import com.arnichem.arnichem_barcode.data.response.InventoryResponse;
+import com.arnichem.arnichem_barcode.data.response.PaymentVoucherResponse;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
 import com.arnichem.arnichem_barcode.leave.LeaveResponse;
 import com.arnichem.arnichem_barcode.order.OrderResponse;
@@ -203,6 +204,23 @@ public interface APIInterface {
     );
 
 
+    @Multipart
+    @POST("voucher_payment_entry.php") // Adjust endpoint as needed
+    Call<ResponseBody> uploadVoucherPayment(
+            @Part("cust_code") RequestBody custCode,
+            @Part("mode") RequestBody mode,
+            @Part("amount") RequestBody amount,
+            @Part("description") RequestBody description,
+            @Part("transaction_id") RequestBody transactionId,
+            @Part("remarks") RequestBody remarks,
+            @Part("email") RequestBody email,
+            @Part("db_host") RequestBody dbHost,
+            @Part("db_username") RequestBody dbUsername,
+            @Part("db_password") RequestBody dbPassword,
+            @Part("db_name") RequestBody dbName,
+            @Part("date") RequestBody date,
+            @Part MultipartBody.Part filePath
+    );
 
     @FormUrlEncoded
     @POST("fetch_report.php")
@@ -321,6 +339,16 @@ public interface APIInterface {
 
     );
 
+
+    @FormUrlEncoded
+    @POST("fetch_payment_voucher.php")
+    Call<PaymentVoucherResponse> getPaymentVoucher(
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName,
+            @Field("vch_no") String vchNo
+    );
 
 
 }

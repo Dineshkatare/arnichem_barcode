@@ -18,6 +18,7 @@ import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.Empty.EmptyMain;
 import com.arnichem.arnichem_barcode.TransactionsView.Liquid_Delivery.LiquidDel_main;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.Main;
+import com.arnichem.arnichem_barcode.TransactionsView.validate_dc.FirstValidateDcActivity;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 import com.example.easywaylocation.EasyWayLocation;
@@ -28,7 +29,7 @@ import com.example.easywaylocation.LocationData;
 public class Transactions extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
-    CardView outward,inward,delivery,empty,fullrecipt,DuraDelivery,Duraempty,LiquidDelivery,ammoniaDelivery,dryIceDelivery;
+    CardView outward,inward,delivery,empty,fullrecipt,DuraDelivery,Duraempty,LiquidDelivery,ammoniaDelivery,dryIceDelivery,validateDc;
     AddClyHelper addClymyDB;
 
     @SuppressLint("MissingInflatedId")
@@ -53,6 +54,7 @@ public class Transactions extends AppCompatActivity implements Listener, Locatio
         LiquidDelivery=findViewById(R.id.LiquidDel);
         ammoniaDelivery=findViewById(R.id.ammoniaDelivery);
         dryIceDelivery=findViewById(R.id.dryIceDelivery);
+        validateDc = findViewById(R.id.validateDc);
 
         outward.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +130,14 @@ public class Transactions extends AppCompatActivity implements Listener, Locatio
 
             }
         });
+        validateDc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i=new Intent(Transactions.this, FirstValidateDcActivity.class);
+                startActivity(i);
 
+            }
+        });
 
         SharedPref.getInstance(getApplicationContext()).storefrom_loc(String.valueOf(0));
         SharedPref.getInstance(getApplicationContext()).store_customersel(String.valueOf(0));

@@ -58,6 +58,7 @@ public class LeaveApplicationActivity extends AppCompatActivity {
         apiInterface = APIClient.getClient().create(APIInterface.class);
         employeeHandler = new EmployeHandler(this);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
         // Initialize Views

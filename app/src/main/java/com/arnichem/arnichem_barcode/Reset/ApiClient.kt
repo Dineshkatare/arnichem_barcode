@@ -9,10 +9,8 @@ object ApiClient {
     private const val BASE_URL = "https://arnichem.co.in/intranet/barcode/APP/app_apis/" // Replace with your API base URL
 
 
-    private val loggingInterceptor =
-        HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY }
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)

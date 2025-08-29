@@ -280,7 +280,6 @@ public class DuraDeliveryMain extends AppCompatActivity implements Listener, Loc
                 searchcylinder = cylinderAdapter.getItem(position);
                 s=searchcylinder;
                 is_scan = "no";
-
                 login();
 
             }

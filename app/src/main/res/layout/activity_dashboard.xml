@@ -235,14 +235,14 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
                     android:padding="10dp"
-                    android:src="@drawable/googlepay"></ImageView>
+                    android:src="@drawable/cash_voucher"></ImageView>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:gravity="center_horizontal"
-                    android:text="GooglePay"
+                    android:text="Payments"
                     android:textColor="@color/arnichem"
                     android:textSize="16sp"
                     android:textStyle="bold">
@@ -301,7 +301,7 @@
             android:id="@+id/file_upload"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_row="7"
+            android:layout_row="6"
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
@@ -345,107 +345,107 @@
         </androidx.cardview.widget.CardView>
 
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/pick"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_row="8"
-            android:layout_rowWeight="1"
-            android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="10dp"
-            tools:ignore="GridLayout">
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:id="@+id/pick"-->
+<!--            android:layout_width="160dp"-->
+<!--            android:layout_height="160dp"-->
+<!--            android:layout_row="8"-->
+<!--            android:layout_rowWeight="1"-->
+<!--            android:layout_column="1"-->
+<!--            android:layout_columnWeight="1"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:padding="10dp"-->
+<!--            app:cardBackgroundColor="@color/white"-->
+<!--            app:cardCornerRadius="10dp"-->
+<!--            app:cardElevation="10dp"-->
+<!--            tools:ignore="GridLayout">-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical">-->
 
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
-                    android:padding="20dp"
-                    android:src="@drawable/ic_pickup">
+<!--                <ImageView-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="100dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:padding="20dp"-->
+<!--                    android:src="@drawable/ic_pickup">-->
 
-                </ImageView>
+<!--                </ImageView>-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center_horizontal"
-                    android:text="Pick Entry"
-                    android:textColor="@color/arnichem"
-                    android:textSize="16sp"
-                    android:textStyle="bold">
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:fontFamily="sans-serif"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:text="Pick Entry"-->
+<!--                    android:textColor="@color/arnichem"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:textStyle="bold">-->
 
-                </TextView>
-
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/Logout"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_row="9"
-            android:layout_rowWeight="1"
-            android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="10dp"
-            tools:ignore="GridLayout">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
-                    android:padding="20dp"
-                    android:src="@drawable/userlogout">
-
-                </ImageView>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center_horizontal"
-                    android:text="Logout"
-                    android:textColor="@color/arnichem"
-                    android:textSize="16sp"
-                    android:textStyle="bold">
-
-                </TextView>
+<!--                </TextView>-->
 
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-        </androidx.cardview.widget.CardView>
+<!--        </androidx.cardview.widget.CardView>-->
+
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:id="@+id/Logout"-->
+<!--            android:layout_width="160dp"-->
+<!--            android:layout_height="160dp"-->
+<!--            android:layout_row="9"-->
+<!--            android:layout_rowWeight="1"-->
+<!--            android:layout_column="1"-->
+<!--            android:layout_columnWeight="1"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:padding="10dp"-->
+<!--            app:cardBackgroundColor="@color/white"-->
+<!--            app:cardCornerRadius="10dp"-->
+<!--            app:cardElevation="10dp"-->
+<!--            tools:ignore="GridLayout">-->
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical">-->
+
+<!--                <ImageView-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="100dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:padding="20dp"-->
+<!--                    android:src="@drawable/userlogout">-->
+
+<!--                </ImageView>-->
+
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:fontFamily="sans-serif"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:text="Logout"-->
+<!--                    android:textColor="@color/arnichem"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:textStyle="bold">-->
+
+<!--                </TextView>-->
+
+
+<!--            </LinearLayout>-->
+
+<!--        </androidx.cardview.widget.CardView>-->
 
         <androidx.cardview.widget.CardView
             android:id="@+id/order"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_row="8"
+            android:layout_row="6"
             android:layout_rowWeight="1"
-            android:layout_column="0"
+            android:layout_column="1"
             android:layout_columnWeight="1"
             android:layout_margin="10dp"
             android:padding="10dp"
@@ -465,7 +465,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
                     android:padding="20dp"
-                    android:src="@drawable/order">
+                    android:src="@drawable/driver">
 
                 </ImageView>
 
@@ -474,7 +474,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:gravity="center_horizontal"
-                    android:text="Order Entry"
+                    android:text="Driver Instructions"
                     android:textColor="@color/arnichem"
                     android:textSize="16sp"
                     android:textStyle="bold">
@@ -491,7 +491,7 @@
             android:id="@+id/resource"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_row="9"
+            android:layout_row="7"
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
@@ -538,7 +538,7 @@
             android:id="@+id/other_cl"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_row="6"
+            android:layout_row="5"
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
@@ -607,7 +607,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="20dp"
                     android:padding="20dp"
-                    android:src="@drawable/setting">
+                    android:src="@drawable/hr">
 
                 </ImageView>
 
@@ -616,7 +616,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:gravity="center_horizontal"
-                    android:text="Settings"
+                    android:text="HR"
                     android:textColor="@color/arnichem"
                     android:textSize="16sp"
                     android:textStyle="bold">
@@ -632,7 +632,7 @@
             android:id="@+id/print"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_row="5"
+            android:layout_row="4"
             android:layout_rowWeight="1"
             android:layout_column="0"
             android:layout_columnWeight="1"
@@ -774,7 +774,7 @@
             android:layout_width="160dp"
             android:padding="10dp"
             android:layout_column="0"
-            android:layout_row="4"
+            android:layout_row="3"
             android:layout_columnWeight="1"
             android:layout_rowWeight="1"
             app:cardBackgroundColor="@color/white"
@@ -860,61 +860,61 @@
 
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/log_cl"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_row="6"
-            android:layout_rowWeight="1"
-            android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="10dp"
-            tools:ignore="GridLayout">
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:id="@+id/log_cl"-->
+<!--            android:layout_width="160dp"-->
+<!--            android:layout_height="160dp"-->
+<!--            android:layout_row="6"-->
+<!--            android:layout_rowWeight="1"-->
+<!--            android:layout_column="1"-->
+<!--            android:layout_columnWeight="1"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:padding="10dp"-->
+<!--            app:cardBackgroundColor="@color/white"-->
+<!--            app:cardCornerRadius="10dp"-->
+<!--            app:cardElevation="10dp"-->
+<!--            tools:ignore="GridLayout">-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical">-->
 
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
-                    android:padding="20dp"
-                    android:src="@drawable/attendance">
+<!--                <ImageView-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="100dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:padding="20dp"-->
+<!--                    android:src="@drawable/attendance">-->
 
-                </ImageView>
+<!--                </ImageView>-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center_horizontal"
-                    android:text="Attendance"
-                    android:textColor="@color/arnichem"
-                    android:textSize="16sp"
-                    android:textStyle="bold">
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:fontFamily="sans-serif"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:text="Attendance"-->
+<!--                    android:textColor="@color/arnichem"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:textStyle="bold">-->
 
-                </TextView>
+<!--                </TextView>-->
 
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-        </androidx.cardview.widget.CardView>
+<!--        </androidx.cardview.widget.CardView>-->
 
         <androidx.cardview.widget.CardView
             android:id="@+id/report"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:layout_row="10"
+            android:layout_row="7"
             android:visibility="gone"
             android:layout_rowWeight="1"
-            android:layout_column="0"
+            android:layout_column="1"
             android:layout_columnWeight="1"
             android:layout_margin="10dp"
             android:padding="10dp"
@@ -955,52 +955,52 @@
 
         </androidx.cardview.widget.CardView>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/leave"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_row="7"
-            android:layout_rowWeight="1"
-            android:layout_column="1"
-            android:layout_columnWeight="1"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="10dp"
-            tools:ignore="GridLayout">
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:id="@+id/leave"-->
+<!--            android:layout_width="160dp"-->
+<!--            android:layout_height="160dp"-->
+<!--            android:layout_row="7"-->
+<!--            android:layout_rowWeight="1"-->
+<!--            android:layout_column="1"-->
+<!--            android:layout_columnWeight="1"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:padding="10dp"-->
+<!--            app:cardBackgroundColor="@color/white"-->
+<!--            app:cardCornerRadius="10dp"-->
+<!--            app:cardElevation="10dp"-->
+<!--            tools:ignore="GridLayout">-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical">-->
 
-                <ImageView
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="20dp"
-                    android:padding="20dp"
-                    android:src="@drawable/leave_icon">
+<!--                <ImageView-->
+<!--                    android:layout_width="100dp"-->
+<!--                    android:layout_height="100dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:padding="20dp"-->
+<!--                    android:src="@drawable/leave_icon">-->
 
-                </ImageView>
+<!--                </ImageView>-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:gravity="center_horizontal"
-                    android:text="Leave Request"
-                    android:textColor="@color/arnichem"
-                    android:textSize="16sp"
-                    android:textStyle="bold">
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:fontFamily="sans-serif"-->
+<!--                    android:gravity="center_horizontal"-->
+<!--                    android:text="Leave Request"-->
+<!--                    android:textColor="@color/arnichem"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:textStyle="bold">-->
 
-                </TextView>
+<!--                </TextView>-->
 
 
-            </LinearLayout>
+<!--            </LinearLayout>-->
 
-        </androidx.cardview.widget.CardView>
+<!--        </androidx.cardview.widget.CardView>-->
 
 
     </GridLayout>

@@ -51,7 +51,7 @@ public class ResourceActivity extends AppCompatActivity {
         });
 
 
-        String fullUrl = "https://www.arnisol.com/intranet/resources_app.php?username=" + SharedPref.getInstance(ResourceActivity.this).getEmail() + "&company_name=" + SharedPref.getInstance(ResourceActivity.this).getCompanyShortName();
+        String fullUrl = "https://www.arnichem.co.in/intranet/resources_app.php?username=" + SharedPref.getInstance(ResourceActivity.this).getEmail() + "&company_name=" + SharedPref.getInstance(ResourceActivity.this).getCompanyShortName();
 
         Log.d("url",""+fullUrl);
         mywebview.loadUrl(fullUrl);

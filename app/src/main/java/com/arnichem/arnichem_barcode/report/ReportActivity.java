@@ -50,7 +50,7 @@ public class ReportActivity extends AppCompatActivity {
         });
 
 
-        String fullUrl = "https://www.arnisol.com/intranet/reports_app.php?username=" + SharedPref.getInstance(ReportActivity.this).getEmail() + "&company_name=" + SharedPref.getInstance(ReportActivity.this).getCompanyShortName();
+        String fullUrl = "https://www.arnichem.co.in/intranet/reports_app.php?username=" + SharedPref.getInstance(ReportActivity.this).getEmail() + "&company_name=" + SharedPref.getInstance(ReportActivity.this).getCompanyShortName();
 
         Log.d("url",""+fullUrl);
         mywebview.loadUrl(fullUrl);

@@ -65,11 +65,14 @@ import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliveryprint;
 import com.arnichem.arnichem_barcode.VehicleLog.check;
 import com.arnichem.arnichem_barcode.VehicleLog.vehicle_logout;
+import com.arnichem.arnichem_barcode.VoucherActivity;
 import com.arnichem.arnichem_barcode.attendance.Attendance_log;
 import com.arnichem.arnichem_barcode.attendance.MyResponseModel;
 import com.arnichem.arnichem_barcode.constant.constant;
 import com.arnichem.arnichem_barcode.data.ReportAccess;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
+import com.arnichem.arnichem_barcode.driver.DriverInstructions;
+import com.arnichem.arnichem_barcode.driver.HrActivity;
 import com.arnichem.arnichem_barcode.leave.LeaveApplicationActivity;
 import com.arnichem.arnichem_barcode.order.OrderMainActivity;
 import com.arnichem.arnichem_barcode.order.PickActivity;
@@ -102,7 +105,7 @@ import retrofit2.Response;
 public class Dashboard extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
-    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,logout,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,logCL,otherCl,report,leave,order,resource,pickup;
+    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,otherCl,report,order,resource;
     SharedPreferences pref;
     ScrollView scrollView;
     boolean doubleBackToExitPressedOnce = false;
@@ -140,7 +143,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         customerHoldCl = findViewById(R.id.customerHoldCl);
         otherCl = findViewById(R.id.other_cl);
         report = findViewById(R.id.report);
-        logout=findViewById(R.id.Logout);
+//        logout=findViewById(R.id.Logout);
         Producation =findViewById(R.id.Producations);
         GooglePay=findViewById(R.id.googlepay);
         Payment_Receipt=findViewById(R.id.PrintReceipt);
@@ -148,12 +151,9 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         Godown=findViewById(R.id.Godown);
         PrintReceipt=findViewById(R.id.print);
         DieselEntry = findViewById(R.id.Diesel);
-        logCL = findViewById(R.id.log_cl);
         CRM=findViewById(R.id.CRM);
-        leave = findViewById(R.id.leave);
         order = findViewById(R.id.order);
         resource =findViewById(R.id.resource);
-        pickup = findViewById(R.id.pick);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if(SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")){
             report.setVisibility(View.VISIBLE);
@@ -209,7 +209,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, MainSettings.class);
+                Intent i=new Intent(Dashboard.this, HrActivity.class);
                 startActivity(i);
 
 
@@ -283,28 +283,28 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         GooglePay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, GooglepayScreen.class);
+                Intent i=new Intent(Dashboard.this, VoucherActivity.class);
                 startActivity(i);
             }
         });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(status.equals("success")) {
-                    Snackbar.make(scrollView, "कृपया वाहन माहिती लॉगऑऊट टाका !", Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
-                }
-                else
-                {
-                    SharedPref.getInstance(getApplicationContext()).logout();
-                    startActivity(new Intent(Dashboard.this, SelectCompanyActivity.class));
-                    finish();
-
-                }
-
-
-            }
-        });
+//        logout.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                if(status.equals("success")) {
+//                    Snackbar.make(scrollView, "कृपया वाहन माहिती लॉगऑऊट टाका !", Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
+//                }
+//                else
+//                {
+//                    SharedPref.getInstance(getApplicationContext()).logout();
+//                    startActivity(new Intent(Dashboard.this, SelectCompanyActivity.class));
+//                    finish();
+//
+//                }
+//
+//
+//            }
+//        });
 
         Payment_Receipt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -344,23 +344,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 //                }
             }
         });
-        logCL.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
-                if (isGpsEnabled) {
-                    Intent i=new Intent(Dashboard.this, Attendance_log.class);
-                    startActivity(i);
-                } else {
-                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(intent);
-                    Toast.makeText(getApplicationContext(), "Please enable GPS", Toast.LENGTH_SHORT).show();
-                }
-
-
-            }
-        });
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -368,29 +352,16 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 startActivity(i);
             }
         });
-        leave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, LeaveApplicationActivity.class);
-                startActivity(i);
-            }
-        });
+
         order.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, OrderMainActivity.class);
+                Intent i=new Intent(Dashboard.this, DriverInstructions.class);
                 startActivity(i);
 
             }
         });
-        pickup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, PickActivity.class);
-                startActivity(i);
 
-            }
-        });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
 
@@ -513,6 +484,10 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 
         if (item.getItemId() == R.id.sync) {
             startActivity(new Intent(Dashboard.this, Test.class));
+
+        }
+        if (item.getItemId() == R.id.menu) {
+            startActivity(new Intent(Dashboard.this, MainSettings.class));
 
         }
         return super.onOptionsItemSelected(item);

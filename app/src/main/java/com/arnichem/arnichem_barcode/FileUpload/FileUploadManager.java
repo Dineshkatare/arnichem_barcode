@@ -11,7 +11,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FileUploadManager {
-    private static final String BASE_URL = "http://arnisol.com/intranet/barcode/APP/app_apis/"; // Adjust your base URL
+    private static final String BASE_URL = "http://arnichem.co.in/intranet/barcode/APP/app_apis/"; // Adjust your base URL
     private final APIInterface apiService;
 
     public FileUploadManager() {
@@ -20,7 +20,7 @@ public class FileUploadManager {
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         Retrofit  retrofit = new Retrofit.Builder()
-                .baseUrl("http://arnisol.com/intranet/barcode/APP/app_apis/")
+                .baseUrl("http://arnichem.co.in/intranet/barcode/APP/app_apis/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();

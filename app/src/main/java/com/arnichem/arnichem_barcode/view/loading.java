@@ -171,7 +171,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/fetchInventoryGases.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/fetchInventoryGases.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -228,7 +228,7 @@ public class loading extends AppCompatActivity {
         dialog.setMessage("Please wait....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
-        String url="http://arnisol.com/intranet/barcode/APP/tesFetchApi.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/tesFetchApi.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST,url,
                 new Response.Listener<String>() {
                     @SuppressLint("WrongConstant")
@@ -310,7 +310,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/Duracylindersearch.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/Duracylindersearch.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -369,7 +369,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/cylinder_location_code_list.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/cylinder_location_code_list.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -426,7 +426,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/Distributor.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/Distributor.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -483,7 +483,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/bp_contact_fetch.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/bp_contact_fetch.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -540,7 +540,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/businesspartners_fetch_data.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/businesspartners_fetch_data.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -604,7 +604,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/Fetch.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/Fetch.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -665,7 +665,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/liquid_delivery_type.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/liquid_delivery_type.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -725,7 +725,7 @@ public class loading extends AppCompatActivity {
         dialog.show();
 
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/cylinder_search.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/cylinder_search.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -787,7 +787,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/customerlist.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/customerlist.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -847,7 +847,7 @@ public class loading extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
         RequestQueue queue= Volley.newRequestQueue(getApplicationContext());
-        String url="http://arnisol.com/intranet/barcode/APP/fromlocationcode.php";
+        String url="http://arnichem.co.in/intranet/barcode/APP/fromlocationcode.php";
         final JsonArrayRequest request=new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {

@@ -281,7 +281,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
         params.put("app_pin",pinvalue.toString());
         params.put("ipaddress",ipstr);
         params.put("imei",imeistr);
-        params.put("appversion","8.6.1");
+        params.put("appversion","8.6.4");
         params.put("lati",latitude);
         params.put("logi",logitude);
         params.put("addr",address);

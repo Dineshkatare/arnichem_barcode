@@ -425,7 +425,7 @@ public class CRM_Main extends AppCompatActivity {
                                         intent.putExtra("contact_name", bp_conatc_name);
                                         intent.putExtra("meeting_type", meeting_type_name);
                                         intent.putExtra("discussion",discussionVal.getText().toString());
-                                        intent.putExtra("link", "https://arnisol.com/intranet/bpview.php?code="+cust_code);
+                                        intent.putExtra("link", "https://arnichem.co.in/intranet/bpview.php?code="+cust_code);
                                         startActivity(intent);
 
                                     } else {
