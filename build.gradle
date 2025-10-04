@@ -6,12 +6,12 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven { url 'https://jitpack.io' }
         maven {
             url "http://storage.googleapis.com/r8-releases/raw"
             allowInsecureProtocol = true
         }
+        jcenter { url 'https://maven.aliyun.com/repository/public' }//important
 
 
     }
@@ -31,12 +31,12 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        jcenter()
         maven { url 'https://jitpack.io' }
         maven {
             url "http://storage.googleapis.com/r8-releases/raw"
             allowInsecureProtocol = true
         }
+        jcenter { url 'https://maven.aliyun.com/repository/public' }//important
 
         // Warning: this repository is going to shut down soon
     }
