@@ -43,6 +43,9 @@ class FirstValidateDcActivity : AppCompatActivity() {
 
         val etvDcEmpNo = findViewById<EditText>(R.id.etvDcEmpNo)
         val getInfoButton = findViewById<Button>(R.id.getInfo)
+
+        // Set current date and time
+
         getInfoButton.setOnClickListener {
             val dcno = etvDcEmpNo.text.toString().trim()
             if (dcno.isNotEmpty()) {
