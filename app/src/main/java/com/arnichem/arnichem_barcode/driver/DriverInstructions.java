@@ -15,10 +15,11 @@ import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.order.OrderMainActivity;
 import com.arnichem.arnichem_barcode.order.PickActivity;
 import com.arnichem.arnichem_barcode.other_entries.OtherEntryActivity;
+import com.arnichem.arnichem_barcode.report.ReportActivity;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 
 public class DriverInstructions extends AppCompatActivity {
-    CardView pickCard,orderCard;
+    CardView pickCard,orderCard,reports;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +27,7 @@ public class DriverInstructions extends AppCompatActivity {
         setContentView(R.layout.activity_driver_instructions);
         pickCard  = findViewById(R.id.pick);
         orderCard = findViewById(R.id.orderCard);
+        reports = findViewById(R.id.report);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Driver Instructions");
 
@@ -44,6 +46,16 @@ public class DriverInstructions extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i=new Intent(DriverInstructions.this, OrderMainActivity.class);
                 startActivity(i);
+            }
+        });
+        reports.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DriverInstructions.this, ReportActivity.class);
+                intent.putExtra("title", "Reports");
+                intent.putExtra("url", "https://www.arnichem.co.in/intranet/reports_orders_app.php");
+                startActivity(intent);
+
             }
         });
 

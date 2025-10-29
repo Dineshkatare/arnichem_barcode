@@ -83,6 +83,7 @@
         tools:node="merge">
         <activity
             android:name=".TransactionsView.validate_dc.SecondValidateDcActivity"
+            android:parentActivityName=".TransactionsView.validate_dc.FirstValidateDcActivity"
             android:exported="false" />
         <activity
             android:name=".TransactionsView.validate_dc.FirstValidateDcActivity"

@@ -20,10 +20,11 @@ import com.arnichem.arnichem_barcode.attendance.Attendance_log;
 import com.arnichem.arnichem_barcode.leave.LeaveApplicationActivity;
 import com.arnichem.arnichem_barcode.order.PickActivity;
 import com.arnichem.arnichem_barcode.other_entries.OtherEntryActivity;
+import com.arnichem.arnichem_barcode.report.ReportActivity;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 
 public class HrActivity extends AppCompatActivity {
-    CardView attendance,leave;
+    CardView attendance,leave,hr_report;
     LocationManager locationManager;
 
     @Override
@@ -33,6 +34,7 @@ public class HrActivity extends AppCompatActivity {
 
         attendance  = findViewById(R.id.attendanceCard);
         leave = findViewById(R.id.leaveCard);
+        hr_report = findViewById(R.id.hr_reports);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("HR");
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -43,6 +45,16 @@ public class HrActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i=new Intent(HrActivity.this, PickActivity.class);
                 startActivity(i);
+
+            }
+        });
+        hr_report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HrActivity.this, ReportActivity.class);
+                intent.putExtra("title", "HR Reports");
+                intent.putExtra("url", "https://www.arnichem.co.in/intranet/reports_hr_app.php");
+                startActivity(intent);
 
             }
         });

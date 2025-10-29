@@ -86,7 +86,7 @@ public class ActivityDigitalSignature extends AppCompatActivity {
                     intent.putExtra("Signed","true");
                     intent.putExtra("path",path);
                     LocalBroadcastManager.getInstance(ActivityDigitalSignature.this).sendBroadcast(intent);
-                    finish();
+                     finish();
                 } else {
                     Toast.makeText(ActivityDigitalSignature.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
                 }
