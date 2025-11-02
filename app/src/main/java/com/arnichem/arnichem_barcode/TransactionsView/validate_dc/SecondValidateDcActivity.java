@@ -202,6 +202,7 @@ public class SecondValidateDcActivity extends AppCompatActivity implements OnIte
             private void postUsingVolley() {
                 String dcno = getIntent().getStringExtra("dcno");
                 String email = SharedPref.getInstance(this).getEmail();
+                String vehicleNo = SharedPref.getInstance(this).getVehicleNo();
                 String transType = "DEL";
 
                 // Calculate validated quantity and cylinder numbers
@@ -280,7 +281,7 @@ public class SecondValidateDcActivity extends AppCompatActivity implements OnIte
                         params.put("sign", digitalSignBase64);
                         params.put("lati", latitude);
                         params.put("logi", logitude);
-
+                        params.put("vehicle_no", vehicleNo);
                         return params;
                     }
                 };
