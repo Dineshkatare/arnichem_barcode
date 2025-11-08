@@ -24,6 +24,7 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -64,6 +65,12 @@ public class dry_ice_print extends AppCompatActivity {
     Bitmap printLogoDr,phoneNumberDr,digital_sign;
     ImageView printImg,phoneImg,custnamesign;
     TextView arnichemsignTxt,termsTxt;
+
+    private static final int REQ_SELECT_BT = 1;
+    private static final int REQ_PRINT_BT = 2; // Separate from finalprint if needed; adjust if conflicting
+
+    private BluetoothConnection selectedDevice;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +110,6 @@ public class dry_ice_print extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 printBluetooth();
-
             }
         });
         String print_logo = SharedPref.mInstance.getPrintLogo();
@@ -111,13 +117,17 @@ public class dry_ice_print extends AppCompatActivity {
         if(imgFile.exists()){
             printLogoDr = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
             printImg.setImageBitmap(printLogoDr);
+        } else {
+            printLogoDr = null;
         }
 
         String phoneNumber = SharedPref.mInstance.getPhoneNumber();
         File imgFilePhoneNumber = new  File(phoneNumber);
-        if(imgFile.exists()){
+        if(imgFilePhoneNumber.exists()){
             phoneNumberDr = BitmapFactory.decodeFile(imgFilePhoneNumber.getAbsolutePath());
             phoneImg.setImageBitmap(phoneNumberDr);
+        } else {
+            phoneNumberDr = null;
         }
         arnichemsignTxt.setText(SharedPref.mInstance.getOwnCode());
         termsTxt.setText(SharedPref.mInstance.getTermsText());
@@ -126,7 +136,6 @@ public class dry_ice_print extends AppCompatActivity {
             if(signFile.exists()){
                 digital_sign = BitmapFactory.decodeFile(signFile.getAbsolutePath());
                 digital_sign = Bitmap.createScaledBitmap(digital_sign,200, 200, true);
-
                 custnamesign.setImageBitmap(digital_sign);
             }
         }else {
@@ -134,41 +143,70 @@ public class dry_ice_print extends AppCompatActivity {
             digital_sign.eraseColor(Color.WHITE);
             custnamesign.setImageBitmap(digital_sign);
         }
-
     }
-
-    public static final int PERMISSION_BLUETOOTH = 1;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-           if (requestCode == finalprint.PERMISSION_BLUETOOTH) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permission granted for Bluetooth, continue with the Bluetooth operation
-            new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
-        } else {
-            // Permission denied, inform the user
-            Toast.makeText(this, "Bluetooth permission denied. Cannot print.", Toast.LENGTH_SHORT).show();
-        }
-    } else if (requestCode == 1) {
-        // This handles the Bluetooth device selection permission for Android 12 and above
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Permission granted, proceed to select Bluetooth device
-            selectBluetoothDevice();
-        } else {
-            // Permission denied, inform the user
-            Toast.makeText(this, "Bluetooth connect permission denied.", Toast.LENGTH_SHORT).show();
-        }
-    }
-    }
-    public void selectBluetoothDevice() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) and above
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 1);
-                return;
+
+        boolean allGranted = grantResults.length > 0;
+        for (int result : grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                allGranted = false;
+                break;
             }
         }
 
+        if (requestCode == REQ_SELECT_BT) {
+            if (allGranted) {
+                selectBluetoothDevice();
+            } else {
+                Toast.makeText(this, "Bluetooth permission denied. Cannot select device.", Toast.LENGTH_SHORT).show();
+                // Optional: Redirect to settings if permanently denied
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(android.net.Uri.fromParts("package", getPackageName(), null));
+                    startActivity(intent);
+                }
+            }
+        } else if (requestCode == REQ_PRINT_BT) {
+            if (allGranted) {
+                printBluetooth();
+            } else {
+                Toast.makeText(this, "Bluetooth permission denied. Cannot print.", Toast.LENGTH_SHORT).show();
+                // Optional: Redirect to settings if permanently denied
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    intent.setData(android.net.Uri.fromParts("package", getPackageName(), null));
+                    startActivity(intent);
+                }
+            }
+        } else if (requestCode == finalprint.PERMISSION_BLUETOOTH) {
+            // Legacy handling if still used elsewhere; adjust or remove if not needed
+            if (allGranted) {
+                printBluetooth();
+            } else {
+                Toast.makeText(this, "Bluetooth permission denied. Cannot print.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    public void selectBluetoothDevice() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12 (API 31) and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // Request only CONNECT for bonded devices and name retrieval
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQ_SELECT_BT);
+                return;
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // Android 6.0 (API 23) to 11
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, REQ_SELECT_BT);
+                return;
+            }
+        }
+        // For < API 23, no runtime permission needed
+
+        // Proceed with selection (permissions granted or not required)
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
             Toast.makeText(this, "Bluetooth is not enabled", Toast.LENGTH_SHORT).show();
@@ -181,7 +219,8 @@ public class dry_ice_print extends AppCompatActivity {
             final CharSequence[] deviceNames = new CharSequence[deviceList.size()];
 
             for (int i = 0; i < deviceList.size(); i++) {
-                deviceNames[i] = deviceList.get(i).getName();
+                String name = deviceList.get(i).getName();
+                deviceNames[i] = (name != null) ? name : "Unnamed Device";
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -191,9 +230,7 @@ public class dry_ice_print extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     BluetoothDevice device = deviceList.get(which);
                     selectedDevice = new BluetoothConnection(device);
-
                     printBluetooth();
-                    // Toast.makeText(getApplicationContext(), "Selected Device: " + device.getName(), Toast.LENGTH_SHORT).show();
                 }
             });
             builder.show();
@@ -202,7 +239,6 @@ public class dry_ice_print extends AppCompatActivity {
         }
     }
 
-    private BluetoothConnection selectedDevice;
     BitmapDrawable flip(BitmapDrawable d)
     {
         Matrix m = new Matrix();
@@ -214,38 +250,57 @@ public class dry_ice_print extends AppCompatActivity {
     }
 
     public void printBluetooth() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, finalprint.PERMISSION_BLUETOOTH);
-        } else {
-            new AsyncBluetoothEscPosPrint(this).execute(this.getAsyncEscPosPrinter(selectedDevice));
-            new AsyncBluetoothEscPosPrint(this).execute(this.getAsyncEscPosPrinter(selectedDevice));
-
+        if (selectedDevice == null) {
+            selectBluetoothDevice();
+            return;
         }
+
+        // Check permissions before printing
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, REQ_PRINT_BT);
+                return;
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, REQ_PRINT_BT);
+                return;
+            }
+        }
+        // For < API 23, no runtime permission needed
+
+        // Permissions ok, proceed to print (single call, no duplicate)
+        new AsyncBluetoothEscPosPrint(this).execute(getAsyncEscPosPrinter(selectedDevice));
     }
-
-
-
 
     @SuppressLint("SimpleDateFormat")
     public AsyncEscPosPrinter getAsyncEscPosPrinter(DeviceConnection printerConnection) {
         AsyncEscPosPrinter printer = new AsyncEscPosPrinter(printerConnection, 203, 48f, 5);
-        return printer.setTextToPrint(
-                "[C]   Dry Ice Delivery challan  \n" +
-                        "[C]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,phoneNumberDr)+"</img>\n" +
-                        "[C]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,printLogoDr)+"</img>\n\n" +
-                        "[C]<font size='small'>DCNO -  "+empb+"</font>\n" +
-                        "[C]<font size='small'>Date -  "+DateFormat.getDateTimeInstance().format(new Date())+"</font>\n" +
-                        "[C]<font size='small'>Code -  "+custcode+"</font>\n" +
-                        "[C]<font size='small'>Name -  "+custname+"</font>\n" +
-                        "[C]<font size='small'>Product :  DRY ICE</font>\n" +
-                        "[C]<font size='small'>Weight : "+weight+"</font>\n" +
-                        "[C]<font size='small'>Vehicle No    :  "+ SharedPref.getInstance(this).getVehicleNo()+"</font>\n" +
-                        "[L]<img>"+ PrinterTextParserImg.bitmapToHexadecimalString(printer,digital_sign)+"</img>\n" +
-                        "[R]               [R]"+SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"\n" +
-                        "[R]Customer  [R]"+" "+SharedPref.getInstance(this).getOwnCode()+"\n\n"+
-                        "[R]"+SharedPref.getInstance(this).getTermsText()+"\n"
 
-        );
+        StringBuilder printText = new StringBuilder();
+        printText.append("[C]   Dry Ice Delivery challan  \n");
+
+        if (phoneNumberDr != null) {
+            printText.append("[C]<img>").append(PrinterTextParserImg.bitmapToHexadecimalString(printer, phoneNumberDr)).append("</img>\n");
+        }
+        if (printLogoDr != null) {
+            printText.append("[C]<img>").append(PrinterTextParserImg.bitmapToHexadecimalString(printer, printLogoDr)).append("</img>\n");
+        }
+        printText.append("\n");
+
+        printText.append("[C]<font size='small'>DCNO -  ").append(empb).append("</font>\n");
+        printText.append("[C]<font size='small'>Date -  ").append(DateFormat.getDateTimeInstance().format(new Date())).append("</font>\n");
+        printText.append("[C]<font size='small'>Code -  ").append(custcode).append("</font>\n");
+        printText.append("[C]<font size='small'>Name -  ").append(custname).append("</font>\n");
+        printText.append("[C]<font size='small'>Product :  DRY ICE</font>\n");
+        printText.append("[C]<font size='small'>Weight : ").append(weight).append("</font>\n");
+        printText.append("[C]<font size='small'>Vehicle No    :  ").append(SharedPref.getInstance(this).getVehicleNo()).append("</font>\n");
+        printText.append("[L]<img>").append(PrinterTextParserImg.bitmapToHexadecimalString(printer, digital_sign)).append("</img>\n");
+        printText.append("[R]               [R]").append(SharedPref.getInstance(this).FirstName()).append(" ").append(SharedPref.getInstance(this).LastName()).append("\n");
+        printText.append("[R]Customer  [R]").append(" ").append(SharedPref.getInstance(this).getOwnCode()).append("\n\n");
+        printText.append("[R]").append(SharedPref.getInstance(this).getTermsText()).append("\n");
+
+        return printer.setTextToPrint(printText.toString());
     }
 
     @Override
