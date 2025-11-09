@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -27,13 +28,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -130,6 +134,52 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         easyWayLocation = new EasyWayLocation(this, false,true,this);
         scrollView=findViewById(R.id.dashlayout);
         apiInterface = APIClient.getClient().create(APIInterface.class);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        TextView tvCompany = findViewById(R.id.tvCompanyName);
+        TextView tvUsername = findViewById(R.id.tvUserName);
+        TextView tvVehicle = findViewById(R.id.tvVehicleNumber);
+        TextView tvVersion = findViewById(R.id.tvAppVersion);
+        ImageView icSync = findViewById(R.id.btnSync);
+        ImageView icMenu = findViewById(R.id.btnMenu);
+
+        // Set values dynamically
+        tvCompany.setText(SharedPref.getInstance(this).getCompanyFullName());
+        tvUsername.setText(SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
+        if(!SharedPref.getInstance(this).getVehicleNo().isEmpty()) {
+            tvVehicle.setText(SharedPref.getInstance(this).getVehicleNo() + " |");
+        }
+        tvVersion.setText(" Version :" + "9.1");
+
+// click listeners
+        icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));
+        icMenu.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, MainSettings.class)));
+
+
+        LinearLayout toolbarLayout = findViewById(R.id.toolbar);
+
+// Example hex color (you can change this dynamically)
+        String hexColor = SharedPref.getInstance(this).getBgColor(); // dark blue
+
+// Convert to int color
+        int bgColor = Color.parseColor(hexColor);
+
+// Create rounded background shape
+        float cornerRadius = getResources().getDisplayMetrics().density * 20; // 20dp
+        float[] radii = new float[]{
+                0f, 0f,  // top-left
+                0f, 0f,  // top-right
+                cornerRadius, cornerRadius,  // bottom-right
+                cornerRadius, cornerRadius   // bottom-left
+        };
+
+        GradientDrawable bgShape = new GradientDrawable();
+        bgShape.setColor(bgColor);
+        bgShape.setCornerRadii(radii);
+
+// Apply background to layout
+        toolbarLayout.setBackground(bgShape);
 
         vehiclelogimageview=findViewById(R.id.vehiclelog);
         checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);

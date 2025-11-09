@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+       android:elevation="6dp"
+    android:gravity="center_vertical">
+
+    <!-- LEFT TEXT SECTION -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvCompanyName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Arnichem Pvt Ltd"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/tvUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User: Dinesh Katare"
+            android:textSize="14sp"
+            android:textColor="@android:color/white" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvVehicleNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vehicle: MP09-1234"
+                android:textSize="13sp"
+                android:layout_marginEnd="10dp"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvAppVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="v1.0.5"
+                android:textSize="13sp"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- RIGHT ICONS -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <ImageView
+            android:id="@+id/btnSync"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="12dp"
+            android:src="@drawable/ic_baseline_sync_24"
+            android:contentDescription="Sync"
+            app:tint="@android:color/white" />
+
+        <ImageView
+            android:id="@+id/btnMenu"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/setting"
+            android:contentDescription="Menu"
+            app:tint="@android:color/white" />
+    </LinearLayout>
+
+</LinearLayout>

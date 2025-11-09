@@ -23,6 +23,7 @@ public class PrintRecyAdapter extends RecyclerView.Adapter<PrintRecyAdapter.Oxyg
     private Activity activity;
     private ArrayList id;
     private ArrayList dcno;
+
     PrintRecyAdapter(Activity activity, Context context, ArrayList id, ArrayList dcno
     ){
         this.activity = activity;

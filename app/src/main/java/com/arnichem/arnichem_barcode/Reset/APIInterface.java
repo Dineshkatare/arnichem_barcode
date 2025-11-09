@@ -58,7 +58,19 @@ public interface APIInterface {
                                         @Field("db_password") String db_password,
                                         @Field("db_name") String db_name);
 
-
+    @Multipart
+    @POST("upload_pod.php")
+    Call<ResponseBody> uploadPod(
+            @Part MultipartBody.Part print_image, // <-- name MUST be 'print_image'
+            @Part("dcno") RequestBody dcno,
+            @Part("email") RequestBody email,
+            @Part("db_host") RequestBody dbHost,
+            @Part("db_username") RequestBody dbUser,
+            @Part("db_password") RequestBody dbPass,
+            @Part("db_name") RequestBody dbName,
+            @Part("trans_type") RequestBody transType,
+            @Part("vehicle_no") RequestBody vehicleNo
+    );
     @FormUrlEncoded
     @POST(APIClient.sync_bp_contact)
     Call<GetDataResponse> sync_bp_contact(@Field("db_host") String db_host,

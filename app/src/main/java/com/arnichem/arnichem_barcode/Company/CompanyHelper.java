@@ -29,6 +29,7 @@ public class CompanyHelper extends SQLiteOpenHelper {
     private static final String DB_BATCH_PREMIX = "batch_premix";
     private static final String DB_CYC_PREMIX = "cyc_premix";
     private static final String LOGIN_MSG = "login_msg";
+    private static final String BG_COLOR = "bg_color";
 
     private final Context context;
 
@@ -53,6 +54,7 @@ public class CompanyHelper extends SQLiteOpenHelper {
                 DB_OWN_CODE + " TEXT, " +
                 DB_BATCH_PREMIX + " TEXT, " +
                 DB_CYC_PREMIX + " TEXT, " +
+                BG_COLOR + " TEXT, " +
                 LOGIN_MSG + " TEXT);";
         db.execSQL(query);
     }
@@ -68,7 +70,7 @@ public class CompanyHelper extends SQLiteOpenHelper {
                            String db_host, String db_username, String db_password,
                            String db_name, String base_url, String terms_text,
                            String own_code, String batch_premix, String cyc_premix,
-                           String login_msg) {
+                           String login_msg,String bg_color) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -86,6 +88,7 @@ public class CompanyHelper extends SQLiteOpenHelper {
         cv.put(DB_BATCH_PREMIX, batch_premix);
         cv.put(DB_CYC_PREMIX, cyc_premix);
         cv.put(LOGIN_MSG, login_msg);
+        cv.put(BG_COLOR, bg_color);
 
         long result = db.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
         if (result == -1) {

@@ -180,7 +180,8 @@ public class SelectCompanyActivity extends AppCompatActivity {
                             String own_code = cursor.getString(10);
                             String batch_prefix = cursor.getString(11);
                             String cyc_prefix = cursor.getString(12);
-                            String login_msg = cursor.getString(13);
+                            String login_msg = cursor.getString(14);
+                            String bg_color = cursor.getString(13);
 
 
 
@@ -190,6 +191,7 @@ public class SelectCompanyActivity extends AppCompatActivity {
                                 SharedPref.getInstance(getApplicationContext()).setCompanyID(company_id);
                                 SharedPref.getInstance(getApplicationContext()).setCompanyShortName(company_short_name);
                                 SharedPref.getInstance(getApplicationContext()).setCompanyFullName(company_full_name);
+                                SharedPref.getInstance(getApplicationContext()).setBgColor(bg_color);
                                 SharedPref.getInstance(getApplicationContext()).setDBHost(db_host);
                                 SharedPref.getInstance(getApplicationContext()).setDBUsername(db_username);
                                 SharedPref.getInstance(getApplicationContext()).setDBPassword(db_password);
@@ -199,8 +201,7 @@ public class SelectCompanyActivity extends AppCompatActivity {
                                 SharedPref.getInstance(getApplicationContext()).setOwnCode(own_code);
                                 SharedPref.getInstance(getApplicationContext()).setBatchPrefix(batch_prefix);
                                 SharedPref.getInstance(getApplicationContext()).setCycPrefix(cyc_prefix);
-                                SharedPref.getInstance(getApplicationContext()).setLoginMsg(login_msg
-                                );
+                                SharedPref.getInstance(getApplicationContext()).setLoginMsg(login_msg);
 
 
 
@@ -443,8 +444,8 @@ public class SelectCompanyActivity extends AppCompatActivity {
                                             ob1.getString("own_cyl_code"),
                                             ob1.getString("batch_prefix"),
                                             ob1.getString("cyc_prefix"),
-                                            ob1.optString("login_msg", "") // optional in case it’s missing
-                                    );
+                                            ob1.optString("login_msg", ""),
+                                            ob1.getString("bg_color"));
 
                                 } catch (JSONException e) {
                                     e.printStackTrace();

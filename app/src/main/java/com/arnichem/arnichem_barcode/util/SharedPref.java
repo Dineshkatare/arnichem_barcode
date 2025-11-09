@@ -39,6 +39,7 @@ public class SharedPref {
     public static final String COMPANY_ID = "COMPANY_ID";
     public static final String COMPANY_SHORT_NAME = "COMPANY_SHORT_NAME";
     public static final String COMPANY_FULL_NAME = "COMPANY_FULL_NAME";
+    public static final String BG_COLOR = "BG_COLOR";
     public static final String DB_HOST = "DB_HOST";
     public static final String DB_USERNAME = "DB_USERNAME";
     public static final String DB_PASSWORD = "DB_PASSWORD";
@@ -353,6 +354,17 @@ public class SharedPref {
     public String getCompanyFullName() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(COMPANY_FULL_NAME, "");
+
+    }    public void setBgColor(String sta) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(BG_COLOR, sta);
+        editor.commit();
+    }
+
+    public String getBgColor() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(BG_COLOR, "");
 
     }
 

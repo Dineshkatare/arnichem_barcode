@@ -98,6 +98,7 @@ public class Closing_stock extends AppCompatActivity {
         inwardmaincylindernumber = findViewById(R.id.inwardmaincylindernumber);
         poslocfixdel = Integer.parseInt(SharedPref.getInstance(this).getfrom_loc());
         fetchData();
+
         loadata();
         usernamevalue = findViewById(R.id.usernametxtvalue);
         date = findViewById(R.id.date);
@@ -160,6 +161,7 @@ public class Closing_stock extends AppCompatActivity {
         });
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
+        refreshData();
         storeDataInArrays();
         Totalscanvalue.setText(count);
         customAdapter = new Closing_Adapter(Closing_stock.this, this, book_id, book_title);
@@ -179,7 +181,16 @@ public class Closing_stock extends AppCompatActivity {
     }
 
 
-
+    private void refreshData() {
+        book_id.clear();
+        book_title.clear();
+        cylinder.clear();
+        storeDataInArrays();
+        Totalscanvalue.setText(count != null ? count : "0");
+        if (customAdapter != null) {
+            customAdapter.notifyDataSetChanged();
+        }
+    }
     private void fetchData() {
         fromloccodehandler db = new fromloccodehandler(getApplicationContext());
         List<String> labels = db.getAllLabels();
@@ -361,6 +372,7 @@ public class Closing_stock extends AppCompatActivity {
             status = false;
             startActivity(getIntent());
         }
+        
         super.onResume();
     }
 
