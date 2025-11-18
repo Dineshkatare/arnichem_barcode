@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".TransactionsView.Liquid_Delivery.LiqourPrint">
     <ScrollView
+        android:id="@+id/receipt_scroll_view"
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="match_parent">

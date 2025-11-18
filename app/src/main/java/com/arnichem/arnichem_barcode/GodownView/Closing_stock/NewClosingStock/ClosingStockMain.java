@@ -111,6 +111,7 @@ public class ClosingStockMain extends AppCompatActivity {
     Cursor cursor = inventoryGases.readAllData();
     if (cursor.getCount() == 0) {
     } else {
+      closingModelList.clear();
       arrayList.clear();
       while (cursor.moveToNext()) {
         String col = cursor.getString(0);
@@ -181,6 +182,11 @@ public class ClosingStockMain extends AppCompatActivity {
     });
 
 
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
   }
 
   private void fetchData() {

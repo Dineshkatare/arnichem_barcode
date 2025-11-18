@@ -117,6 +117,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
     TextView arnichemsignTxt,termsTxt,cylinder_number_txt,total_quantity_txt;
 
     boolean isOxygen = true;
+    boolean isSign = false;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -159,6 +160,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
                     digital_sign.eraseColor(Color.WHITE);
 
                 }
+                saveFullScrollViewImage();
                 printBluetooth();
 
             }
@@ -202,6 +204,16 @@ public class ViewDeliveryPrint extends AppCompatActivity {
             } else {
                 // Permission denied, inform the user
                 Toast.makeText(this, "Bluetooth connect permission denied.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (requestCode == 101) { // storage permission request
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                // 👍 Permission granted → call again
+                saveFullScrollViewImage();
+
+            } else {
+                Toast.makeText(this, "Storage permission denied!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -548,9 +560,11 @@ public class ViewDeliveryPrint extends AppCompatActivity {
             digital_sign = Bitmap.createScaledBitmap(digital_sign,200, 200, true);
 
             signedImg.setImageBitmap(digital_sign);
+            isSign = true;
         }else {
             digital_sign = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
             digital_sign.eraseColor(Color.WHITE);
+            isSign = false;
 
         }
 
@@ -750,7 +764,7 @@ public class ViewDeliveryPrint extends AppCompatActivity {
                             cylindernumberempty.setText(itemName);
 
                         }
-                        saveFullScrollViewImage();
+
                     }
                 } else {
                     Log.d("API", "Failed to fetch data");
@@ -804,66 +818,90 @@ public class ViewDeliveryPrint extends AppCompatActivity {
     // New: Main method to capture, save, upload, and insert to DB
 
     private void saveFullScrollViewImage() {
-        // 🌀 Show loading dialog
+        if (!isSign) {
+            Log.e("SAVE_SCROLL", "Digital sign missing → Upload skipped");
+            return;
+        }
+        // Check and request permission for Android < 10
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+
+                return; // wait for permission result
+            }
+        }
+
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Please Wait");
         progressDialog.setMessage("Preparing receipt for upload...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // ⏳ Delay for 1 second before capturing
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             try {
+
                 ScrollView scrollView = findViewById(R.id.receipt_scroll_view);
                 View childView = scrollView.getChildAt(0);
 
-                // ✅ Measure and layout view properly
+                // Measure properly
                 int widthSpec = View.MeasureSpec.makeMeasureSpec(scrollView.getWidth(), View.MeasureSpec.EXACTLY);
                 int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
                 childView.measure(widthSpec, heightSpec);
                 childView.layout(0, 0, childView.getMeasuredWidth(), childView.getMeasuredHeight());
 
-                // ✅ Create bitmap and draw background
                 Bitmap bitmap = Bitmap.createBitmap(
                         childView.getMeasuredWidth(),
                         childView.getMeasuredHeight(),
                         Bitmap.Config.ARGB_8888
                 );
+
                 Canvas canvas = new Canvas(bitmap);
                 canvas.drawColor(Color.WHITE);
                 childView.draw(canvas);
 
-                // ✅ Save bitmap to storage
-                File dir = new File(
-                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                        "ArnichemReceipts"
-                );
-                if (!dir.exists()) dir.mkdirs();
+                // ---------- FIXED STORAGE SECTION ----------
+                File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                File storageDir = new File(picturesDir, "ArnichemReceipts");
 
+                if (!storageDir.exists()) {
+                    boolean created = storageDir.mkdirs();
+                    if (!created) {
+                        Toast.makeText(this, "Failed to create folder!", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        return;
+                    }
+                }
+
+                // Create file
                 String fileName = "ScrollView_" + dcno + "_" + System.currentTimeMillis() + ".jpg";
-                File imageFile = new File(dir, fileName);
+                File imageFile = new File(storageDir, fileName);
 
                 FileOutputStream out = new FileOutputStream(imageFile);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
                 out.flush();
                 out.close();
 
-                // ✅ Make visible in gallery
-                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(imageFile)));
+                // Make it visible in Gallery
+                sendBroadcast(new Intent(
+                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                        Uri.fromFile(imageFile)
+                ));
 
-                // ✅ Upload automatically
+                // Upload automatically
                 uploadAndInsertPod(imageFile.getAbsolutePath(), fileName);
 
-                // ✅ Dismiss loader and show message
                 progressDialog.dismiss();
-                Toast.makeText(this, "Receipt saved and uploaded successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Receipt saved and uploaded!", Toast.LENGTH_SHORT).show();
 
             } catch (Exception e) {
-                e.printStackTrace();
                 progressDialog.dismiss();
-                Toast.makeText(this, "Error saving image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+                Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        }, 1000); // 1 second delay
+        }, 1000);
     }
 
 
@@ -948,5 +986,6 @@ public class ViewDeliveryPrint extends AppCompatActivity {
             }
         });
     }
+
 
 }
