@@ -448,8 +448,10 @@ public class GodownDelPrint extends AppCompatActivity {
                 Log.d("SAVE_SCROLL", "Child view drawn on canvas.");
 
                 // ---------- FIXED STORAGE SECTION ----------
-                File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                File storageDir = new File(picturesDir, "ArnichemReceipts");
+                File storageDir = new File(
+                        getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                        "ArnichemReceipts"
+                );
 
                 Log.d("SAVE_SCROLL", "Saving directory: " + storageDir.getAbsolutePath());
 

@@ -10,7 +10,7 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="9.2"
+        android:text="9.3"
         android:textColor="@color/arnichem"
         android:textSize="100sp"
         android:textStyle="bold"

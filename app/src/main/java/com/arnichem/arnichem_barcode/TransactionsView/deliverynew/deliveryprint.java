@@ -472,8 +472,10 @@ public class deliveryprint extends AppCompatActivity {
                 childView.draw(canvas);
 
                 // ---------- FIXED STORAGE SECTION ----------
-                File picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                File storageDir = new File(picturesDir, "ArnichemReceipts");
+                File storageDir = new File(
+                        getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                        "ArnichemReceipts"
+                );
 
                 if (!storageDir.exists()) {
                     boolean created = storageDir.mkdirs();
