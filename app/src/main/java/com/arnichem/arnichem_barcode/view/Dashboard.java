@@ -150,7 +150,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         if(!SharedPref.getInstance(this).getVehicleNo().isEmpty()) {
             tvVehicle.setText(SharedPref.getInstance(this).getVehicleNo() + " |");
         }
-        tvVersion.setText(" Version :" + "9.3");
+        tvVersion.setText(" Version :" + "9.4");
 
 // click listeners
         icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));

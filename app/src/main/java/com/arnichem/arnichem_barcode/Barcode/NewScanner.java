@@ -100,6 +100,41 @@ public class NewScanner extends AppCompatActivity implements BarcodeReader.Barco
         });
         editText = findViewById(R.id.newScan);
         editText.requestFocus();
+        
+        // Fix: Use OnKeyListener instead of dispatchKeyEvent
+        editText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+                        && event.getAction() == KeyEvent.ACTION_UP) {
+                    
+                    String text = editText.getText().toString().trim();
+                    if (!text.isEmpty()) {
+                        Log.d("ScannerFix", "NewScanner Enter detected: " + text);
+                        scanned(text, true);
+                    }
+                    editText.setText("");
+                    editText.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        // Focus protection
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                 if (!hasFocus) {
+                    editText.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            editText.requestFocus();
+                        }
+                    }, 50);
+                }
+            }
+        });
 
         flashImg.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("UseCompatLoadingForDrawables")

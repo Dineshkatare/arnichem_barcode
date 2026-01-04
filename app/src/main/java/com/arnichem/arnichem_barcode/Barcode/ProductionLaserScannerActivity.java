@@ -112,6 +112,46 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
 
         editText = findViewById(R.id.newScan);
         editText.requestFocus();
+
+        // Fix: Remove unstable dispatchKeyEvent and usage of timer.
+        // Instead, use a direct OnKeyListener to detect the ENTER key sent by the scanner.
+        editText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // Handle both standard Enter (66) and Numpad Enter (160)
+                if ((keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+                        && event.getAction() == KeyEvent.ACTION_UP) {
+                    
+                    String text = editText.getText().toString().trim();
+                    if (!text.isEmpty()) {
+                        Log.d("ScannerFix", "Enter detected. Scanned: " + text);
+                        scanned(text, true);
+                    }
+                    // Clear and keep focus
+                    editText.setText("");
+                    editText.requestFocus();
+                    return true; // Consume the event
+                }
+                return false;
+            }
+        });
+
+        // Aggressive Focus Protection: Ensure scanner input always has focus
+        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    Log.d("ScannerFix", "Focus lost. Reclaiming focus.");
+                    editText.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            editText.requestFocus();
+                        }
+                    }, 50); // Small delay to ensure it works after UI transitions
+                }
+            }
+        });
+
         closeKeypad(this);
         storeDataInArrays();
 
@@ -162,66 +202,8 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
     }
 
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event == null) {
-            return false;
-        }
-
-        int action = event.getAction();
-
-        try {
-            if (action == KeyEvent.ACTION_DOWN) {
-                Log.d("KEYDOWN", event.getKeyCode() + "");
-            } else if (action == KeyEvent.ACTION_UP) {
-                char pressedKey = (char) event.getUnicodeChar();
-                Log.d("pressedKey != 0", pressedKey + "");
-                if (pressedKey != 0) {
-                    if (pressedKey == ',' || pressedKey == 10) {
-                        Log.d("pressedKey != ','", "inputHolder " + this.inputHolder);
-                        // Perform action based on inputHolder value
-                        // registerID(this.inputHolder); // Replace with your actual method call
-                        this.inputHolder = "";
-                    } else {
-                        this.inputHolder += pressedKey;
-                        Log.d("pressedKey", pressedKey + "");
-                    }
-                }
-                Log.d("KEYUP", event.getKeyCode() + "");
-            }
-
-            Log.d("load", editText.getText().toString());
-            android.os.Handler handler = new Handler();
-
-            // Create a runnable that will be executed after 1000 milliseconds (1 second)
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    // Do something here
-
-                    String text = editText.getText().toString();
-                    if (!text.isEmpty()) {
-                        // Replace with your actual method call
-                        scanned(text, true);
-                        Log.d("load1", editText.getText().toString() + text);
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-                }
-            };
-
-            // Schedule the runnable to be executed after 1000 milliseconds
-            handler.postDelayed(runnable, 500);
-            // Delay the call to the `call()` method by 1000 milliseconds
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("DispatchKeyEvent", "An exception occurred: " + e.getMessage());
-        }
-
-        Log.d("KEY", event.getKeyCode() + "");
-        return false;
-    }
+    // dispatchKeyEvent removed as it caused delays and race conditions.
+    // Logic moved to editText.setOnKeyListener in onCreate.
 
     private void scanned(String displayValue, boolean val) {
 

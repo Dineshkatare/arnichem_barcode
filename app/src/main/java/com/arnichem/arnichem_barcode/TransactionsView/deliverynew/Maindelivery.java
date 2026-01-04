@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -882,25 +883,48 @@ public class Maindelivery extends AppCompatActivity implements Listener, Locatio
         deliverycylindersea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
-                } else {
-                    while (cursor.moveToNext()) {
-                        String volume = cursor.getString(4);
-                        String Fillwith = cursor.getString(5);
-                        String col1 = cursor.getString(1);
-                        if (col1.contentEquals(deliverycylindersea.getText().toString())) {
-                            delidb.addBook(deliverycylindersea.getText().toString(), Fillwith, volume,"N");
-                            finish();
-                            startActivity(getIntent());
-                        }
-                    }
-                }
-
+                processBarcode(deliverycylindersea.getText().toString());
             }
         });
+
+        // Fix: Add OnKeyListener to bypass dropdown delay
+        deliverycylindersea.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+                        && event.getAction() == KeyEvent.ACTION_UP) {
+                    
+                    String code = deliverycylindersea.getText().toString().trim();
+                    if(!code.isEmpty()){
+                         processBarcode(code);
+                         deliverycylindersea.dismissDropDown(); // Hide dropdown if visible
+                         deliverycylindersea.setText(""); // Clear for next scan
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void processBarcode(String barcode) {
+        Cursor cursor = synchelper.readAllData();
+        if (cursor.getCount() == 0) {
+            // No data
+        } else {
+            while (cursor.moveToNext()) {
+                String volume = cursor.getString(4);
+                String Fillwith = cursor.getString(5);
+                String col1 = cursor.getString(1);
+                        
+                if (col1.contentEquals(barcode)) {
+                    delidb.addBook(barcode, Fillwith, volume, "N");
+                    finish();
+                    startActivity(getIntent());
+                    return; // Found and added
+                }
+            }
+        }
     }
 
     void check() {

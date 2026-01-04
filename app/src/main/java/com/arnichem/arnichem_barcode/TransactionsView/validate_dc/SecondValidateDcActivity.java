@@ -122,6 +122,36 @@ public class SecondValidateDcActivity extends AppCompatActivity implements OnIte
                 signedImg = findViewById(R.id.signedImg);
                 closeImg = findViewById(R.id.closeImg);
                 newScan = findViewById(R.id.newScan);
+                
+                // Fix: Use OnKeyListener instead of dispatchKeyEvent
+                newScan.setOnKeyListener(new View.OnKeyListener() {
+                    @Override
+                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+                        if ((keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
+                                && event.getAction() == KeyEvent.ACTION_UP) {
+                            
+                            String text = newScan.getText().toString().trim();
+                            if (!text.isEmpty()) {
+                                Log.d(TAG, "Validate Scan Detected: " + text);
+                                validateCylinder(text);
+                            }
+                            newScan.setText("");
+                            newScan.requestFocus();
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+                // Focus Protection
+                newScan.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        if (!hasFocus) {
+                             newScan.postDelayed(() -> newScan.requestFocus(), 50);
+                        }
+                    }
+                });
 
 
 
@@ -321,66 +351,7 @@ public class SecondValidateDcActivity extends AppCompatActivity implements OnIte
             }
 
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event == null) {
-            return false;
-        }
-
-        int action = event.getAction();
-
-        try {
-            if (action == KeyEvent.ACTION_DOWN) {
-                Log.d("KEYDOWN", event.getKeyCode() + "");
-            } else if (action == KeyEvent.ACTION_UP) {
-                char pressedKey = (char) event.getUnicodeChar();
-                Log.d("pressedKey != 0", pressedKey + "");
-                if (pressedKey != 0) {
-                    if (pressedKey == ',' || pressedKey == 10) {
-                        Log.d("pressedKey != ','", "inputHolder " + this.inputHolder);
-                        // Perform action based on inputHolder value
-                        // registerID(this.inputHolder); // Replace with your actual method call
-                        this.inputHolder = "";
-                    } else {
-                        this.inputHolder += pressedKey;
-                        Log.d("pressedKey", pressedKey + "");
-                    }
-                }
-                Log.d("KEYUP", event.getKeyCode() + "");
-            }
-
-            Log.d("load", newScan.getText().toString() + "");
-            android.os.Handler handler = new Handler();
-
-            // Create a runnable that will be executed after 1000 milliseconds (1 second)
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    // Do something here
-
-                    String text = newScan.getText().toString();
-                    if (!text.isEmpty()) {
-                        // Replace with your actual method call
-                        validateCylinder(text);
-                        Log.d("load1", newScan.getText().toString() + text);
-                    }
-                    newScan.setText("");
-                    newScan.requestFocus();
-                }
-            };
-
-            // Schedule the runnable to be executed after 1000 milliseconds
-            handler.postDelayed(runnable, 500);
-            // Delay the call to the `call()` method by 1000 milliseconds
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.e("DispatchKeyEvent", "An exception occurred: " + e.getMessage());
-        }
-
-        Log.d("KEY", event.getKeyCode() + "");
-        return false;
-    }
+    // dispatchKeyEvent removed. Logic moved to OnKeyListener.
 
 
 
