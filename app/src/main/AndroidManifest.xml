@@ -82,6 +82,17 @@
         android:usesCleartextTraffic="true"
         tools:node="merge">
         <activity
+            android:name=".PaymentReceipt.ExpenseClaimActivity"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Arnichem_barcode" />
+        <activity
+            android:name=".view.ContactSearchActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Arnichem.NoActionBar" />
+        <activity
             android:name=".TransactionsView.validate_dc.SecondValidateDcActivity"
             android:parentActivityName=".TransactionsView.validate_dc.FirstValidateDcActivity"
             android:exported="false" />
@@ -271,6 +282,10 @@
                 android:value="" />
         </activity>
         <activity
+            android:name=".CustomerHolding.TasksWebViewActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".CustomerHolding.MainHoldingScreen"
             android:exported="false">
             <meta-data
@@ -381,7 +396,16 @@
         <activity
             android:name=".PaymentReceipt.MainPaymentReceipt"
             android:exported="true"
+            android:parentActivityName=".PaymentReceipt.PaymentsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PaymentReceipt.PaymentsActivity"
+            android:exported="true"
             android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Settings.SwitchDriverActivity"
+            android:exported="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".Settings.TestPrinter"
@@ -552,7 +576,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".GodownView.GodownFullRecipt.GodownFullRecpPrint"
-            android:parentActivityName=".TransactionsView.Transactions"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".TransactionsView.FullRecipt.FullRecPrint"
@@ -564,7 +588,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".GodownView.godownempty.GOdownEmptyprint"
-            android:parentActivityName=".TransactionsView.Transactions"
+            android:parentActivityName=".GodownView.GOdownMainActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".TransactionsView.deliverynew.deliveryprint"

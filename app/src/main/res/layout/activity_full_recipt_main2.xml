@@ -215,21 +215,41 @@
             <!--        android:background="@drawable/editbox"-->
             <!--        android:layout_marginTop="15dp"-->
             <!--        android:layout_height="wrap_content" />-->
-
             <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView"
-                    android:layout_width="409dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_horizontal"
-                    android:nestedScrollingEnabled="false"
-                    android:paddingTop="20dp" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView"
+                        android:layout_width="409dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_horizontal"
+                        android:nestedScrollingEnabled="false"
+                        android:paddingTop="20dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/fillwithrec"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:background="@drawable/border_new"
+                            android:backgroundTint="@color/white"
+                            android:nestedScrollingEnabled="false"
+                            android:paddingTop="20dp" />
+                    </LinearLayout>
+                </LinearLayout>
             </androidx.core.widget.NestedScrollView>
-
 
             <TextView
                 android:id="@+id/Totalscan"

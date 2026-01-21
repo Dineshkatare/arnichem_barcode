@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -19,18 +22,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryHelper;
-import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
 import com.arnichem.arnichem_barcode.GodownView.godownempty.GodownEmptyHelper;
 import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
-import com.arnichem.arnichem_barcode.TransactionsView.Empty.EmptyMain;
 import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardCustomAdapter;
 import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardDatabaseHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.CustomAdapter;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.MyDatabaseHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.FilledWithAdapter;
-import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
 import com.arnichem.arnichem_barcode.view.syncHelper;
 
@@ -42,46 +42,33 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
     RecyclerView recyclerView;
     syncHelper synchelper;
     boolean status = true;
-    private String inputHolder = "";
 
+    // UI Elements
     ArrayList<String> book_id, book_title;
     TextView Totalscanvalue;
+    Button doneBtn;
+    EditText editText;
+    RecyclerView Filled_with_Recycle_View;
 
+    // Helpers & Adapters
     InWardCustomAdapter customAdapter;
     InWardDatabaseHelper myDB;
-
     GodownDeliveryHelper godownDeliveryHelper;
     GodownEmptyHelper godownEmptyHelper;
-
-
-
     AddClyHelper addClyHelper;
-
-
     deliDB delidb;
-
-
-    Button doneBtn;
-
-    String count;
-
-    List<String> cylinder;
-
-    List<String> is_scan;
-    EditText editText;
-    String type = "";
-    String dis = "";
-
-
-    ArrayList<String> name, tot, volume;
     CustomAdapter outwardCustomAdapter;
     FilledWithAdapter filledWithAdapter;
     MyDatabaseHelper outwatdMyDB;
 
-
+    // Data Holders
+    String count;
+    List<String> cylinder;
+    List<String> is_scan;
+    String type = "";
+    String dis = "";
+    ArrayList<String> name, tot, volume;
     ArrayList<String> cylIdList, cyclinderNameList, fillwith;
-    RecyclerView Filled_with_Recycle_View;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,15 +76,63 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         setContentView(R.layout.activity_laser_scanner);
         getIntentData();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         if (savedInstanceState != null) {
-
-            // Get the bundle from the savedInstanceState
             Bundle bundle = savedInstanceState.getBundle("data");
-
-            // Get the type and dis variables from the bundle
-            type = bundle.getString("type");
-            dis = bundle.getString("dis");
+            if (bundle != null) {
+                type = bundle.getString("type");
+                dis = bundle.getString("dis");
+            }
         }
+
+        setupTitle();
+
+        // Initialize Views
+        recyclerView = findViewById(R.id.recyclerView);
+        Totalscanvalue = findViewById(R.id.Totalscanvalue);
+        Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
+        doneBtn = findViewById(R.id.doneBtn);
+        editText = findViewById(R.id.newScan);
+
+        // Initialize Helpers
+        synchelper = new syncHelper(LaserScannerActivity.this);
+        addClyHelper = new AddClyHelper(LaserScannerActivity.this);
+        godownDeliveryHelper = new GodownDeliveryHelper(LaserScannerActivity.this);
+        godownEmptyHelper = new GodownEmptyHelper(LaserScannerActivity.this);
+        myDB = new InWardDatabaseHelper(LaserScannerActivity.this);
+        delidb = new deliDB(LaserScannerActivity.this);
+        outwatdMyDB = new MyDatabaseHelper(LaserScannerActivity.this);
+
+        // Initialize Lists
+        book_id = new ArrayList<>();
+        book_title = new ArrayList<>();
+        cylinder = new ArrayList<>();
+        is_scan = new ArrayList<>();
+        cylIdList = new ArrayList<>();
+        cyclinderNameList = new ArrayList<>();
+        fillwith = new ArrayList<>();
+        name = new ArrayList<>();
+        tot = new ArrayList<>();
+        volume = new ArrayList<>();
+
+        // Setup Scanner Input Resilience and Focus Management
+        setupScannerInput();
+
+        // Initial Data Load
+        refreshUI();
+
+        doneBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
+
+    private void setupTitle() {
+        if (type == null)
+            type = "";
+
         if (type.contentEquals("inward")) {
             getSupportActionBar().setTitle("Inward Barcode Scan");
         } else if (type.contentEquals("outward")) {
@@ -108,444 +143,332 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             getSupportActionBar().setTitle("Empty Barcode Scan");
         } else if (type.contentEquals("godown_delivery")) {
             getSupportActionBar().setTitle("Godwon Delivery Barcode Scan");
-        }else if (type.contentEquals("godown_empty")) {
+        } else if (type.contentEquals("godown_empty")) {
             getSupportActionBar().setTitle("Godwon Empty Barcode Scan");
         }
+    }
 
-
-
-
-
-        recyclerView = findViewById(R.id.recyclerView);
-        synchelper = new syncHelper(LaserScannerActivity.this);
-        addClyHelper=new AddClyHelper(LaserScannerActivity.this);
-        godownDeliveryHelper = new GodownDeliveryHelper(LaserScannerActivity.this);
-        godownEmptyHelper  = new GodownEmptyHelper(LaserScannerActivity.this);
-
-        Totalscanvalue = findViewById(R.id.Totalscanvalue);
-        Filled_with_Recycle_View = findViewById(R.id.fillwithrec);
-        doneBtn = findViewById(R.id.doneBtn);
-        book_id = new ArrayList<>();
-        book_title = new ArrayList<>();
-        cylinder = new ArrayList<String>();
-        is_scan = new ArrayList<>();
-
-        myDB = new InWardDatabaseHelper(LaserScannerActivity.this);
-        delidb = new deliDB(LaserScannerActivity.this);
-        outwatdMyDB = new MyDatabaseHelper(LaserScannerActivity.this);
-
-        editText = findViewById(R.id.newScan);
+    private void setupScannerInput() {
         editText.requestFocus();
-        
-        // Fix: Remove unstable dispatchKeyEvent and usage of timer.
-        // Instead, use a direct OnKeyListener to detect the ENTER key sent by the scanner.
+        // aggressively clear focus on startup to ensure we get it fresh
+        editText.setText("");
+
+        // 1. OnKeyListener to capture ENTER events (Hardware Keyboard)
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // Handle both standard Enter (66) and Numpad Enter (160)
+                // Action UP is safer for barcode scanners to avoid repeating events
                 if ((keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
                         && event.getAction() == KeyEvent.ACTION_UP) {
-                    
-                    String text = editText.getText().toString().trim();
-                    if (!text.isEmpty()) {
-                        Log.d("ScannerFix", "Enter detected. Scanned: " + text);
-                        scanned(text, true);
-                    }
-                    // Clear and keep focus
-                    editText.setText("");
-                    editText.requestFocus();
-                    return true; // Consume the event
+                    processInput();
+                    return true;
                 }
                 return false;
             }
         });
 
-        // Aggressive Focus Protection: Ensure scanner input always has focus
+        // 2. TextWatcher to capture newline characters (Batch Input)
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.toString().contains("\n")) {
+                    processInput();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        // 3. Focus Management (Aggressive Reclaim)
         editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    Log.d("ScannerFix", "Focus lost. Reclaiming focus.");
-                    editText.postDelayed(new Runnable() {
+                    // Post a runnable to reclaim focus after a short delay
+                    // This handles cases where focus is briefly lost during UI updates or system
+                    // dialogs
+                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            editText.requestFocus();
+                            if (editText != null) {
+                                editText.requestFocus();
+                            }
                         }
-                    }, 50); // Small delay to ensure it works after UI transitions
+                    }, 50);
                 }
             }
         });
+    }
 
-        closeKeypad(this);
+    private void processInput() {
+        String text = editText.getText().toString().trim();
+        if (!text.isEmpty()) {
+            scanned(text);
+        }
+        editText.setText("");
+        editText.requestFocus();
+    }
+
+    private void clearDataLists() {
+        book_id.clear();
+        book_title.clear();
+        cylinder.clear();
+        is_scan.clear();
+        cylIdList.clear();
+        cyclinderNameList.clear();
+        fillwith.clear();
+        name.clear();
+        tot.clear();
+        volume.clear();
+    }
+
+    private void refreshUI() {
+        // 1. Clear Data
+        clearDataLists();
+
+        // 2. Reload Data based on type
         if (type.equalsIgnoreCase("inward")) {
+            storeDataInArrays(); // Populates book_id, book_title, cylinder, is_scan
 
-            storeDataInArrays();
-            Totalscanvalue.setText(count);
+            // Setup or Notify Adapter
+            if (customAdapter == null) {
+                customAdapter = new InWardCustomAdapter(LaserScannerActivity.this, this, book_id, book_title, this,
+                        type);
+                recyclerView.setAdapter(customAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
+            } else {
+                customAdapter.notifyDataSetChanged();
+            }
 
-            customAdapter = new InWardCustomAdapter(LaserScannerActivity.this, this, book_id, book_title,this,"inward");
-            recyclerView.setAdapter(customAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
-            recyclerView.scrollToPosition(0);
+        } else if (type.equalsIgnoreCase("delivery") || type.equalsIgnoreCase("godown_delivery")
+                || type.equalsIgnoreCase("outward") || type.equalsIgnoreCase("empty")
+                || type.equalsIgnoreCase("godown_empty")) {
+            storedOutwardValues(); // Populates cylIdList, cyclinderNameList, fillwith
+            check(); // Populates name, tot, volume
 
-        } else if (type.equalsIgnoreCase("delivery")||type.equalsIgnoreCase("godown_delivery")) {
-
-            cylIdList = new ArrayList<>();
-            cyclinderNameList = new ArrayList<>();
-            fillwith = new ArrayList<>();
-            name = new ArrayList<>();
-            tot = new ArrayList<>();
-            volume = new ArrayList<>();
-            storedOutwardValues();
-            Totalscanvalue.setText(count);
-            check();
             Collections.reverse(cylIdList);
             Collections.reverse(cyclinderNameList);
             Collections.reverse(fillwith);
 
-            outwardCustomAdapter = new CustomAdapter(LaserScannerActivity.this, this, cylIdList, cyclinderNameList, fillwith,this,type);
-            filledWithAdapter = new FilledWithAdapter(LaserScannerActivity.this, this, name, tot);
-            Filled_with_Recycle_View.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
-            Filled_with_Recycle_View.setAdapter(filledWithAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
-            recyclerView.setAdapter(outwardCustomAdapter);
-            recyclerView.scrollToPosition(0);
+            // Setup or Notify Main Adapter
+            if (outwardCustomAdapter == null) {
+                outwardCustomAdapter = new CustomAdapter(LaserScannerActivity.this, this, cylIdList, cyclinderNameList,
+                        fillwith, this, type);
+                recyclerView.setAdapter(outwardCustomAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
+            } else {
+                outwardCustomAdapter.notifyDataSetChanged();
+            }
 
-
-
-        } else if (type.equalsIgnoreCase("empty")||type.equalsIgnoreCase("godown_empty")) {
-
-            storeDataInArrays();
-            Totalscanvalue.setText(count);
-
-            customAdapter = new InWardCustomAdapter(LaserScannerActivity.this, this, book_id, book_title,this,"empty");
-            recyclerView.setAdapter(customAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
-            recyclerView.scrollToPosition(0);
-
-
-
-        } else if (type.equalsIgnoreCase("outward")) {
-
-            cylIdList = new ArrayList<>();
-            cyclinderNameList = new ArrayList<>();
-            fillwith = new ArrayList<>();
-            name = new ArrayList<>();
-            tot = new ArrayList<>();
-            volume = new ArrayList<>();
-            storedOutwardValues();
-            Totalscanvalue.setText(count);
-            check();
-            outwardCustomAdapter = new CustomAdapter(LaserScannerActivity.this, this, cylIdList, cyclinderNameList, fillwith,this,type);
-            filledWithAdapter = new FilledWithAdapter(LaserScannerActivity.this, this, name, tot);
-            Filled_with_Recycle_View.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
-            Filled_with_Recycle_View.setAdapter(filledWithAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
-            recyclerView.setAdapter(outwardCustomAdapter);
-            recyclerView.scrollToPosition(0);
-
-
-
+            // Setup or Notify FilledWith Adapter
+            if (filledWithAdapter == null) {
+                filledWithAdapter = new FilledWithAdapter(LaserScannerActivity.this, this, name, tot);
+                Filled_with_Recycle_View.setAdapter(filledWithAdapter);
+                Filled_with_Recycle_View.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
+            } else {
+                filledWithAdapter.notifyDataSetChanged();
+            }
         }
 
+        // 3. Update Text
+        Totalscanvalue.setText(count);
 
-        doneBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        // 4. Scroll to top if needed
+        if (recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() > 0) {
+            recyclerView.scrollToPosition(0);
+        }
     }
 
     void check() {
-
         Cursor cursor = null;
-
         if (type.equalsIgnoreCase("delivery")) {
             cursor = delidb.readAllDataInFIFOOrder();
-        } if (type.equalsIgnoreCase("godown_delivery")) {
+        } else if (type.equalsIgnoreCase("godown_delivery")) {
             cursor = godownDeliveryHelper.readAllDataWithoutOrder();
         } else if (type.equalsIgnoreCase("outward")) {
             cursor = outwatdMyDB.readAllDataWithoutOrder();
+        } else if (type.equalsIgnoreCase("empty")) {
+            cursor = addClyHelper.readcount();
+        } else if (type.equalsIgnoreCase("godown_empty")) {
+            cursor = godownEmptyHelper.readcount();
         }
 
-        if (cursor.getCount() == 0) {
-        } else {
+        if (cursor != null) {
             while (cursor.moveToNext()) {
                 name.add(cursor.getString(3));
                 volume.add(cursor.getString(4));
                 tot.add(cursor.getString(2));
-
             }
+            cursor.close();
         }
     }
 
-
     void storeDataInArrays() {
         Cursor cursor = null;
-
         if (type.equalsIgnoreCase("inward")) {
             cursor = myDB.readAllDataWithoutOrder();
-        } else if (type.equalsIgnoreCase("empty")) {
-            cursor = addClyHelper.readAllDataWithoutOrder();
-        } else if (type.equalsIgnoreCase("godown_empty")) {
-            cursor = godownEmptyHelper.readAllData();
-        }else if (type.equalsIgnoreCase("godown_delivery")) {
+        } else if (type.equalsIgnoreCase("godown_delivery")) {
+            // Fallback/Safety - though typically handled in blocked above
             cursor = godownDeliveryHelper.readAllDataWithoutOrder();
         }
 
         if (cursor != null) {
-            if (cursor.getCount() == 0) {
-                // Handle case where no data is present
-            } else {
-                while (cursor.moveToNext()) {
-                    book_id.add(cursor.getString(0));
-                    book_title.add(cursor.getString(1));
-                    cylinder.add(cursor.getString(1));
-                    is_scan.add(cursor.getString(4));
-                }
-                int cou = cursor.getCount();
-                count = String.valueOf(cou);
+            while (cursor.moveToNext()) {
+                book_id.add(cursor.getString(0));
+                book_title.add(cursor.getString(1));
+                cylinder.add(cursor.getString(1));
+                is_scan.add(cursor.getString(4));
             }
+            int cou = cursor.getCount();
+            count = String.valueOf(cou);
             cursor.close();
-        } else {
-            // Handle case where cursor is null, if necessary
         }
     }
 
     void storedOutwardValues() {
         Cursor cursor = null;
-        Log.d("TypeCheck", "Type received: " + type);
-
         if (type.equalsIgnoreCase("delivery")) {
-            Log.d("DBAccess", "Fetching data from delidb in FIFO order.");
             cursor = delidb.readAllDataInFIFOOrder();
         } else if (type.equalsIgnoreCase("godown_delivery")) {
-            Log.d("DBAccess", "Fetching data from godownDeliveryHelper without order.");
             cursor = godownDeliveryHelper.readAllDataWithoutOrder();
         } else if (type.equalsIgnoreCase("outward")) {
-            Log.d("DBAccess", "Fetching data from outwatdMyDB.");
             cursor = outwatdMyDB.readAllData();
-        } else {
-            Log.d("DBAccess", "Unknown type: " + type);
+        } else if (type.equalsIgnoreCase("empty")) {
+            cursor = addClyHelper.readAllDataWithoutOrder();
+        } else if (type.equalsIgnoreCase("godown_empty")) {
+            cursor = godownEmptyHelper.readAllData();
         }
-             if (cursor != null) {
-            if (cursor.getCount() == 0) {
-                // no_data.setVisibility(View.VISIBLE);
-            } else {
-                while (cursor.moveToNext()) {
-                    cylIdList.add(cursor.getString(0));
-                    cyclinderNameList.add(cursor.getString(1));
-                    fillwith.add(cursor.getString(2));
-                    cylinder.add(cursor.getString(1));
-                    is_scan.add(cursor.getString(4));
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                cylIdList.add(cursor.getString(0));
+                cyclinderNameList.add(cursor.getString(1));
+
+                String filledVal = "";
+                if (type.equalsIgnoreCase("empty") || type.equalsIgnoreCase("godown_empty")) {
+                    filledVal = cursor.getString(5);
+                } else {
+                    filledVal = cursor.getString(2);
                 }
-                int cou = cursor.getCount();
-                count = String.valueOf(cou);
-                // no_data.setVisibility(View.GONE);
+                fillwith.add(filledVal);
+
+                cylinder.add(cursor.getString(1));
+                is_scan.add(cursor.getString(4));
             }
+            int cou = cursor.getCount();
+            count = String.valueOf(cou);
             cursor.close();
         }
     }
 
-    // dispatchKeyEvent removed as it caused delays and race conditions.
-    // Logic moved to editText.setOnKeyListener in onCreate.
+    private void scanned(String displayValue) {
+        // Basic Validation
+        if (displayValue == null || displayValue.isEmpty())
+            return;
 
-    private void scanned(String displayValue, boolean val) {
+        Cursor cursor = synchelper.readAllData();
+        if (cursor == null || cursor.getCount() == 0)
+            return;
 
-        if (status) {
-            if (type.equalsIgnoreCase("inward")) {
+        boolean found = false;
 
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                } else {
-                    while (cursor.moveToNext()) {
-                        String col = cursor.getString(1);
-                        String col1 = cursor.getString(2);
+        // Iterate through master data to find match
+        while (cursor.moveToNext()) {
+            String col = cursor.getString(1); // Item Code / Cylinder No
+            String col1 = cursor.getString(2); // Barcode
+            String volume = cursor.getString(4);
+            String filledWith = cursor.getString(5);
 
-                        if (col1.contentEquals(displayValue)) {
-                            status = false;
-                            myDB.addBook(col, "B");
-                            editText.setText("");
-                            editText.requestFocus();
+            // Safety checks for null strings
+            if (col == null)
+                col = "";
+            if (col1 == null)
+                col1 = "";
 
-                            finish();
-                            startActivity(getIntent());
-                            break;
-                        }
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
+            // Check based on type specific logic if needed, but generally we match input to
+            // master data
+            // Original code matched displayValue against col1 (Barcode) often, let's
+            // preserve that logic or improve it
+            // Issue found previously: Some manual entry used col instead of col1.
+            // For SCANNER, we expect Barcode (col1) or Cylinder No (col)?
+            // Usually scanner reads barcode (col1).
 
+            // Logic Consolidation:
+            // Check if scanned value matches Barcode (col1) OR Cylinder No (col)
+            // But strict requirement was to match existing logic.
+            // Existing logic mostly matched `col1.contentEquals(displayValue)`.
 
+            if (col1.contentEquals(displayValue)) {
+                found = true;
+                // Match found! Add to appropriate DB
+                if (type.equalsIgnoreCase("inward")) {
+                    myDB.addBook(col, "B");
+                } else if (type.equalsIgnoreCase("empty")) {
+                    addClyHelper.addBook(col, filledWith, volume, "B");
+                } else if (type.equalsIgnoreCase("godown_empty")) {
+                    godownEmptyHelper.addBook(col, filledWith, volume, "B");
+                } else if (type.equalsIgnoreCase("delivery")) {
+                    delidb.addBook(col, filledWith, volume, "B");
+                } else if (type.equalsIgnoreCase("godown_delivery")) {
+                    godownDeliveryHelper.addBook(col, filledWith, volume, "B");
+                } else if (type.equalsIgnoreCase("outward")) {
+                    outwatdMyDB.addBook(col, filledWith, volume, "B");
                 }
 
-
-            }else if (type.equalsIgnoreCase("empty")) {
-
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                } else {
-                    while (cursor.moveToNext()) {
-                        String col = cursor.getString(1);
-                        String col1 = cursor.getString(2);
-                        Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
-
-                        if (col1.contentEquals(displayValue)) {
-                            status = false;
-                            addClyHelper.addBook(col,"B");
-                            editText.setText("");
-                            editText.requestFocus();
-
-                            finish();
-                            startActivity(getIntent());
-                            break;
-                        }
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-                }
-            }else if (type.equalsIgnoreCase("godown_empty")) {
-
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                } else {
-                    while (cursor.moveToNext()) {
-                        String col = cursor.getString(1);
-                        String col1 = cursor.getString(2);
-                        Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
-
-                        if (col1.contentEquals(displayValue)) {
-                            status = false;
-                            godownEmptyHelper.addBook(col,"B");
-                            editText.setText("");
-                            editText.requestFocus();
-
-                            finish();
-                            startActivity(getIntent());
-                            break;
-                        }
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-                }
-            }  else if (type.equalsIgnoreCase("delivery")) {
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
-                } else {
-                    while (cursor.moveToNext()) {
-                        String volume = cursor.getString(4);
-                        String Fillwith = cursor.getString(5);
-                        String col1 = cursor.getString(2);
-                        String col = cursor.getString(1);
-                        Log.e("col1", "An exception occurred: " + col1 + " " + col);
-
-                        if (col1.contentEquals(displayValue)) {
-                            delidb.addBook(col, Fillwith, volume,"B");
-                            finish();
-                            startActivity(getIntent());
-                            break;
-                        }
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-                }
-            }else if (type.equalsIgnoreCase("godown_delivery")) {
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
-                } else {
-                    while (cursor.moveToNext()) {
-                        String volume = cursor.getString(4);
-                        String Fillwith = cursor.getString(5);
-                        String col1 = cursor.getString(2);
-                        String col = cursor.getString(1);
-                        Log.e("col1", "An exception occurred: " + col1 + " " + col);
-
-                        if (col1.contentEquals(displayValue)) {
-                            godownDeliveryHelper.addBook(col, Fillwith, volume,"B");
-                            finish();
-                            startActivity(getIntent());
-                            break;
-                        }
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-                }
-            }else {
-                Cursor cursor = synchelper.readAllData();
-                if (cursor.getCount() == 0) {
-                } else {
-                    while (cursor.moveToNext()) {
-                        String volume = cursor.getString(4);
-                        String Fillwith = cursor.getString(5);
-                        String col1 = cursor.getString(2);
-                        String col = cursor.getString(1);
-
-                        Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
-
-                        if (col1.contentEquals(displayValue)) {
-                            status = false;
-                            editText.setText("");
-                            editText.requestFocus();
-
-                            Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
-
-                            outwatdMyDB.addBook(col, Fillwith, volume, "B");
-                            finish();
-                            startActivity(getIntent());
-                        }
-                    }
-                    editText.setText("");
-                    editText.requestFocus();
-
-
-                }
-
+                break; // Stop after finding match
             }
-
-
         }
+        cursor.close();
 
+        if (found) {
+            refreshUI(); // Update UI without recreating activity
+        } else {
+            // Optional: Feedback for not found?
+            // Toast.makeText(this, "Barcode not found", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static void closeKeypad(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) activity
+                .getSystemService(Activity.INPUT_METHOD_SERVICE);
         View currentFocusedView = activity.getCurrentFocus();
         if (currentFocusedView != null) {
             inputMethodManager.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        editText.requestFocus();
+        closeKeypad(this);
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
-
     }
 
     private void getIntentData() {
         Intent intent = getIntent();
-
         if (intent.hasExtra("type")) {
             type = intent.getExtras().getString("type", "");
             dis = intent.getExtras().getString("dis", "");
         }
-
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        // Create a new Bundle object
         Bundle bundle = new Bundle();
-
-        // Put the type and dis variables into the bundle
         bundle.putString("type", type);
         bundle.putString("dis", dis);
-
-        // Put the bundle into the savedInstanceState
         outState.putBundle("data", bundle);
     }
 
@@ -564,17 +487,19 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             godownDeliveryHelper.close();
         if (godownEmptyHelper != null)
             godownEmptyHelper.close();
-
-
-
+        if (synchelper != null)
+            synchelper.close();
     }
-
 
     @Override
     public void onItemClick(int position) {
-        finish();
-        startActivity(getIntent());
-
+        // This was refreshing the activity previously.
+        // Now we should probably just refresh UI if it was intended to delete or
+        // update?
+        // OnItemClick in these adapters usually (checking history) might delete item?
+        // In original code: finish(); startActivity(getIntent());
+        // We should just refreshUI()
+        refreshUI();
     }
 
     @Override
@@ -587,5 +512,4 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
                 return super.onOptionsItemSelected(item);
         }
     }
-
 }

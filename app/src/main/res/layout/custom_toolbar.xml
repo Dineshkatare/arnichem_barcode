@@ -42,7 +42,7 @@
                 android:id="@+id/tvVehicleNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vehicle: MP09-1234"
+                android:text="NO VEHICLE |"
                 android:textSize="13sp"
                 android:layout_marginEnd="10dp"
                 android:textColor="@android:color/white" />

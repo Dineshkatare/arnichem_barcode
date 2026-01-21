@@ -1,4 +1,5 @@
 package com.arnichem.arnichem_barcode.view;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -32,7 +33,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -75,6 +75,8 @@ import com.arnichem.arnichem_barcode.attendance.MyResponseModel;
 import com.arnichem.arnichem_barcode.constant.constant;
 import com.arnichem.arnichem_barcode.data.ReportAccess;
 import com.arnichem.arnichem_barcode.data.response.ReportResponse;
+import com.arnichem.arnichem_barcode.data.response.TaskCountResponse;
+
 import com.arnichem.arnichem_barcode.driver.DriverInstructions;
 import com.arnichem.arnichem_barcode.driver.HrActivity;
 import com.arnichem.arnichem_barcode.leave.LeaveApplicationActivity;
@@ -106,10 +108,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Dashboard extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
+public class Dashboard extends AppCompatActivity implements Listener, LocationData.AddressCallBack {
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
-    CardView vehicle,Barcode,transactions,Producation,GooglePay,Godown,file_upload,setting,PrintReceipt,Payment_Receipt,CRM,DieselEntry,customerHoldCl,otherCl,report,order,resource;
+    CardView vehicle, Barcode, transactions, Producation, GooglePay, Godown, file_upload, setting, Payment_Receipt, CRM,
+            DieselEntry, customerHoldCl, otherCl, report, order, resource, contactSearchCl, tasksCl, printhistory;
     SharedPreferences pref;
     ScrollView scrollView;
     boolean doubleBackToExitPressedOnce = false;
@@ -118,11 +121,10 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 
     String status;
     ImageView vehiclelogimageview;
-    TextView textView;
+    TextView textView, tvTaskCount;
     LocationManager locationManager;
     private static final int CAMERA_PERMISSION_CODE = 100;
     APIInterface apiInterface;
-
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -131,8 +133,8 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         setContentView(R.layout.activity_dashboard);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getLocationDetail = new GetLocationDetail(this, this);
-        easyWayLocation = new EasyWayLocation(this, false,true,this);
-        scrollView=findViewById(R.id.dashlayout);
+        easyWayLocation = new EasyWayLocation(this, false, true, this);
+        scrollView = findViewById(R.id.dashlayout);
         apiInterface = APIClient.getClient().create(APIInterface.class);
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -147,129 +149,137 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         // Set values dynamically
         tvCompany.setText(SharedPref.getInstance(this).getCompanyFullName());
         tvUsername.setText(SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
-        if(!SharedPref.getInstance(this).getVehicleNo().isEmpty()) {
+        if (!SharedPref.getInstance(this).getVehicleNo().isEmpty()) {
             tvVehicle.setText(SharedPref.getInstance(this).getVehicleNo() + " |");
+        } else {
+            tvVehicle.setText("NO VEHICLE |");
         }
         tvVersion.setText(" Version :" + "9.4");
 
-// click listeners
+        // click listeners
         icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));
         icMenu.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, MainSettings.class)));
 
-
         LinearLayout toolbarLayout = findViewById(R.id.toolbar);
 
-// Example hex color (you can change this dynamically)
-        String hexColor = SharedPref.getInstance(this).getBgColor(); // dark blue
+        // Example hex color (you can change this dynamically)
+        String hexColor = SharedPref.getInstance(this).getBgColor();
+        int bgColor;
+        try {
+            if (hexColor != null && !hexColor.isEmpty()) {
+                bgColor = Color.parseColor(hexColor);
+            } else {
+                bgColor = Color.parseColor("#2E3192"); // Default to a safe color (Dark Blue)
+            }
+        } catch (IllegalArgumentException e) {
+            bgColor = Color.parseColor("#2E3192");
+        }
 
-// Convert to int color
-        int bgColor = Color.parseColor(hexColor);
-
-// Create rounded background shape
+        // Create rounded background shape
         float cornerRadius = getResources().getDisplayMetrics().density * 20; // 20dp
-        float[] radii = new float[]{
-                0f, 0f,  // top-left
-                0f, 0f,  // top-right
-                cornerRadius, cornerRadius,  // bottom-right
-                cornerRadius, cornerRadius   // bottom-left
+        float[] radii = new float[] {
+                0f, 0f, // top-left
+                0f, 0f, // top-right
+                cornerRadius, cornerRadius, // bottom-right
+                cornerRadius, cornerRadius // bottom-left
         };
 
         GradientDrawable bgShape = new GradientDrawable();
         bgShape.setColor(bgColor);
         bgShape.setCornerRadii(radii);
 
-// Apply background to layout
+        // Apply background to layout
         toolbarLayout.setBackground(bgShape);
 
-        vehiclelogimageview=findViewById(R.id.vehiclelog);
+        vehiclelogimageview = findViewById(R.id.vehiclelog);
         checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
-        pref = getSharedPreferences(constant.TAG,MODE_PRIVATE);
+        pref = getSharedPreferences(constant.TAG, MODE_PRIVATE);
         status = SharedPref.getInstance(Dashboard.this).vLoggedInUser();
-        textView=findViewById(R.id.vehicleloginlogout);
-        vehicle=findViewById(R.id.vehicledetails);
-        Barcode=findViewById(R.id.BarcodeRegistration);
+        textView = findViewById(R.id.vehicleloginlogout);
+        vehicle = findViewById(R.id.vehicledetails);
+        Barcode = findViewById(R.id.BarcodeRegistration);
         file_upload = findViewById(R.id.file_upload);
-        transactions=findViewById(R.id.Transactions);
+        transactions = findViewById(R.id.Transactions);
         customerHoldCl = findViewById(R.id.customerHoldCl);
         otherCl = findViewById(R.id.other_cl);
         report = findViewById(R.id.report);
-//        logout=findViewById(R.id.Logout);
-        Producation =findViewById(R.id.Producations);
-        GooglePay=findViewById(R.id.googlepay);
-        Payment_Receipt=findViewById(R.id.PrintReceipt);
-        setting =findViewById(R.id.setting);
-        Godown=findViewById(R.id.Godown);
-        PrintReceipt=findViewById(R.id.print);
+        // logout=findViewById(R.id.Logout);
+        Producation = findViewById(R.id.Producations);
+        GooglePay = findViewById(R.id.googlepay);
+        // Payment_Receipt=findViewById(R.id.PrintReceipt);
+        setting = findViewById(R.id.setting);
+        Godown = findViewById(R.id.Godown);
+
         DieselEntry = findViewById(R.id.Diesel);
-        CRM=findViewById(R.id.CRM);
+        CRM = findViewById(R.id.CRM);
         order = findViewById(R.id.order);
-        resource =findViewById(R.id.resource);
+        resource = findViewById(R.id.resource);
+        contactSearchCl = findViewById(R.id.contactSearchCl);
+        tasksCl = findViewById(R.id.tasksCl);
+        tvTaskCount = findViewById(R.id.tvTaskCount);
+        printhistory = findViewById(R.id.printhistory);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if(SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")){
+        if (SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")) {
             report.setVisibility(View.VISIBLE);
         }
 
-        Log.d("chech","0"+SharedPref.getInstance(Dashboard.this).get_show_msg_status());
-        if(SharedPref.getInstance(Dashboard.this).get_show_msg_status().equalsIgnoreCase("0")){
-                SharedPref.getInstance(Dashboard.this).store_show_msg_status("1");
-            if (SharedPref.getInstance(Dashboard.this).getLoginMsg() != null && !SharedPref.getInstance(Dashboard.this).getLoginMsg().isEmpty()) {
-                String message = SharedPref.getInstance(Dashboard.this).getLoginMsg(); // Replace literal "\n" with a newline
+        Log.d("chech", "0" + SharedPref.getInstance(Dashboard.this).get_show_msg_status());
+        if (SharedPref.getInstance(Dashboard.this).get_show_msg_status().equalsIgnoreCase("0")) {
+            SharedPref.getInstance(Dashboard.this).store_show_msg_status("1");
+            if (SharedPref.getInstance(Dashboard.this).getLoginMsg() != null
+                    && !SharedPref.getInstance(Dashboard.this).getLoginMsg().isEmpty()) {
+                String message = SharedPref.getInstance(Dashboard.this).getLoginMsg(); // Replace literal "\n" with a
+                                                                                       // newline
                 String message1 = message.replace("\\n", "\n"); // Replace literal "\n" with a newline
 
-                showCustomMsg( message1);
-                Log.d("chech","1"+message);
+                showCustomMsg(message1);
+                Log.d("chech", "1" + message);
             }
         }
-//        Toast.makeText(Dashboard.this, ""+SharedPref.getInstance(Dashboard.this).getCompanyFullName(), Toast.LENGTH_SHORT).show();
+        // Toast.makeText(Dashboard.this,
+        // ""+SharedPref.getInstance(Dashboard.this).getCompanyFullName(),
+        // Toast.LENGTH_SHORT).show();
 
-        if(status.equals("success"))
-        {
+        if (status.equals("success")) {
             vehiclelogimageview.setImageDrawable(ContextCompat.getDrawable(Dashboard.this, R.drawable.logout));
             textView.setText("Vehicle Logout");
-            Snackbar.make(scrollView, SharedPref.getInstance(Dashboard.this).FirstName()+" "+SharedPref.getInstance(Dashboard.this).LastName()+" तुमचा  गाडी  नंबर "+SharedPref.getInstance(this).getVehicleNo()+" सोबत रजिस्टर झाला आहे ", Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK).show();
-            vehiclelogimageview.setPadding(20,20,20,20);
+            Snackbar.make(scrollView,
+                    SharedPref.getInstance(Dashboard.this).FirstName() + " "
+                            + SharedPref.getInstance(Dashboard.this).LastName() + " तुमचा  गाडी  नंबर "
+                            + SharedPref.getInstance(this).getVehicleNo() + " सोबत रजिस्टर झाला आहे ",
+                    Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK).show();
+            vehiclelogimageview.setPadding(20, 20, 20, 20);
             vehicle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent i=new Intent(Dashboard.this, vehicle_logout.class);
+                    Intent i = new Intent(Dashboard.this, vehicle_logout.class);
                     startActivity(i);
                 }
             });
-        }
-        else
-        {
+        } else {
             vehiclelogimageview.setImageDrawable(ContextCompat.getDrawable(Dashboard.this, R.drawable.truck));
             textView.setText("Vehicle Login");
             vehicle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent i=new Intent(Dashboard.this, check.class);
+                    Intent i = new Intent(Dashboard.this, check.class);
                     startActivity(i);
                 }
             });
         }
-        PrintReceipt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, MainPrintActivity.class);
-                startActivity(i);
 
-            }
-        });
         setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, HrActivity.class);
+                Intent i = new Intent(Dashboard.this, HrActivity.class);
                 startActivity(i);
-
-
 
             }
         });
         Godown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, GOdownMainActivity.class);
+                Intent i = new Intent(Dashboard.this, GOdownMainActivity.class);
                 startActivity(i);
 
             }
@@ -277,31 +287,29 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         otherCl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, OtherEntryActivity.class);
+                Intent i = new Intent(Dashboard.this, OtherEntryActivity.class);
                 startActivity(i);
             }
         });
 
-
-
         Barcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i=new Intent(Dashboard.this, ScannerView.class);
+                Intent i = new Intent(Dashboard.this, ScannerView.class);
                 startActivity(i);
             }
         });
         CRM.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i=new Intent(Dashboard.this, CRM_Main.class);
+                Intent i = new Intent(Dashboard.this, CRM_Main.class);
                 startActivity(i);
             }
         });
         customerHoldCl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, MainHoldingScreen.class);
+                Intent i = new Intent(Dashboard.this, MainHoldingScreen.class);
                 startActivity(i);
             }
         });
@@ -309,14 +317,12 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             @Override
             public void onClick(View view) {
 
-
-                if (status.equals("success"))
-                {
-                    Intent i=new Intent(Dashboard.this, Transactions.class);
+                if (status.equals("success")) {
+                    Intent i = new Intent(Dashboard.this, Transactions.class);
                     startActivity(i);
-                }
-                else {
-                    Snackbar.make(scrollView, "कृपया वाहन माहिती टाका !", Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
+                } else {
+                    Snackbar.make(scrollView, "कृपया वाहन माहिती टाका !", Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
 
                 }
 
@@ -325,7 +331,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         Producation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i=new Intent(Dashboard.this, Producation_Main.class);
+                Intent i = new Intent(Dashboard.this, Producation_Main.class);
                 startActivity(i);
                 finish();
             }
@@ -333,49 +339,50 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         GooglePay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, VoucherActivity.class);
+                Intent i = new Intent(Dashboard.this, VoucherActivity.class);
                 startActivity(i);
             }
         });
-//        logout.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if(status.equals("success")) {
-//                    Snackbar.make(scrollView, "कृपया वाहन माहिती लॉगऑऊट टाका !", Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
-//                }
-//                else
-//                {
-//                    SharedPref.getInstance(getApplicationContext()).logout();
-//                    startActivity(new Intent(Dashboard.this, SelectCompanyActivity.class));
-//                    finish();
-//
-//                }
-//
-//
-//            }
-//        });
+        // logout.setOnClickListener(new View.OnClickListener() {
+        // @Override
+        // public void onClick(View v) {
+        //
+        // if(status.equals("success")) {
+        // Snackbar.make(scrollView, "कृपया वाहन माहिती लॉगऑऊट टाका !",
+        // Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
+        // }
+        // else
+        // {
+        // SharedPref.getInstance(getApplicationContext()).logout();
+        // startActivity(new Intent(Dashboard.this, SelectCompanyActivity.class));
+        // finish();
+        //
+        // }
+        //
+        //
+        // }
+        // });
 
-        Payment_Receipt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, MainPaymentReceipt.class);
-                startActivity(i);
-            }
-        });
-
+        // Payment_Receipt.setOnClickListener(new View.OnClickListener() {
+        // @Override
+        // public void onClick(View v) {
+        // Intent i=new Intent(Dashboard.this,
+        // com.arnichem.arnichem_barcode.PaymentReceipt.PaymentsActivity.class);
+        // startActivity(i);
+        // }
+        // });
 
         resource.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, ResourceActivity.class);
+                Intent i = new Intent(Dashboard.this, ResourceActivity.class);
                 startActivity(i);
             }
         });
         file_upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, FIleUploadMainActivity.class);
+                Intent i = new Intent(Dashboard.this, FIleUploadMainActivity.class);
                 startActivity(i);
 
             }
@@ -383,22 +390,23 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         DieselEntry.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (status.equals("success"))
-//                {
-                    Intent i=new Intent(Dashboard.this, MainDieselEntry.class);
-                    startActivity(i);
-//                }
-//                else {
-//                    Snackbar.make(scrollView, "कृपया वाहन माहिती टाका !", Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
-//
-//                }
+                // if (status.equals("success"))
+                // {
+                Intent i = new Intent(Dashboard.this, MainDieselEntry.class);
+                startActivity(i);
+                // }
+                // else {
+                // Snackbar.make(scrollView, "कृपया वाहन माहिती टाका !",
+                // Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
+                //
+                // }
             }
         });
 
         report.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, ReportActivity.class);
+                Intent i = new Intent(Dashboard.this, ReportActivity.class);
                 startActivity(i);
             }
         });
@@ -406,22 +414,48 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         order.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(Dashboard.this, DriverInstructions.class);
+                Intent i = new Intent(Dashboard.this, DriverInstructions.class);
                 startActivity(i);
 
             }
         });
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        contactSearchCl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Dashboard.this, ContactSearchActivity.class);
+                startActivity(i);
+            }
+        });
 
-                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+        tasksCl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Dashboard.this,
+                        com.arnichem.arnichem_barcode.CustomerHolding.TasksWebViewActivity.class);
+                startActivity(i);
+            }
+        });
+
+        printhistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Dashboard.this, MainPrintActivity.class);
+                startActivity(i);
+            }
+        });
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS }, 1);
 
             }
         }
         getReport();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted
             fetchAndUploadCallLogs(this);
 
@@ -431,21 +465,19 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             // Permission already granted
         }
 
-
-// Set the second alarm at 3:30 PM
+        // Set the second alarm at 3:30 PM
 
         // Schedule the call log sync worker to run every 5 hours
-//        Intent serviceIntent = new Intent(this, CallLogSyncService.class);
-//        startService(serviceIntent);
-
-
-
+        // Intent serviceIntent = new Intent(this, CallLogSyncService.class);
+        // startService(serviceIntent);
 
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         easyWayLocation.startLocation();
+        fetchTaskCount();
     }
 
     @Override
@@ -473,28 +505,24 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
     public void locationData(LocationData locationData) {
 
     }
-    public void checkPermission(String permission, int requestCode)
-    {
+
+    public void checkPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(Dashboard.this, permission) == PackageManager.PERMISSION_DENIED) {
 
             // Requesting the permission
             ActivityCompat.requestPermissions(Dashboard.this, new String[] { permission }, requestCode);
-        }
-        else {
+        } else {
 
-//            Toast.makeText(Scanner
-//
-//            View.this, "Permission already granted", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(Scanner
+            //
+            // View.this, "Permission already granted", Toast.LENGTH_SHORT).show();
         }
     }
 
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults)
-    {
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode,
                 permissions,
                 grantResults);
@@ -502,10 +530,10 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-//                Toast.makeText(ScannerView.this, "Camera Permission Granted", Toast.LENGTH_SHORT) .show();
-            }
-            else {
-                Toast.makeText(Dashboard.this, "Camera Permission Denied", Toast.LENGTH_SHORT) .show();
+                // Toast.makeText(ScannerView.this, "Camera Permission Granted",
+                // Toast.LENGTH_SHORT) .show();
+            } else {
+                Toast.makeText(Dashboard.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
         if (requestCode == PERMISSION_REQUEST_READ_CALL_LOG) {
@@ -518,9 +546,6 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             }
         }
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -542,6 +567,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
@@ -556,7 +582,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
     }
@@ -587,7 +613,8 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                     // Assuming getData() returns the data object that contains the report access
 
                     // Save the report status and update the UI
-                    SharedPref.getInstance(Dashboard.this).store_report_status(String.valueOf(reportResponse.getReportsAccess()));
+                    SharedPref.getInstance(Dashboard.this)
+                            .store_report_status(String.valueOf(reportResponse.getReportsAccess()));
                     if (reportResponse.getReportsAccess() == 1) {
                         report.setVisibility(View.VISIBLE);
                     } else {
@@ -608,13 +635,13 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 
     }
 
-
     private void fetchAndUploadCallLogs(Context context) {
         // Check if permission to read call logs is granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
             // Request permission if it's not granted
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CALL_LOG},
+                    new String[] { Manifest.permission.READ_CALL_LOG },
                     PERMISSION_REQUEST_READ_CALL_LOG);
         } else {
             // Permission already granted, fetch and upload call logs
@@ -634,14 +661,14 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 CallLogManager callLogManager = new CallLogManager(Dashboard.this);
                 List<CallLogManager.CallLogEntry> callLogs = callLogManager.getCallLogs();
 
-                if(SharedPref.getInstance(context).get_call_log_access().equalsIgnoreCase("Y")) {
+                if (SharedPref.getInstance(context).get_call_log_access().equalsIgnoreCase("Y")) {
                     if (!callLogs.isEmpty()) {
                         // This method will run on a background thread
                         callLogManager.sendCallLogsToServer(callLogs);
                     }
-                    Log.d("call log","sync");
-                }else {
-                    Log.d("call log","not sync");
+                    Log.d("call log", "sync");
+                } else {
+                    Log.d("call log", "not sync");
 
                 }
             }
@@ -657,8 +684,8 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 
         // Create the dialog and get the reference of the button
         builder.setMessage(msg);
-        builder.setCancelable(false);  // Disable dismissing the dialog with back button or touch
-        builder.setNegativeButton("Okay", (dialog, which) -> dialog.dismiss());  // The default "Okay" button
+        builder.setCancelable(false); // Disable dismissing the dialog with back button or touch
+        builder.setNegativeButton("Okay", (dialog, which) -> dialog.dismiss()); // The default "Okay" button
 
         // Create the dialog
         AlertDialog dialog = builder.create();
@@ -666,25 +693,27 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         // Show the dialog
         dialog.show();
 
-        // Get the "Okay" button from the dialog and make it initially show the countdown value
+        // Get the "Okay" button from the dialog and make it initially show the
+        // countdown value
         Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
         negativeButton.setVisibility(View.VISIBLE); // Ensure the button is visible
         negativeButton.setText("5 sec");
 
         // Set the button text color to white
-        negativeButton.setTextColor(getResources().getColor(android.R.color.white));  // White text color
+        negativeButton.setTextColor(getResources().getColor(android.R.color.white)); // White text color
 
         // Apply the background drawable with rounded corners to the dialog window
         dialog.getWindow().setBackgroundDrawableResource(R.drawable.rounded_dialog_background);
 
-
-        TextView messageTextView = dialog.findViewById(android.R.id.message); // This accesses the dialog's message TextView
+        TextView messageTextView = dialog.findViewById(android.R.id.message); // This accesses the dialog's message
+                                                                              // TextView
         if (messageTextView != null) {
-            messageTextView.setTextColor(getResources().getColor(android.R.color.white)); // Set message text color to white
+            messageTextView.setTextColor(getResources().getColor(android.R.color.white)); // Set message text color to
+                                                                                          // white
         }
 
         // Countdown timer logic (5 seconds)
-        final int[] countdown = {5};  // Array to hold the countdown value so it's accessible inside the Runnable
+        final int[] countdown = { 5 }; // Array to hold the countdown value so it's accessible inside the Runnable
         final Handler handler = new Handler();
 
         // Run a countdown on the UI thread
@@ -695,16 +724,47 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                     // Update the button text to show the countdown
                     negativeButton.setText(countdown[0] + " sec");
                     countdown[0]--;
-                    handler.postDelayed(this, 1000);  // Run every second
+                    handler.postDelayed(this, 1000); // Run every second
                 } else {
                     // After countdown ends, change the button text to "Okay"
                     negativeButton.setText("Okay");
                 }
             }
-        }, 1000);  // Start the countdown with a delay of 1 second
+        }, 1000); // Start the countdown with a delay of 1 second
     }
 
     // Handle the result of the permission request
 
-}
+    private void fetchTaskCount() {
+        String user = SharedPref.getInstance(Dashboard.this).getEmail();
+        String dbHost = SharedPref.mInstance.getDBHost();
+        String dbUsername = SharedPref.mInstance.getDBUsername();
+        String dbPassword = SharedPref.mInstance.getDBPassword();
+        String dbName = SharedPref.mInstance.getDBName();
 
+        Call<TaskCountResponse> call = apiInterface.getTaskCount(dbHost, dbUsername, dbPassword, dbName, user);
+        call.enqueue(new Callback<TaskCountResponse>() {
+            @Override
+            public void onResponse(Call<TaskCountResponse> call, Response<TaskCountResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TaskCountResponse data = response.body();
+                    if (data.getCount() != null && data.getCount() > 0) {
+                        tvTaskCount.setText(String.valueOf(data.getCount()));
+                        tvTaskCount.setVisibility(View.VISIBLE);
+                    } else {
+                        tvTaskCount.setVisibility(View.GONE);
+                    }
+                } else {
+                    tvTaskCount.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TaskCountResponse> call, Throwable t) {
+                tvTaskCount.setVisibility(View.GONE);
+                Log.e("Dashboard", "Task count failed", t);
+            }
+        });
+    }
+
+}

@@ -13,7 +13,7 @@ public class AddClyHelper extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DATABASE_NAME = "ScanCly.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private static final String TABLE_NAME = "my_library";
     private static final String COLUMN_ID = "_id";
@@ -21,6 +21,7 @@ public class AddClyHelper extends SQLiteOpenHelper {
     private static final String COLUMN_AUTHOR = "book_author";
     private static final String COLUMN_PAGES = "book_pages";
     private static final String STATUS = "status";
+    private static final String FILLED_WITH = "filled_with";
 
     public AddClyHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,85 +35,98 @@ public class AddClyHelper extends SQLiteOpenHelper {
                 COLUMN_TITLE + " TEXT UNIQUE, " +
                 COLUMN_AUTHOR + " TEXT, " +
                 COLUMN_PAGES + " INTEGER, " +
-                STATUS + " TEXT);";
+                STATUS + " TEXT, " +
+                FILLED_WITH + " TEXT);";
         db.execSQL(query);
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 
-    public void addBook(String title,String status){
+    public void addBook(String title, String filled_with, String Volume, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_TITLE, title);
         cv.put(STATUS, status);
+        cv.put(FILLED_WITH, filled_with);
+        cv.put(COLUMN_PAGES, Volume);
 
-        //   cv.put(COLUMN_AUTHOR, author);
-//        cv.put(COLUMN_PAGES, pages);
-        long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
+        long result = db.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
 
-        if(result == -1){
+        if (result == -1) {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        }else {
-            //  Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला आहे ", Toast.LENGTH_LONG).show();
+        } else {
+            // Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला
+            // आहे ", Toast.LENGTH_LONG).show();
         }
-        //Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला आहे ", Toast.LENGTH_LONG).show();
-
     }
-    public Cursor readAllData(){
-        String query = "SELECT * FROM " + TABLE_NAME+" ORDER BY "+COLUMN_TITLE+" ASC";
+
+    public Cursor readcount() {
+        String query = "SELECT " + COLUMN_ID + ",SUM(" + COLUMN_PAGES + "),COUNT(" + FILLED_WITH + ")," + FILLED_WITH
+                + "," + COLUMN_PAGES + " FROM " + TABLE_NAME + " GROUP BY " + FILLED_WITH;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
     }
 
-    public Cursor readAllDataWithoutOrder(){
+    public Cursor readAllData() {
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_TITLE + " ASC";
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+
+    public Cursor readAllDataWithoutOrder() {
         // Remove the ORDER BY clause
         String query = "SELECT * FROM " + TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
     }
 
-
-    void updateData(String row_id, String title){
+    void updateData(String row_id, String title) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_TITLE, title);
-//        cv.put(COLUMN_AUTHOR, author);
-//        cv.put(COLUMN_PAGES, pages);
+        // cv.put(COLUMN_AUTHOR, author);
+        // cv.put(COLUMN_PAGES, pages);
 
-        long result = db.update(TABLE_NAME, cv, "_id=?", new String[]{row_id});
-        if(result == -1){
+        long result = db.update(TABLE_NAME, cv, "_id=?", new String[] { row_id });
+        if (result == -1) {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             Toast.makeText(context, "Updated Successfully!", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    public void deleteOneRow(String row_id){
+    public void deleteOneRow(String row_id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        long result = db.delete(TABLE_NAME, "_id=?", new String[]{row_id});
-        if(result == -1){
+        long result = db.delete(TABLE_NAME, "_id=?", new String[] { row_id });
+        if (result == -1) {
             Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             Toast.makeText(context, "Successfully Deleted.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void deleteAllData(){
+    public void deleteAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME);
     }

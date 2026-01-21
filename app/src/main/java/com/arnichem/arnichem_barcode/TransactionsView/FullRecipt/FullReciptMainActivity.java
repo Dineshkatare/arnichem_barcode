@@ -98,28 +98,32 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class FullReciptMainActivity extends AppCompatActivity implements Listener, LocationData.AddressCallBack, OnItemClickListener {
+public class FullReciptMainActivity extends AppCompatActivity
+        implements Listener, LocationData.AddressCallBack, OnItemClickListener {
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
     ProgressDialog dialog;
-    ArrayList<String> book_id, book_title,fillwith;
-    RecyclerView recyclerView;
+    ArrayList<String> book_id, book_title, fillwith, volume;
+    RecyclerView recyclerView, fillwithrec;
+    FilledWithAdapter filledWithAdapter;
+    ArrayList<String> name, tot;
     FloatingActionButton add_button;
     ImageView empty_imageview;
     boolean status = false;
     DatabaseHandler databaseHandlercustomer;
     com.arnichem.arnichem_barcode.view.fromloccodehandler fromloccodehandler;
-    TextView no_data,vehiclevalue,usernamevalue,date,Totalscanvalue;
-    Spinner spinner,customerspinnerdelivery;
-    String from_warehouse,to_warehouse,cust_code,from_code,srno,count,latitude="0",logitude="0",address="0",digitalSignPath="";
+    TextView no_data, vehiclevalue, usernamevalue, date, Totalscanvalue;
+    Spinner spinner, customerspinnerdelivery;
+    String from_warehouse, to_warehouse, cust_code, from_code, srno, count, latitude = "0", logitude = "0",
+            address = "0", digitalSignPath = "";
     SharedPreferences pref;
-    Button button,print;
+    Button button, print;
     CustomAdapter customAdapter;
     ArrayAdapter<String> dataAdapter;
     ArrayAdapter<String> customerdataAdapter;
     FullReciptHelper addClyHelper;
-    public  int poslocfixdel,poscustfixdel;
-    static JSONObject object =null;
+    public int poslocfixdel, poscustfixdel;
+    static JSONObject object = null;
     List<String> cylinder;
     List<String> is_scan;
     AutoCompleteTextView emptycylindernumber;
@@ -127,8 +131,9 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
     syncHelper synchelper;
 
     ConstraintLayout constraintSigned;
-    ImageView closeImg,signedImg;
-    String digital_sign = "" ;
+    ImageView closeImg, signedImg;
+    String digital_sign = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,19 +142,19 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Full Receipt");
         getLocationDetail = new GetLocationDetail(this, this);
-        easyWayLocation = new EasyWayLocation(this, false,true,this);
-        print=findViewById(R.id.emptyprintbtn);
+        easyWayLocation = new EasyWayLocation(this, false, true, this);
+        print = findViewById(R.id.emptyprintbtn);
         print.setVisibility(View.GONE);
-        cylinder=new ArrayList<String>();
-        is_scan=new ArrayList<>();
-        addClyHelper=new FullReciptHelper(FullReciptMainActivity.this);
-        spinner=findViewById(R.id.spinfromemp);
-        emptycylindernumber=findViewById(R.id.emptycylindersea);
-        customerspinnerdelivery=findViewById(R.id.custnamespinemp);
-        poslocfixdel= Integer.parseInt(SharedPref.getInstance(this).getfrom_loc());
-        poscustfixdel=Integer.parseInt(SharedPref.getInstance(this).getcustomersel());
-        databaseHandlercustomer=new DatabaseHandler(FullReciptMainActivity.this);
-        fromloccodehandler=new fromloccodehandler(FullReciptMainActivity.this);
+        cylinder = new ArrayList<String>();
+        is_scan = new ArrayList<>();
+        addClyHelper = new FullReciptHelper(FullReciptMainActivity.this);
+        spinner = findViewById(R.id.spinfromemp);
+        emptycylindernumber = findViewById(R.id.emptycylindersea);
+        customerspinnerdelivery = findViewById(R.id.custnamespinemp);
+        poslocfixdel = Integer.parseInt(SharedPref.getInstance(this).getfrom_loc());
+        poscustfixdel = Integer.parseInt(SharedPref.getInstance(this).getcustomersel());
+        databaseHandlercustomer = new DatabaseHandler(FullReciptMainActivity.this);
+        fromloccodehandler = new fromloccodehandler(FullReciptMainActivity.this);
         uploadSign = findViewById(R.id.uploadSign);
         constraintSigned = findViewById(R.id.constraintSigned);
         closeImg = findViewById(R.id.closeImg);
@@ -159,40 +164,42 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         loadata();
         fetchData();
         loadSpinnerData();
-        vehiclevalue=findViewById(R.id.vno);
-        usernamevalue=findViewById(R.id.usernametxtvalue);
-        Totalscanvalue=findViewById(R.id.Totalscanvalue);
-        button=findViewById(R.id.EmptyMainPost);
+        vehiclevalue = findViewById(R.id.vno);
+        usernamevalue = findViewById(R.id.usernametxtvalue);
+        Totalscanvalue = findViewById(R.id.Totalscanvalue);
+        button = findViewById(R.id.EmptyMainPost);
         button.setEnabled(true);
-        pref = getSharedPreferences(constant.TAG,MODE_PRIVATE);
-        usernamevalue.setText(SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName());
+        pref = getSharedPreferences(constant.TAG, MODE_PRIVATE);
+        usernamevalue.setText(SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
         vehiclevalue.setText(SharedPref.getInstance(this).getVehicleNo());
-        date=findViewById(R.id.date);
+        date = findViewById(R.id.date);
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
-        add_button = findViewById(R.id.emptyscan);
+        fillwithrec = findViewById(R.id.fillwithrec);
+        name = new ArrayList<>();
+        tot = new ArrayList<>();
+
         empty_imageview = findViewById(R.id.empty_imageview);
+        add_button = findViewById(R.id.emptyscan);
 
         no_data = findViewById(R.id.no_data);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 from_warehouse = dataAdapter.getItem(position);
-                poslocfixdel=position;
+                poslocfixdel = position;
                 SharedPref.getInstance(getApplicationContext()).storefrom_loc(String.valueOf(poslocfixdel));
                 Cursor cursor = fromloccodehandler.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
-                        String col=cursor.getString(1);
-                        String col1 =cursor.getString(2);
-                        if(col.contentEquals(from_warehouse))
-                        {
-                            from_code=col1;
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
+                        if (col.contentEquals(from_warehouse)) {
+                            from_code = col1;
 
                         }
                     }
@@ -205,25 +212,23 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
             }
         });
 
-        customerspinnerdelivery.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        customerspinnerdelivery.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 to_warehouse = customerdataAdapter.getItem(position);
-                poscustfixdel=position;
+                poscustfixdel = position;
                 SharedPref.getInstance(getApplicationContext()).store_customersel(String.valueOf(poscustfixdel));
                 Cursor cursor = databaseHandlercustomer.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
-                        String col=cursor.getString(1);
-                        String col1 =cursor.getString(2);
-                        if(col.contentEquals(to_warehouse))
-                        {
-                            cust_code=col1;
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
+                        if (col.contentEquals(to_warehouse)) {
+                            cust_code = col1;
 
                         }
                     }
@@ -240,10 +245,9 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
             public void onClick(View view) {
                 Intent intent = new Intent(FullReciptMainActivity.this, AddActivity.class);
                 startActivity(intent);
-                //          startScan();
+                // startScan();
             }
         });
-
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,22 +259,32 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
         fillwith = new ArrayList<>();
-        customAdapter = new CustomAdapter(FullReciptMainActivity.this, this, book_id, book_title, fillwith,this,"full_receipt");
+        volume = new ArrayList<>();
+        customAdapter = new CustomAdapter(FullReciptMainActivity.this, this, book_id, book_title, fillwith, this,
+                "full_receipt");
 
-      //  emptyadpter = new FullReciptAdapter(FullReciptMainActivity.this, this, book_id, book_title);
+        // emptyadpter = new FullReciptAdapter(FullReciptMainActivity.this, this,
+        // book_id, book_title);
         storeDataInArrays();
         Totalscanvalue.setText(count);
+        customAdapter = new CustomAdapter(FullReciptMainActivity.this, this, book_id, book_title, fillwith, this,
+                "full_receipt");
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(FullReciptMainActivity.this));
+
+        check();
+        filledWithAdapter = new FilledWithAdapter(FullReciptMainActivity.this, this, name, tot);
+        fillwithrec.setAdapter(filledWithAdapter);
+        fillwithrec.setLayoutManager(new LinearLayoutManager(FullReciptMainActivity.this));
         print.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(FullReciptMainActivity.this, FullRecPrint.class);
+                Intent intent = new Intent(FullReciptMainActivity.this, FullRecPrint.class);
                 intent.putExtra("durano", String.valueOf(cylinder));
-                intent.putExtra("custname",to_warehouse);
-                intent.putExtra("empb",srno);
+                intent.putExtra("custname", to_warehouse);
+                intent.putExtra("empb", srno);
                 intent.putExtra("count", count);
-                intent.putExtra("custcode",cust_code);
+                intent.putExtra("custcode", cust_code);
                 intent.putExtra("cylinder", String.valueOf(cylinder));
                 startActivity(intent);
             }
@@ -280,7 +294,7 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(FullReciptMainActivity.this, ActivityDigitalSignature.class);
-                intent.putExtra("type","delivery");
+                intent.putExtra("type", "delivery");
                 startActivity(intent);
             }
         });
@@ -294,8 +308,8 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                status =true;
-                Intent intent =new Intent(FullReciptMainActivity.this, NewScanner.class);
+                status = true;
+                Intent intent = new Intent(FullReciptMainActivity.this, NewScanner.class);
                 intent.putExtra("type", "full_receipt");
                 startActivity(intent);
 
@@ -306,10 +320,9 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
 
     }
 
-
     @Override
     protected void onResume() {
-        if(status){
+        if (status) {
             status = false;
             startActivity(getIntent());
         }
@@ -344,20 +357,20 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
     public void locationData(LocationData locationData) {
         address = locationData.getFull_address();
     }
+
     private void fetchData() {
         fromloccodehandler db = new fromloccodehandler(getApplicationContext());
         List<String> labels = db.getAllLabels();
 
         // Creating adapter for spinner
-        dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinner.setAdapter(dataAdapter);
-        if(poslocfixdel!=0)
-        {
+        if (poslocfixdel != 0) {
             spinner.setSelection(poslocfixdel);
         }
     }
@@ -367,23 +380,21 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         List<String> labels = db.getAllLabels();
 
         // Creating adapter for spinner
-        customerdataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        customerdataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
         customerdataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        //  data adapter to spinner
+        // data adapter to spinner
         customerspinnerdelivery.setAdapter(customerdataAdapter);
-        if(poscustfixdel!=0)
-        {
+        if (poscustfixdel != 0) {
             customerspinnerdelivery.setSelection(poscustfixdel);
         }
     }
 
-    private  void  loadata()
-    {
-        List<ItemCode>  itemCodes=new ArrayList<>();
-        SearchAdapter searchAdapter=new SearchAdapter(getApplicationContext(),itemCodes);
+    private void loadata() {
+        List<ItemCode> itemCodes = new ArrayList<>();
+        SearchAdapter searchAdapter = new SearchAdapter(getApplicationContext(), itemCodes);
         emptycylindernumber.setThreshold(1);
         emptycylindernumber.setAdapter(searchAdapter);
         emptycylindernumber.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -392,15 +403,15 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
 
                 Cursor cursor = synchelper.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
                         String volume = cursor.getString(4);
                         String Fillwith = cursor.getString(5);
                         String col1 = cursor.getString(1);
                         if (col1.contentEquals(emptycylindernumber.getText().toString())) {
-                            addClyHelper.addBook(emptycylindernumber.getText().toString(), Fillwith, volume,"no");
+                            addClyHelper.addBook(emptycylindernumber.getText().toString(), Fillwith, volume, "no");
                             finish();
                             startActivity(getIntent());
                         }
@@ -412,43 +423,38 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         });
     }
 
-
-
-
-
-
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1){
-//            recreate();
+        if (requestCode == 1) {
+            // recreate();
         }
     }
 
-    void storeDataInArrays(){
+    void storeDataInArrays() {
         Cursor cursor = addClyHelper.readAllData();
-        if(cursor.getCount() == 0){
-//            empty_imageview.setVisibility(View.VISIBLE);
+        if (cursor.getCount() == 0) {
+            // empty_imageview.setVisibility(View.VISIBLE);
             no_data.setVisibility(View.VISIBLE);
-        }else{
-            while (cursor.moveToNext()){
+        } else {
+            while (cursor.moveToNext()) {
                 book_id.add(cursor.getString(0));
                 book_title.add(cursor.getString(1));
                 fillwith.add(cursor.getString(2));
+                volume.add(cursor.getString(3)); // Ensure index 3 is correct for volume. In Helper: 0=id, 1=title,
+                                                 // 2=author(fill), 3=pages(volume)
                 cylinder.add(cursor.getString(1));
                 is_scan.add(cursor.getString(4));
-//                book_author.add(cursor.getString(2));
-//                book_pages.add(cursor.getString(3));
+                // book_author.add(cursor.getString(2));
+                // book_pages.add(cursor.getString(3));
             }
             int cou = cursor.getCount();
-            count= String.valueOf(cou);
-            //         empty_imageview.setVisibility(View.GONE);
+            count = String.valueOf(cou);
+            // empty_imageview.setVisibility(View.GONE);
             no_data.setVisibility(View.GONE);
         }
     }
+
     private void postUsingVolley() {
         dialog = new ProgressDialog(FullReciptMainActivity.this);
         dialog.setTitle("Data Inserting");
@@ -458,19 +464,58 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         if (poslocfixdel == 0) {
             dialog.dismiss();
             button.setEnabled(true);
-            MDToast.makeText(FullReciptMainActivity.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            MDToast.makeText(FullReciptMainActivity.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT,
+                    MDToast.TYPE_ERROR).show();
 
         } else if (poscustfixdel == 0) {
             dialog.dismiss();
             button.setEnabled(true);
-            MDToast.makeText(FullReciptMainActivity.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            MDToast.makeText(FullReciptMainActivity.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT,
+                    MDToast.TYPE_ERROR).show();
 
+        } else {
+            // Group items by Gas Type (fillwith) and Volume
+            Map<String, Integer> groupedMap = new HashMap<>();
 
-        }  else {
-            StringBuilder str = new StringBuilder("");
-            for (String eachstring : cylinder) {
-                str.append(eachstring).append(",");
+            for (int i = 0; i < cylinder.size(); i++) {
+                String gasType = fillwith.get(i);
+                if (gasType == null || gasType.isEmpty())
+                    gasType = "Unknown";
+
+                String vol = volume.get(i);
+                if (vol == null || vol.isEmpty())
+                    vol = "0";
+
+                String key = gasType + "###" + vol;
+
+                if (groupedMap.containsKey(key)) {
+                    groupedMap.put(key, groupedMap.get(key) + 1);
+                } else {
+                    groupedMap.put(key, 1);
+                }
             }
+
+            ArrayList<String> itemList = new ArrayList<>();
+            ArrayList<String> itemQList = new ArrayList<>();
+            ArrayList<String> quantityVolumeList = new ArrayList<>();
+
+            for (Map.Entry<String, Integer> entry : groupedMap.entrySet()) {
+                String[] parts = entry.getKey().split("###");
+                itemList.add(parts[0]);
+                quantityVolumeList.add(parts[1]);
+                itemQList.add(String.valueOf(entry.getValue()));
+            }
+
+            StringBuilder itemStr = new StringBuilder();
+            StringBuilder itemQStr = new StringBuilder();
+            StringBuilder volStr = new StringBuilder();
+
+            for (String s : itemList)
+                itemStr.append(s).append(",");
+            for (String s : itemQList)
+                itemQStr.append(s).append(",");
+            for (String s : quantityVolumeList)
+                volStr.append(s).append(",");
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.full_recipt_entry,
                     new Response.Listener<String>() {
@@ -486,31 +531,34 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
                                     String msg = object.getString("msg");
 
                                     if (status.equals("success")) {
-                                        MDToast.makeText(FullReciptMainActivity.this, "FullRecipt Entry Done!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                                        MDToast.makeText(FullReciptMainActivity.this, "FullRecipt Entry Done!",
+                                                MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
 
                                         button.setVisibility(View.GONE);
                                         print.setVisibility(View.VISIBLE);
                                         srno = object.getString("srno");
-//
-//                                        //  SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
+                                        //
+                                        // //
+                                        // SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
                                         dialog.dismiss();
-                                        Intent intent=new Intent(FullReciptMainActivity.this, FullRecPrint.class);
+                                        Intent intent = new Intent(FullReciptMainActivity.this, FullRecPrint.class);
                                         intent.putExtra("durano", String.valueOf(cylinder));
-                                        intent.putExtra("custname",to_warehouse);
-                                        intent.putExtra("empb",srno);
+                                        intent.putExtra("custname", to_warehouse);
+                                        intent.putExtra("empb", srno);
                                         intent.putExtra("count", count);
-                                        intent.putExtra("sign_path",digitalSignPath);
-                                        intent.putExtra("custcode",cust_code);
+                                        intent.putExtra("sign_path", digitalSignPath);
+                                        intent.putExtra("custcode", cust_code);
                                         intent.putExtra("cylinder", String.valueOf(cylinder));
                                         button.setEnabled(true);
+                                        intent.setFlags(
+                                                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                                         startActivity(intent);
-////                                        Toast.makeText(login.this, "msg " + msg, Toast.LENGTH_SHORT).show();
+                                        //// Toast.makeText(login.this, "msg " + msg, Toast.LENGTH_SHORT).show();
 
                                     } else {
                                         dialog.dismiss();
                                         button.setEnabled(true);
-
 
                                     }
 
@@ -538,30 +586,35 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<>();
-                    params.put("dura_code", String.valueOf(cylinder));
-                    params.put("is_scan", String.valueOf(is_scan));
+                    params.put("dura_code", android.text.TextUtils.join(",", cylinder));
+                    params.put("is_scan", android.text.TextUtils.join(",", is_scan));
                     params.put("from_warehouse", from_warehouse);
                     params.put("to_warehouse", to_warehouse);
                     params.put("transport_type", "ARNICHEM");
                     params.put("cust_code", cust_code);
-                    params.put("from_code",from_code);
+                    params.put("from_code", from_code);
                     params.put("lati", latitude);
                     params.put("logi", logitude);
-                    params.put("addr",address);
+                    params.put("addr", address);
                     params.put("sign", digital_sign);
                     params.put("transport_no", SharedPref.getInstance(FullReciptMainActivity.this).getVehicleNo());
                     params.put("driver", SharedPref.getInstance(FullReciptMainActivity.this).getID());
                     params.put("email", SharedPref.getInstance(FullReciptMainActivity.this).getEmail());
                     params.put("count", count);
-                    params.put("db_host",SharedPref.mInstance.getDBHost());
-                    params.put("db_username",SharedPref.mInstance.getDBUsername());
-                    params.put("db_password",SharedPref.mInstance.getDBPassword());
-                    params.put("db_name",SharedPref.mInstance.getDBName());
+
+                    // Added grouped parameters
+                    params.put("item", itemStr.toString());
+                    params.put("itemq", itemQStr.toString());
+                    params.put("item_volume", volStr.toString());
+
+                    params.put("db_host", SharedPref.mInstance.getDBHost());
+                    params.put("db_username", SharedPref.mInstance.getDBUsername());
+                    params.put("db_password", SharedPref.mInstance.getDBPassword());
+                    params.put("db_name", SharedPref.mInstance.getDBName());
                     return params;
                 }
             };
             VolleySingleton.getInstance(FullReciptMainActivity.this).addToRequestQueue(stringRequest);
-
 
         }
     }
@@ -572,6 +625,7 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         inflater.inflate(R.menu.my_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.delete_all) {
@@ -579,7 +633,8 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         }
         return super.onOptionsItemSelected(item);
     }
-    void confirmDialog(){
+
+    void confirmDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete All?");
         builder.setMessage("Are you sure you want to delete all Data?");
@@ -587,7 +642,7 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 addClyHelper.deleteAllData();
-                //Refresh Activity
+                // Refresh Activity
                 finish();
                 startActivity(getIntent());
             }
@@ -600,10 +655,11 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         });
         builder.create().show();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(addClyHelper != null)
+        if (addClyHelper != null)
             addClyHelper.close();
     }
 
@@ -613,19 +669,46 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
         startActivity(intent);
     }
 
-    private BroadcastReceiver mServiceReceiver = new BroadcastReceiver(){
+    void check() {
+        name.clear();
+        tot.clear();
+        Cursor cursor = addClyHelper.readAllData();
+        Map<String, Integer> counts = new HashMap<>();
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String fw = cursor.getString(2); // filled_with column (book_author)
+                if (fw == null || fw.isEmpty() || fw.equals("null"))
+                    fw = "Other";
+
+                if (counts.containsKey(fw)) {
+                    counts.put(fw, counts.get(fw) + 1);
+                } else {
+                    counts.put(fw, 1);
+                }
+            }
+        }
+
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            name.add(entry.getKey());
+            tot.add(String.valueOf(entry.getValue()));
+        }
+        if (filledWithAdapter != null) {
+            filledWithAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if(intent.getAction().equalsIgnoreCase("digital_sign")){
-                //Extract your data - better to use constants...
-                String Signed=intent.getStringExtra("Signed");
-                digitalSignPath=intent.getStringExtra("path");
-                if (Signed.equalsIgnoreCase("true"))
-                {
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equalsIgnoreCase("digital_sign")) {
+                // Extract your data - better to use constants...
+                String Signed = intent.getStringExtra("Signed");
+                digitalSignPath = intent.getStringExtra("path");
+                if (Signed.equalsIgnoreCase("true")) {
                     constraintSigned.setVisibility(View.VISIBLE);
-                    File imgFile = new  File(digitalSignPath);
-                    if(imgFile.exists()){
+                    File imgFile = new File(digitalSignPath);
+                    if (imgFile.exists()) {
                         Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         digital_sign = Util.getImage(myBitmap);
                         signedImg.setImageBitmap(myBitmap);
@@ -635,7 +718,6 @@ public class FullReciptMainActivity extends AppCompatActivity implements Listene
 
         }
     };
-
 
     @Override
     public void onItemClick(int position) {

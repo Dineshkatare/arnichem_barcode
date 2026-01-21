@@ -90,6 +90,14 @@
         <item>OTHER 1</item>
         <item>OTHER 2</item>
     </string-array>
+    <string-array name="expense_categories">
+        <item>Category निवडा</item>
+        <item>Food</item>
+        <item>Traveling</item>
+        <item>Petrol</item>
+        <item>Lodging</item>
+        <item>Other</item>
+    </string-array>
 
 
     <string name="empty_list_message">No items available. Type to add a new item.</string>

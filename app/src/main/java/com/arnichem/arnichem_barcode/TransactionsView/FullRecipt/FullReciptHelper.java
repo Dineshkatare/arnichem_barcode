@@ -21,7 +21,6 @@ public class FullReciptHelper extends SQLiteOpenHelper {
     private static final String COLUMN_PAGES = "book_pages";
     private static final String STATUS = "status";
 
-
     public FullReciptHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -37,12 +36,14 @@ public class FullReciptHelper extends SQLiteOpenHelper {
                 STATUS + " TEXT);";
         db.execSQL(query);
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
-    public void addBook(String title,String Fill,String Volume,String status){
+
+    public void addBook(String title, String Fill, String Volume, String status) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -51,66 +52,69 @@ public class FullReciptHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_PAGES, Volume);
         cv.put(STATUS, status);
 
-        long result = db.insertWithOnConflict(TABLE_NAME,null, cv,SQLiteDatabase.CONFLICT_REPLACE);
+        long result = db.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
 
-        if(result == -1){
+        if (result == -1) {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        }else {
-            //  Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला आहे ", Toast.LENGTH_LONG).show();
+        } else {
+            // Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला
+            // आहे ", Toast.LENGTH_LONG).show();
         }
-        //Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला आहे ", Toast.LENGTH_LONG).show();
+        // Toast.makeText(context, "तुमचा बारकोड नंबर सिलेंडर नंबर "+title+" शी जोडला
+        // आहे ", Toast.LENGTH_LONG).show();
 
     }
 
-    Cursor readAllData(){
-        String query = "SELECT * FROM " + TABLE_NAME+" ORDER BY "+COLUMN_TITLE+" ASC";
+    Cursor readAllData() {
+        String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMN_TITLE + " ASC";
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
     }
 
-    void updateData(String row_id, String title){
+    void updateData(String row_id, String title) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_TITLE, title);
-//        cv.put(COLUMN_AUTHOR, author);
-//        cv.put(COLUMN_PAGES, pages);
+        // cv.put(COLUMN_AUTHOR, author);
+        // cv.put(COLUMN_PAGES, pages);
 
-        long result = db.update(TABLE_NAME, cv, "_id=?", new String[]{row_id});
-        if(result == -1){
+        long result = db.update(TABLE_NAME, cv, "_id=?", new String[] { row_id });
+        if (result == -1) {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             Toast.makeText(context, "Updated Successfully!", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    public void deleteOneRow(String row_id){
+    public void deleteOneRow(String row_id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        long result = db.delete(TABLE_NAME, "_id=?", new String[]{row_id});
-        if(result == -1){
+        long result = db.delete(TABLE_NAME, "_id=?", new String[] { row_id });
+        if (result == -1) {
             Toast.makeText(context, "Failed to Delete.", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             Toast.makeText(context, "Successfully Deleted.", Toast.LENGTH_SHORT).show();
         }
     }
-    public Cursor readcount(){
-        String query = "SELECT "+COLUMN_ID+",SUM("+COLUMN_PAGES+"),COUNT("+COLUMN_AUTHOR+"),"+COLUMN_AUTHOR+","+COLUMN_PAGES+" FROM " + TABLE_NAME+" GROUP BY "+COLUMN_AUTHOR;
+
+    public Cursor readcount() {
+        String query = "SELECT " + COLUMN_ID + ",SUM(" + COLUMN_PAGES + "),COUNT(" + COLUMN_AUTHOR + "),"
+                + COLUMN_AUTHOR + "," + COLUMN_PAGES + " FROM " + TABLE_NAME + " GROUP BY " + COLUMN_AUTHOR;
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
-        if(db != null){
+        if (db != null) {
             cursor = db.rawQuery(query, null);
         }
         return cursor;
     }
 
-
-    void deleteAllData(){
+    void deleteAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_NAME);
     }

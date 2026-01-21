@@ -55,7 +55,7 @@
                         android:id="@+id/tvVehicleNumber"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Vehicle: MP09-1234"
+                        android:text="NO VEHICLE |"
                         android:textSize="13sp"
                         android:textColor="@android:color/white" />
 
@@ -361,41 +361,6 @@
             android:layout_marginHorizontal="10dp"
             android:weightSum="2">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/PrintReceipt"
-                android:layout_width="0dp"
-                android:layout_height="160dp"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:padding="10dp"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_marginTop="10dp"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/payment_receipt" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif"
-                        android:gravity="center_horizontal"
-                        android:text="Payment Receipt"
-                        android:textColor="@color/arnichem"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/CRM"
@@ -410,9 +375,9 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="10dp"
-                    android:gravity="center">
+                    android:padding="10dp">
 
                     <ImageView
                         android:layout_width="80dp"
@@ -432,6 +397,42 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/order"
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="10dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/driver" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_horizontal"
+                        android:text="Driver Instructions"
+                        android:textColor="@color/arnichem"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
         <!-- Row 5 -->
@@ -515,6 +516,8 @@
             </androidx.cardview.widget.CardView>
         </LinearLayout>
 
+
+
         <!-- Row 6 -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -522,42 +525,6 @@
             android:orientation="horizontal"
             android:layout_marginHorizontal="10dp"
             android:weightSum="2">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/print"
-                android:layout_width="0dp"
-                android:layout_height="160dp"
-                android:layout_weight="1"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="10dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:padding="10dp"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:layout_marginTop="10dp"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/receipt" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif"
-                        android:gravity="center_horizontal"
-                        android:text="Print History"
-                        android:textColor="@color/arnichem"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/setting"
@@ -594,15 +561,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-        </LinearLayout>
-
-        <!-- Row 7 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginHorizontal="10dp"
-            android:weightSum="2">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/other_cl"
@@ -639,6 +597,15 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <!-- Row 7 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:weightSum="2">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/file_upload"
@@ -675,15 +642,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-        </LinearLayout>
-
-        <!-- Row 8 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginHorizontal="10dp"
-            android:weightSum="2">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/resource"
@@ -720,9 +678,21 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+
+
+        <!-- Row 9 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="10dp"
+            android:weightSum="2"
+            android:layout_marginBottom="20dp">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/order"
+                android:id="@+id/contactSearchCl"
                 android:layout_width="0dp"
                 android:layout_height="160dp"
                 android:layout_weight="1"
@@ -743,22 +713,90 @@
                         android:layout_height="80dp"
                         android:layout_marginTop="10dp"
                         android:scaleType="centerInside"
-                        android:src="@drawable/driver" />
+                        android:src="@drawable/contact_search_icon" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
                         android:gravity="center_horizontal"
-                        android:text="Driver Instructions"
+                        android:text="Contact"
+                        android:textColor="@color/arnichem"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_horizontal"
+                        android:text="Search"
                         android:textColor="@color/arnichem"
                         android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/tasksCl"
+                android:layout_width="0dp"
+                android:layout_height="160dp"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_marginTop="10dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/report_new_icon" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center_horizontal"
+                            android:text="Tasks"
+                            android:textColor="@color/arnichem"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvTaskCount"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:background="@drawable/badge_circle"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@android:color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
 
-        <!-- Row 9 (Report - visibility gone) -->
+        <!-- Row 8 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -772,7 +810,6 @@
                 android:layout_height="160dp"
                 android:layout_weight="1"
                 android:layout_margin="5dp"
-                android:visibility="gone"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="10dp">
@@ -789,7 +826,7 @@
                         android:layout_height="80dp"
                         android:layout_marginTop="10dp"
                         android:scaleType="centerInside"
-                        android:src="@drawable/ic_report" />
+                        android:src="@drawable/report_icon" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -802,14 +839,42 @@
                         android:textStyle="bold" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <!-- Empty placeholder to maintain layout -->
-            <View
+            <androidx.cardview.widget.CardView
+                android:id="@+id/printhistory"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="160dp"
                 android:layout_weight="1"
-                android:layout_margin="5dp" />
-        </LinearLayout>
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="10dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginTop="10dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/receipt" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center_horizontal"
+                        android:text="Print History"
+                        android:textColor="@color/arnichem"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

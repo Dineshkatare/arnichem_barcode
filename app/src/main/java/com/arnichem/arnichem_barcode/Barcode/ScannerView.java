@@ -69,13 +69,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+
 public class ScannerView extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_CODE = 100;
 
-    Button button,upload;
+    Button button, upload;
     syncHelper sync;
 
-    TextView textView,serialno,weight,aicode,manufacturer;
+    TextView textView, serialno, weight, aicode, manufacturer;
     public String s;
     public Spinner spinmm;
     public Spinner spinyyyy;
@@ -83,9 +84,9 @@ public class ScannerView extends AppCompatActivity {
     ScrollView scrollView;
     String type = "";
     File photoFile = null;
-    ImageView img1 , img2 , img3, img4;
-    String ba1 = "",ba2 = "",ba3="",ba4="";
-    String Selected,Selectedmm,Selectedyy;
+    ImageView img1, img2, img3, img4;
+    String ba1 = "", ba2 = "", ba3 = "", ba4 = "";
+    String Selected, Selectedmm, Selectedyy;
     Spinner spinnerselect;
     public static final int CAMERA_PERM_CODE = 101;
     public static final int CAMERA_REQUEST_CODE = 102;
@@ -98,13 +99,12 @@ public class ScannerView extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase("barcode_register")) {
-                //Extract your data - better to use constants...
+                // Extract your data - better to use constants...
                 s = intent.getStringExtra("val");
-                if(s==null||s.isEmpty())
-                {
+                if (s == null || s.isEmpty()) {
                     textView.setText("");
-                    //assign some value to result
-                }else {
+                    // assign some value to result
+                } else {
                     textView.setText(s);
                 }
             }
@@ -126,11 +126,11 @@ public class ScannerView extends AppCompatActivity {
         checkPermission(Manifest.permission.CAMERA, CAMERA_PERMISSION_CODE);
         sync = new syncHelper(ScannerView.this);
 
-        button=findViewById(R.id.button);
-        textView=findViewById(R.id.textView);
-        serialno=findViewById(R.id.edserialnumber);
-        weight=findViewById(R.id.edenterweight);
-        aicode=findViewById(R.id.edaicode);
+        button = findViewById(R.id.button);
+        textView = findViewById(R.id.textView);
+        serialno = findViewById(R.id.edserialnumber);
+        weight = findViewById(R.id.edenterweight);
+        aicode = findViewById(R.id.edaicode);
         img1 = findViewById(R.id.img1);
         img2 = findViewById(R.id.img2);
         img3 = findViewById(R.id.img3);
@@ -139,18 +139,21 @@ public class ScannerView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 type = "img1";
-                Intent intent = new Intent(ScannerView.this, com.arnichem.arnichem_barcode.Barcode.NewCamerActivity.class);
-                intent.putExtra("type",type);
-                startActivity(intent);                // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for capture the image
+                Intent intent = new Intent(ScannerView.this,
+                        com.arnichem.arnichem_barcode.Barcode.NewCamerActivity.class);
+                intent.putExtra("type", type);
+                startActivity(intent); // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for
+                                       // capture the image
             }
         });
         img2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 type = "img2";
-                Intent intent = new Intent(ScannerView.this,NewCamerActivity.class);
-                intent.putExtra("type",type);
-                startActivity(intent);                // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for capture the image
+                Intent intent = new Intent(ScannerView.this, NewCamerActivity.class);
+                intent.putExtra("type", type);
+                startActivity(intent); // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for
+                                       // capture the image
 
             }
         });
@@ -158,9 +161,10 @@ public class ScannerView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 type = "img3";
-                Intent intent = new Intent(ScannerView.this,NewCamerActivity.class);
-                intent.putExtra("type",type);
-                startActivity(intent);                // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for capture the image
+                Intent intent = new Intent(ScannerView.this, NewCamerActivity.class);
+                intent.putExtra("type", type);
+                startActivity(intent); // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for
+                                       // capture the image
 
             }
         });
@@ -168,30 +172,32 @@ public class ScannerView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 type = "img4";
-                Intent intent = new Intent(ScannerView.this,NewCamerActivity.class);
-                intent.putExtra("type",type);
-                startActivity(intent);                // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for capture the image
+                Intent intent = new Intent(ScannerView.this, NewCamerActivity.class);
+                intent.putExtra("type", type);
+                startActivity(intent); // Create the camera_intent ACTION_IMAGE_CAPTURE it will open the camera for
+                                       // capture the image
 
             }
         });
         spinmm = (Spinner) findViewById(R.id.spinmm);
         spinyyyy = (Spinner) findViewById(R.id.spinyyyy);
-        scrollView=findViewById(R.id.scannerviewmain);
-        upload=findViewById(R.id.uploadregitration);
-        manufacturer=findViewById(R.id.manufacturerval);
-        spinnerselect=findViewById(R.id.spinselect);
-        ArrayList aList= new ArrayList(Arrays.asList(SharedPref.getInstance(ScannerView.this).getCycPrefix().split(",")));
+        scrollView = findViewById(R.id.scannerviewmain);
+        upload = findViewById(R.id.uploadregitration);
+        manufacturer = findViewById(R.id.manufacturerval);
+        spinnerselect = findViewById(R.id.spinselect);
+        ArrayList aList = new ArrayList(
+                Arrays.asList(SharedPref.getInstance(ScannerView.this).getCycPrefix().split(",")));
 
-        ArrayAdapter<String> itemsAdapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, aList);
-      //  adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> itemsAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_dropdown_item, aList);
+        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerselect.setAdapter(itemsAdapter);
         spinnerselect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position, long id) {
-              ///  Log.v("item", (String) parent.getItemAtPosition(position));
-                Selected= (String) parent.getItemAtPosition(position);
+                    int position, long id) {
+                /// Log.v("item", (String) parent.getItemAtPosition(position));
+                Selected = (String) parent.getItemAtPosition(position);
             }
 
             @Override
@@ -199,15 +205,14 @@ public class ScannerView extends AppCompatActivity {
                 // TODO Auto-generated method stub
             }
         });
-        String[] items1= new String[]{"00","01", "02", "03", "04", "05", "06","07", "08", "09", "10", "11", "12"};
+        String[] items1 = new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" };
 
         ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, items1);
 
         spinmm.setAdapter(adapter1);
 
-        spinmm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinmm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Selectedmm = adapter1.getItem(position);
@@ -219,14 +224,15 @@ public class ScannerView extends AppCompatActivity {
 
             }
         });
-        String[] items2= new String[]{"00000","2010", "2011", "2012", "2013", "2014", "2015","2016", "2017", "2018", "2019","2020", "2021", "2022", "2023", "2024", "2025","2026", "2027", "2028", "2029", "2030","2031"};
-        ArrayAdapter<String> adapter2= new ArrayAdapter<String>(this,
+        String[] items2 = new String[] { "00000", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017",
+                "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030",
+                "2031" };
+        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, items2);
 
         spinyyyy.setAdapter(adapter2);
 
-        spinyyyy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinyyyy.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Selectedyy = adapter2.getItem(position);
@@ -241,8 +247,7 @@ public class ScannerView extends AppCompatActivity {
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 Intent intent = new Intent(ScannerView.this, NewScanner.class);
                 intent.putExtra("type", "barcode_register");
                 startActivity(intent);
@@ -256,18 +261,16 @@ public class ScannerView extends AppCompatActivity {
             }
         });
 
-
     }
 
     private void checkPermission(String camera, int cameraPermissionCode) {
     }
 
-
     @Override
-public void onBackPressed() {
-    Intent intent = new Intent(this, Dashboard.class);
-    startActivity(intent);
-}
+    public void onBackPressed() {
+        Intent intent = new Intent(this, Dashboard.class);
+        startActivity(intent);
+    }
 
     private void postUsingVolley() {
         dialog = new ProgressDialog(ScannerView.this);
@@ -277,60 +280,65 @@ public void onBackPressed() {
         dialog.show();
         // creating a new variable for our request queue
         RequestQueue queue = Volley.newRequestQueue(ScannerView.this);
-        StringRequest request = new StringRequest(Request.Method.POST,APIClient.barcode_registration, new com.android.volley.Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                dialog.dismiss();
-                try {
-                    Snackbar.make(scrollView,Selected+aicode.getText().toString().trim()+"हा सिलेंडर नंबर "+textView.getText().toString()+"या बारकोड सोबत रजिस्टर झाला आहे ", Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK).show();
-                    sync.addBook(
-                            Selected+aicode.getText().toString().trim(),
-                            textView.getText().toString().trim(),
-                            weight.getText().toString(),
-                            "",
-                            "",
-                            serialno.getText().toString(),
-                            Selectedmm+"/"+Selectedyy+"/"+"01",
-                            "",
-                            "",
-                            "",
-                            manufacturer.getText().toString(),
-                            ""
-                    );
-                    JSONObject respObj = new JSONObject(response);
-                    String status = respObj.getString("status");
-                    String msg = respObj.getString("msg");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // method to handle errors.
-                Toast.makeText(ScannerView.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
-            }
-        }) {
+        StringRequest request = new StringRequest(Request.Method.POST, APIClient.barcode_registration,
+                new com.android.volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        dialog.dismiss();
+                        try {
+                            Snackbar.make(scrollView,
+                                    Selected + aicode.getText().toString().trim() + "हा सिलेंडर नंबर "
+                                            + textView.getText().toString() + "या बारकोड सोबत रजिस्टर झाला आहे ",
+                                    Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK)
+                                    .show();
+                            sync.addBook(
+                                    Selected + aicode.getText().toString().trim(),
+                                    textView.getText().toString().trim(),
+                                    weight.getText().toString(),
+                                    "",
+                                    "",
+                                    serialno.getText().toString(),
+                                    Selectedmm + "/" + Selectedyy + "/" + "01",
+                                    "",
+                                    "",
+                                    "",
+                                    manufacturer.getText().toString(),
+                                    "");
+                            JSONObject respObj = new JSONObject(response);
+                            String status = respObj.getString("status");
+                            String msg = respObj.getString("msg");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new com.android.volley.Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // method to handle errors.
+                        Toast.makeText(ScannerView.this, "Fail to get response = " + error, Toast.LENGTH_SHORT).show();
+                    }
+                }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("aicode",Selected+aicode.getText().toString().trim());
-                params.put("serialno",serialno.getText().toString());
-                params.put("weight",weight.getText().toString());
-                params.put("hydrodate",Selectedmm+"/"+Selectedyy+"/"+"01");
-                params.put("barcodeno",textView.getText().toString().trim());
-                params.put("manufacturer",manufacturer.getText().toString());
-                params.put("file_path1",ba1);
-                params.put("file_path2",ba2);
-                params.put("file_path3",ba3);
-                params.put("file_path4",ba4);
-                params.put("email",SharedPref.getInstance(ScannerView.this).getEmail());
-                params.put("username", SharedPref.getInstance(ScannerView.this).FirstName()+" "+SharedPref.getInstance(ScannerView.this).LastName());
+                params.put("aicode", Selected + aicode.getText().toString().trim());
+                params.put("serialno", serialno.getText().toString());
+                params.put("weight", weight.getText().toString());
+                params.put("hydrodate", Selectedmm + "/" + Selectedyy + "/" + "01");
+                params.put("barcodeno", textView.getText().toString().trim());
+                params.put("manufacturer", manufacturer.getText().toString());
+                params.put("file_path1", ba1);
+                params.put("file_path2", ba2);
+                params.put("file_path3", ba3);
+                params.put("file_path4", ba4);
+                params.put("email", SharedPref.getInstance(ScannerView.this).getEmail());
+                params.put("username", SharedPref.getInstance(ScannerView.this).FirstName() + " "
+                        + SharedPref.getInstance(ScannerView.this).LastName());
                 params.put("remarks", "Transaction Through App");
-                params.put("db_host",SharedPref.mInstance.getDBHost());
-                params.put("db_username",SharedPref.mInstance.getDBUsername());
-                params.put("db_password",SharedPref.mInstance.getDBPassword());
-                params.put("db_name",SharedPref.mInstance.getDBName());
+                params.put("db_host", SharedPref.mInstance.getDBHost());
+                params.put("db_username", SharedPref.mInstance.getDBUsername());
+                params.put("db_password", SharedPref.mInstance.getDBPassword());
+                params.put("db_name", SharedPref.mInstance.getDBName());
                 return params;
             }
         };
@@ -338,8 +346,6 @@ public void onBackPressed() {
         // a json object request.
         queue.add(request);
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -351,16 +357,16 @@ public void onBackPressed() {
                 ByteArrayOutputStream bao = new ByteArrayOutputStream();
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 10, bao);
                 byte[] ba = bao.toByteArray();
-                if(type.equalsIgnoreCase("img1")){
+                if (type.equalsIgnoreCase("img1")) {
                     ba1 = Base64.encodeToString(ba, Base64.DEFAULT);
                     img1.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
-                }else if(type.equalsIgnoreCase("img2")) {
+                } else if (type.equalsIgnoreCase("img2")) {
                     ba2 = Base64.encodeToString(ba, Base64.DEFAULT);
                     img2.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
-                }else if(type.equalsIgnoreCase("img3")){
+                } else if (type.equalsIgnoreCase("img3")) {
                     ba3 = Base64.encodeToString(ba, Base64.DEFAULT);
                     img3.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
-                }else if(type.equalsIgnoreCase("img4")){
+                } else if (type.equalsIgnoreCase("img4")) {
                     ba4 = Base64.encodeToString(ba, Base64.DEFAULT);
                     img4.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
                 }
@@ -374,28 +380,29 @@ public void onBackPressed() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase("camera_data")) {
-                //Extract your data - better to use constants...
+                // Extract your data - better to use constants...
                 String url = intent.getStringExtra("url");
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(ScannerView.this.getContentResolver(),Uri.parse(url));
-                    bitmap = RotateBitmap(bitmap,90);
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(ScannerView.this.getContentResolver(),
+                            Uri.parse(url));
+                    bitmap = RotateBitmap(bitmap, 90);
                     ByteArrayOutputStream bao = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 10, bao);
                     byte[] ba = bao.toByteArray();
-                    if(type.equalsIgnoreCase("img1")){
+                    if (type.equalsIgnoreCase("img1")) {
                         ba1 = Base64.encodeToString(ba, Base64.DEFAULT);
                         img1.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
-                    }else if(type.equalsIgnoreCase("img2")) {
+                    } else if (type.equalsIgnoreCase("img2")) {
                         ba2 = Base64.encodeToString(ba, Base64.DEFAULT);
                         img2.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
-                    }else if(type.equalsIgnoreCase("img3")){
+                    } else if (type.equalsIgnoreCase("img3")) {
                         ba3 = Base64.encodeToString(ba, Base64.DEFAULT);
                         img3.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
-                    }else if(type.equalsIgnoreCase("img4")){
+                    } else if (type.equalsIgnoreCase("img4")) {
                         ba4 = Base64.encodeToString(ba, Base64.DEFAULT);
                         img4.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 100, 100, false));
                     }
-                    //   imageView.setImageURI(imageUri);
+                    // imageView.setImageURI(imageUri);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -404,14 +411,11 @@ public void onBackPressed() {
             }
         }
     };
-    public static Bitmap RotateBitmap(Bitmap source, float angle)
-    {
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
-
-
-
 
 }

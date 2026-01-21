@@ -58,9 +58,13 @@ public class WebViewActivity extends AppCompatActivity {
             }
         });
 
+        String username = SharedPref.getInstance(this).getEmail();
+        String companyName = SharedPref.getInstance(this).getCompanyShortName();
 
-        String fullUrl = "http://arnichem.co.in/intranet/1239812038120831.php?code=" + cust_code + "&username=" + SharedPref.getInstance(WebViewActivity.this).getEmail();
 
+       // String fullUrl = "http://arnichem.co.in/intranet/1239812038120831.php?code=" + cust_code + "&username=" + SharedPref.getInstance(WebViewActivity.this).getEmail();
+        String fullUrl = "https://arnisol.com/intranet/verify_pin.php?target=holding&username=" + username + "&company_name="
+                + companyName;
         Log.d("url",""+fullUrl);
          mywebview.loadUrl(fullUrl);
         mywebview.setWebViewClient(new WebViewClient() {

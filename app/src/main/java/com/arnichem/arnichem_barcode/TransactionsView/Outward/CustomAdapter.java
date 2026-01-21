@@ -21,8 +21,10 @@ import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.GodownFullRecip
 import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.GodownFullRecpPrint;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryHelper;
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryMainActivity;
+import com.arnichem.arnichem_barcode.GodownView.godownempty.GodownEmptyHelper;
 import com.arnichem.arnichem_barcode.OnItemClickListener;
 import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.FullRecipt.FullReciptHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.FullRecipt.FullReciptMainActivity;
 import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardCustomAdapter;
@@ -41,9 +43,8 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     private OnItemClickListener clickListener;
     private String type;
 
-
-
-    public CustomAdapter(Activity activity, Context context, ArrayList cycIDList, ArrayList cycNameList, ArrayList fillWithList,OnItemClickListener onItemClickListener,String type) {
+    public CustomAdapter(Activity activity, Context context, ArrayList cycIDList, ArrayList cycNameList,
+            ArrayList fillWithList, OnItemClickListener onItemClickListener, String type) {
         this.activity = activity;
         this.context = context;
         this.cycIDList = cycIDList;
@@ -81,48 +82,58 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
                     myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                     Intent intent = new Intent(context, Main.class);
                     activity.startActivityForResult(intent, 1);
-                } else if (context instanceof Maindelivery){
+                } else if (context instanceof Maindelivery) {
                     deliDB myDB = new deliDB(context.getApplicationContext());
                     myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                     Intent intent = new Intent(context, Maindelivery.class);
                     activity.startActivityForResult(intent, 1);
-                }else if (context instanceof GodownDeliveryMainActivity){
+                } else if (context instanceof GodownDeliveryMainActivity) {
                     GodownDeliveryHelper myDB = new GodownDeliveryHelper(context.getApplicationContext());
                     myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                     Intent intent = new Intent(context, GodownDeliveryMainActivity.class);
                     activity.startActivityForResult(intent, 1);
-                }else if (context instanceof FullReciptMain){
+                } else if (context instanceof FullReciptMain) {
                     GodownFullReciptHelper myDB = new GodownFullReciptHelper(context.getApplicationContext());
                     myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                     Intent intent = new Intent(context, FullReciptMain.class);
                     activity.startActivityForResult(intent, 1);
                     // You may want to display a toast or handle it differently
-                } else if (context instanceof FullReciptMainActivity){
+                } else if (context instanceof FullReciptMainActivity) {
                     FullReciptHelper myDB = new FullReciptHelper(context.getApplicationContext());
                     myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                     Intent intent = new Intent(context, FullReciptMainActivity.class);
                     activity.startActivityForResult(intent, 1);
 
-                } else if (context instanceof LaserScannerActivity){
-                    if(type.equalsIgnoreCase("delivery")){
+                } else if (context instanceof LaserScannerActivity) {
+                    if (type.equalsIgnoreCase("delivery")) {
                         deliDB myDB = new deliDB(context.getApplicationContext());
                         myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                         clickListener.onItemClick(position);
 
-                    }if(type.equalsIgnoreCase("godown_delivery")){
+                    } else if (type.equalsIgnoreCase("godown_delivery")) {
                         GodownDeliveryHelper myDB = new GodownDeliveryHelper(context.getApplicationContext());
                         myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                         clickListener.onItemClick(position);
 
-                    }else {
+                    } else if (type.equalsIgnoreCase("empty")) {
+                        AddClyHelper myDB = new AddClyHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
+                        clickListener.onItemClick(position);
+
+                    } else if (type.equalsIgnoreCase("godown_empty")) {
+                        GodownEmptyHelper myDB = new GodownEmptyHelper(context.getApplicationContext());
+                        myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
+                        clickListener.onItemClick(position);
+
+                    } else {
                         MyDatabaseHelper myDB = new MyDatabaseHelper(context.getApplicationContext());
                         myDB.deleteOneRow(String.valueOf(cycIDList.get(position)));
                         clickListener.onItemClick(position);
 
                     }
 
-//                    Intent intent = new Intent(context, LaserScannerActivity.class);
-//                    activity.startActivityForResult(intent, 1);
+                    // Intent intent = new Intent(context, LaserScannerActivity.class);
+                    // activity.startActivityForResult(intent, 1);
 
                 }
 
@@ -136,7 +147,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView book_title_txt,fillwith;
+        TextView book_title_txt, fillwith;
         ImageView deleteBtn;
 
         MyViewHolder(@NonNull View itemView) {
@@ -147,7 +158,5 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         }
 
     }
-
-
 
 }

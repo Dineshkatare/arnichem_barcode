@@ -1,0 +1,257 @@
+package com.arnichem.arnichem_barcode.Settings;
+
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.util.SharedPref;
+import com.arnichem.arnichem_barcode.view.VolleySingleton;
+import com.arnichem.arnichem_barcode.view.Dashboard;
+import com.chaos.view.PinView;
+import com.valdesekamdem.library.mdtoast.MDToast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class SwitchDriverActivity extends AppCompatActivity {
+
+    Button login;
+    EditText username;
+    ProgressDialog dialog;
+    SharedPreferences pref;
+    PinView pinView;
+    Editable pinvalue;
+    String userid;
+    static JSONObject object = null;
+    String imeistr = "0";
+    String ipstr = "0";
+    ImageView ivLogLogo;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_switch_driver);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
+        // Feature Restriction: Only same day login allowed
+        String loginDate = SharedPref.getInstance(getApplicationContext()).getLoginDate();
+        SimpleDateFormat df = new SimpleDateFormat("dd", Locale.getDefault());
+        String currentDate = df.format(new Date());
+
+        if (!currentDate.equals(loginDate)) {
+            MDToast.makeText(this, "Cannot switch user as first login was yesterday", MDToast.LENGTH_LONG,
+                    MDToast.TYPE_ERROR).show();
+            // Disable interactions or finish
+            finish();
+            return;
+        }
+
+        login = findViewById(R.id.btnlogin);
+        username = findViewById(R.id.editUsername);
+        pinView = findViewById(R.id.pinview);
+        ivLogLogo = findViewById(R.id.ivLogLogo);
+        pinView.setHideLineWhenFilled(true);
+        pinView.setPasswordHidden(true);
+
+        ipstr = ipget();
+
+        String strImage = SharedPref.mInstance.getLogo();
+        File imgFile = new File(strImage);
+        if (imgFile.exists()) {
+            Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            ivLogLogo.setImageBitmap(myBitmap);
+        }
+
+        pinView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                pinvalue = s;
+            }
+        });
+
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (username.getText().toString().isEmpty() || pinvalue == null || pinvalue.toString().isEmpty()) {
+                    MDToast.makeText(SwitchDriverActivity.this, "Please enter details", MDToast.LENGTH_SHORT,
+                            MDToast.TYPE_ERROR).show();
+                    return;
+                }
+                loginfun();
+            }
+        });
+    }
+
+    private void loginfun() {
+        dialog = new ProgressDialog(SwitchDriverActivity.this);
+        dialog.setTitle("Switching User");
+        dialog.setMessage("Please wait....");
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.show();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.access_login,
+                new Response.Listener<String>() {
+                    @SuppressLint("WrongConstant")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray array = new JSONArray(response);
+                            for (int i = 0; i < array.length(); i++) {
+                                object = array.getJSONObject(i);
+                                String status = object.getString("status");
+                                String msg = object.getString("msg");
+                                if (status.equals("success")) {
+                                    // Update User Data
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .storeStatus(object.getString("status"));
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .storeFName(object.getString("fname"));
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .storeLName(object.getString("lname"));
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .storeEmail(object.getString("email"));
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .storesuperId(object.getString("id"));
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .store_call_log_access(object.getString("call_log_access"));
+                                    SharedPref.getInstance(getApplicationContext())
+                                            .storeUserName(username.getText().toString()); // Store username for display
+
+                                    closekey();
+
+                                    // Logout Vehicle (Local) as per requirement
+                                    SharedPref.getInstance(getApplicationContext()).storeVStatus("failed");
+                                    SharedPref.getInstance(getApplicationContext()).storeVehicleNumber(""); // Clear
+                                                                                                            // vehicle
+                                                                                                            // number
+
+                                    dialog.dismiss();
+
+                                    MDToast.makeText(SwitchDriverActivity.this, "User Switched Successfully!",
+                                            MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+
+                                    Intent intent = new Intent(SwitchDriverActivity.this, Dashboard.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                            | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                    finish();
+
+                                } else {
+                                    dialog.dismiss();
+                                    MDToast.makeText(SwitchDriverActivity.this, "Please check User Id and Password",
+                                            MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                                }
+                            }
+
+                        } catch (JSONException e) {
+                            dialog.dismiss();
+                            MDToast.makeText(SwitchDriverActivity.this, "Error" + e.toString(), MDToast.LENGTH_SHORT,
+                                    MDToast.TYPE_ERROR).show();
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @SuppressLint("WrongConstant")
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        dialog.dismiss();
+                        MDToast.makeText(SwitchDriverActivity.this, "Check Internet " + error, MDToast.LENGTH_SHORT,
+                                MDToast.TYPE_ERROR).show();
+                        error.printStackTrace();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", username.getText().toString());
+                params.put("app_pin", pinvalue.toString());
+                params.put("ipaddress", ipstr);
+                params.put("imei", imeistr);
+                params.put("appversion", "9.4");
+                params.put("lati", "0"); // No location needed for switch?
+                params.put("logi", "0");
+                params.put("addr", "Switch User");
+                params.put("db_host", SharedPref.mInstance.getDBHost());
+                params.put("db_username", SharedPref.mInstance.getDBUsername());
+                params.put("db_password", SharedPref.mInstance.getDBPassword());
+                params.put("db_name", SharedPref.mInstance.getDBName());
+                return params;
+            }
+        };
+        VolleySingleton.getInstance(SwitchDriverActivity.this).addToRequestQueue(stringRequest);
+    }
+
+    private void closekey() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    private String ipget() {
+        String readline = "";
+        try {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            URL myur = new URL("https://checkip.amazonaws.com/");
+            URLConnection connection = myur.openConnection();
+            connection.setConnectTimeout(1000);
+            connection.setReadTimeout(1000);
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            readline = in.readLine();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return readline;
+    }
+}

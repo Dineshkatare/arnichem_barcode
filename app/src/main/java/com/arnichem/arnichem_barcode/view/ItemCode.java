@@ -4,10 +4,10 @@ import java.io.Serializable;
 
 public class ItemCode implements Serializable {
 
-    private  String item_Code,barcode,weight,height,volume,unit,owner,max_pressure;
+    private String item_Code, barcode, weight, height, volume, unit, owner, max_pressure, filled_with;
 
-
-    public ItemCode(String item_Code, String barcode, String weight, String height, String volume, String unit, String owner, String max_pressure) {
+    public ItemCode(String item_Code, String barcode, String weight, String height, String volume, String unit,
+            String owner, String max_pressure, String filled_with) {
         this.item_Code = item_Code;
         this.barcode = barcode;
         this.weight = weight;
@@ -16,13 +16,8 @@ public class ItemCode implements Serializable {
         this.unit = unit;
         this.owner = owner;
         this.max_pressure = max_pressure;
+        this.filled_with = filled_with;
     }
-
-
-
-
-
-
 
     public String getBarcode() {
         return barcode;
@@ -86,6 +81,14 @@ public class ItemCode implements Serializable {
 
     public void setItem_Code(String item_Code) {
         this.item_Code = item_Code;
+    }
+
+    public String getFilled_with() {
+        return filled_with;
+    }
+
+    public void setFilled_with(String filled_with) {
+        this.filled_with = filled_with;
     }
 
     public ItemCode() {

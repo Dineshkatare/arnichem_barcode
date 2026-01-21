@@ -20,8 +20,10 @@ import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.digital_signature.ActivityDigitalSignature;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 
+import com.arnichem.arnichem_barcode.PaymentReceipt.ExpenseClaimActivity;
+
 public class VoucherActivity extends AppCompatActivity {
-    CardView googlePay,paymenteceipt,cashReceipt;
+    CardView googlePay, paymenteceipt, cashReceipt, expenseClaim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,29 +36,36 @@ public class VoucherActivity extends AppCompatActivity {
         googlePay = findViewById(R.id.googlepay);
         paymenteceipt = findViewById(R.id.PrintReceipt);
         cashReceipt = findViewById(R.id.cashVoucher);
+        expenseClaim = findViewById(R.id.expenseClaim);
 
         googlePay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(VoucherActivity.this, GooglepayScreen.class);
+                Intent i = new Intent(VoucherActivity.this, GooglepayScreen.class);
                 startActivity(i);
             }
         });
         paymenteceipt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(VoucherActivity.this, MainPaymentReceipt.class);
+                Intent i = new Intent(VoucherActivity.this, MainPaymentReceipt.class);
                 startActivity(i);
             }
         });
         cashReceipt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(VoucherActivity.this, CashVoucherActivity.class);
+                Intent i = new Intent(VoucherActivity.this, CashVoucherActivity.class);
                 startActivity(i);
             }
         });
-
+        expenseClaim.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(VoucherActivity.this, ExpenseClaimActivity.class);
+                startActivity(i);
+            }
+        });
 
     }
 }

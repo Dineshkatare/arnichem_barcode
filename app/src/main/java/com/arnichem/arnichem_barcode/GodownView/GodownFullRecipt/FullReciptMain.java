@@ -49,6 +49,7 @@ import com.arnichem.arnichem_barcode.Reset.APIClient;
 import com.arnichem.arnichem_barcode.TransactionsView.DuraDelivery.DuraDeliveryMain;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.AddActivity;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.CustomAdapter;
+import com.arnichem.arnichem_barcode.GodownView.GodownFullRecipt.GodownFullReciptAdapter;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.Maindelivery;
 import com.arnichem.arnichem_barcode.constant.constant;
 import com.arnichem.arnichem_barcode.digital_signature.ActivityDigitalSignature;
@@ -78,37 +79,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class  FullReciptMain extends AppCompatActivity implements Listener, LocationData.AddressCallBack, OnItemClickListener {
+import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.FilledWithAdapter;
+
+public class FullReciptMain extends AppCompatActivity
+        implements Listener, LocationData.AddressCallBack, OnItemClickListener {
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
     syncHelper synchelper;
 
-    ArrayList<String> book_id, book_title,fillwith;
-    RecyclerView recyclerView;
+    ArrayList<String> book_id, book_title, fillwith, volume, is_scan;
+    RecyclerView recyclerView, fillwithrec;
+    FilledWithAdapter filledWithAdapter;
+    ArrayList<String> name, tot;
     FloatingActionButton add_button;
     ImageView empty_imageview;
-    TextView no_data,usernamevalue,Totalscanvalue,date;
+    TextView no_data, usernamevalue, Totalscanvalue, date;
     SharedPreferences pref;
-    Button button,print;
+    Button button, print;
     ProgressDialog dialog;
     boolean status = false;
-    Spinner spinnerloc,spinnercust;
+    Spinner spinnerloc, spinnercust;
     GodownFullReciptHelper myDB;
-    CustomAdapter customAdapter;
+    GodownFullReciptAdapter customAdapter;
     AutoCompleteTextView godownfullrecptcylinder;
     DatabaseHandler databaseHandlercustomer;
     fromloccodehandler fromloccodehandler;
     ArrayAdapter<String> dataAdapter;
     ArrayAdapter<String> customerdataAdapter;
-    public  int poslocfixdel,poscustfixdel;
-    static JSONObject object =null;
+    public int poslocfixdel, poscustfixdel;
+    static JSONObject object = null;
     List<String> cylinder;
-    String digital_sign = "",digitalSignPath="" ;
-    String from_warehouse,to_warehouse,cust_code,from_code,srno,count,latitude="0",logitude="0",address="0";
+    String digital_sign = "", digitalSignPath = "";
+    String from_warehouse, to_warehouse, cust_code, from_code, srno, count, latitude = "0", logitude = "0",
+            address = "0";
     Button uploadSign;
     ConstraintLayout constraintSigned;
-    ImageView closeImg,signedImg;
-
+    ImageView closeImg, signedImg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,12 +123,12 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Godown FullReceipt");
         getLocationDetail = new GetLocationDetail(this, this);
-        easyWayLocation = new EasyWayLocation(this, false,true,this);
-        spinnerloc=findViewById(R.id.spinlocgodownfullrecipt);
-        spinnercust=findViewById(R.id.custnamespingodownfullrecipt);
-        Totalscanvalue=findViewById(R.id.Totalscanvalue);
-        godownfullrecptcylinder=findViewById(R.id.godownfullrecptcylinder);
-        print=findViewById(R.id.godownfullreciptprintbtn);
+        easyWayLocation = new EasyWayLocation(this, false, true, this);
+        spinnerloc = findViewById(R.id.spinlocgodownfullrecipt);
+        spinnercust = findViewById(R.id.custnamespingodownfullrecipt);
+        Totalscanvalue = findViewById(R.id.Totalscanvalue);
+        godownfullrecptcylinder = findViewById(R.id.godownfullrecptcylinder);
+        print = findViewById(R.id.godownfullreciptprintbtn);
         uploadSign = findViewById(R.id.uploadSign);
         constraintSigned = findViewById(R.id.constraintSigned);
         closeImg = findViewById(R.id.closeImg);
@@ -130,60 +136,65 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         add_button = findViewById(R.id.godwonfullrecscan);
 
         print.setVisibility(View.GONE);
-        cylinder=new ArrayList<String>();
-        poslocfixdel= Integer.parseInt(SharedPref.getInstance(this).getfrom_loc());
-        poscustfixdel=Integer.parseInt(SharedPref.getInstance(this).getcustomersel());
-        databaseHandlercustomer=new DatabaseHandler(FullReciptMain.this);
-        fromloccodehandler=new fromloccodehandler(FullReciptMain.this);
+        cylinder = new ArrayList<String>();
+        poslocfixdel = Integer.parseInt(SharedPref.getInstance(this).getfrom_loc());
+        poscustfixdel = Integer.parseInt(SharedPref.getInstance(this).getcustomersel());
+        databaseHandlercustomer = new DatabaseHandler(FullReciptMain.this);
+        fromloccodehandler = new fromloccodehandler(FullReciptMain.this);
         fetchData();
         loadSpinnerData();
         loadata();
-        usernamevalue=findViewById(R.id.usernametxtvaluefullrecipt);
-        pref = getSharedPreferences(constant.TAG,MODE_PRIVATE);
-        usernamevalue.setText(SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName());
-        date=findViewById(R.id.date);
+        usernamevalue = findViewById(R.id.usernametxtvaluefullrecipt);
+        pref = getSharedPreferences(constant.TAG, MODE_PRIVATE);
+        usernamevalue.setText(SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
+        date = findViewById(R.id.date);
         synchelper = new syncHelper(FullReciptMain.this);
 
         String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerViewfullrecipt);
-        add_button = findViewById(R.id.godwonfullrecscan);
+        fillwithrec = findViewById(R.id.fillwithrec);
+        name = new ArrayList<>();
+        tot = new ArrayList<>();
+
+        empty_imageview = findViewById(R.id.empty_imageview);
         no_data = findViewById(R.id.no_datafullrecipt);
-        button=findViewById(R.id.godownfullreciptMainPost);
+        button = findViewById(R.id.godownfullreciptMainPost);
         button.setEnabled(true);
+        add_button = findViewById(R.id.godwonfullrecscan);
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startCameraPreviewActivity();
-                Intent intent = new Intent(FullReciptMain.this, AddActivity.class);
+                status = true;
+                Intent intent = new Intent(FullReciptMain.this, NewScanner.class);
+                intent.putExtra("type", "godown_fullreceipt");
                 startActivity(intent);
-                //          startScan();
             }
         });
         myDB = new GodownFullReciptHelper(FullReciptMain.this);
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
         fillwith = new ArrayList<>();
+        volume = new ArrayList<>();
+        is_scan = new ArrayList<>();
         storeDataInArrays();
         Totalscanvalue.setText(count);
-        spinnerloc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinnerloc.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 from_warehouse = dataAdapter.getItem(position);
-                poslocfixdel=position;
+                poslocfixdel = position;
                 SharedPref.getInstance(getApplicationContext()).storefrom_loc(String.valueOf(poslocfixdel));
                 Cursor cursor = fromloccodehandler.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
-                        String col=cursor.getString(1);
-                        String col1 =cursor.getString(2);
-                        if(col.contentEquals(from_warehouse))
-                        {
-                            from_code=col1;
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
+                        if (col.contentEquals(from_warehouse)) {
+                            from_code = col1;
                         }
                     }
                 }
@@ -197,12 +208,12 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         print.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(FullReciptMain.this, GodownFullRecpPrint.class);
+                Intent intent = new Intent(FullReciptMain.this, GodownFullRecpPrint.class);
                 intent.putExtra("durano", String.valueOf(cylinder));
-                intent.putExtra("custname",to_warehouse);
-                intent.putExtra("empb",srno);
+                intent.putExtra("custname", to_warehouse);
+                intent.putExtra("empb", srno);
                 intent.putExtra("count", count);
-                intent.putExtra("custcode",cust_code);
+                intent.putExtra("custcode", cust_code);
                 intent.putExtra("cylinder", String.valueOf(cylinder));
                 startActivity(intent);
             }
@@ -210,31 +221,29 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                status =true;
-                Intent intent =new Intent(FullReciptMain.this, NewScanner.class);
+                status = true;
+                Intent intent = new Intent(FullReciptMain.this, NewScanner.class);
                 intent.putExtra("type", "godown_fullreceipt");
                 startActivity(intent);
             }
         });
-        spinnercust.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
-        {
+        spinnercust.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 to_warehouse = customerdataAdapter.getItem(position);
-                poscustfixdel=position;
+                poscustfixdel = position;
                 SharedPref.getInstance(getApplicationContext()).store_customersel(String.valueOf(poscustfixdel));
                 Cursor cursor = databaseHandlercustomer.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
-                        String col=cursor.getString(1);
-                        String col1 =cursor.getString(2);
+                        String col = cursor.getString(1);
+                        String col1 = cursor.getString(2);
 
-                        if(col.contentEquals(to_warehouse))
-                        {
-                            cust_code=col1;
+                        if (col.contentEquals(to_warehouse)) {
+                            cust_code = col1;
 
                         }
                     }
@@ -254,17 +263,20 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
                 postUsingVolley();
             }
         });
-        customAdapter = new CustomAdapter(FullReciptMain.this, this, book_id, book_title, fillwith,this,"full_receipt");
-
-      //  customAdapter = new GodownFullReciptAdapter(FullReciptMain.this,this, book_id, book_title);
+        customAdapter = new GodownFullReciptAdapter(FullReciptMain.this, this, book_id, book_title, fillwith);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(FullReciptMain.this));
+
+        check();
+        filledWithAdapter = new FilledWithAdapter(FullReciptMain.this, this, name, tot);
+        fillwithrec.setAdapter(filledWithAdapter);
+        fillwithrec.setLayoutManager(new LinearLayoutManager(FullReciptMain.this));
 
         uploadSign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(FullReciptMain.this, ActivityDigitalSignature.class);
-                intent.putExtra("type","delivery");
+                intent.putExtra("type", "delivery");
                 startActivity(intent);
             }
         });
@@ -278,12 +290,11 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         LocalBroadcastManager.getInstance(this).registerReceiver(mServiceReceiver,
                 new IntentFilter("digital_sign"));
 
-
     }
 
     @Override
     protected void onResume() {
-        if(status){
+        if (status) {
             status = false;
             startActivity(getIntent());
         }
@@ -319,38 +330,36 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         address = locationData.getFull_address();
     }
 
-
     private void fetchData() {
         fromloccodehandler db = new fromloccodehandler(getApplicationContext());
         List<String> labels = db.getAllLabels();
 
         // Creating adapter for spinner
-        dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinnerloc.setAdapter(dataAdapter);
-        if(poslocfixdel!=0)
-        {
+        if (poslocfixdel != 0) {
             spinnerloc.setSelection(poslocfixdel);
         }
     }
+
     private void loadSpinnerData() {
         DatabaseHandler db = new DatabaseHandler(getApplicationContext());
         List<String> labels = db.getAllLabels();
 
         // Creating adapter for spinner
-        customerdataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, labels);
+        customerdataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, labels);
 
         // Drop down layout style - list view with radio button
         customerdataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         // attaching data adapter to spinner
         spinnercust.setAdapter(customerdataAdapter);
-        if(poscustfixdel!=0)
-        {
+        if (poscustfixdel != 0) {
             spinnercust.setSelection(poscustfixdel);
         }
     }
@@ -358,14 +367,14 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == 1){
-//            recreate();
+        if (requestCode == 1) {
+            // recreate();
         }
     }
-    private  void  loadata()
-    {
-        List<ItemCode>  itemCodes=new ArrayList<>();
-        SearchAdapter searchAdapter=new SearchAdapter(getApplicationContext(),itemCodes);
+
+    private void loadata() {
+        List<ItemCode> itemCodes = new ArrayList<>();
+        SearchAdapter searchAdapter = new SearchAdapter(getApplicationContext(), itemCodes);
         godownfullrecptcylinder.setThreshold(1);
         godownfullrecptcylinder.setAdapter(searchAdapter);
         godownfullrecptcylinder.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -373,16 +382,17 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = synchelper.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
                         String volume = cursor.getString(4);
                         String Fillwith = cursor.getString(5);
                         String col1 = cursor.getString(1);
                         if (col1.contentEquals(godownfullrecptcylinder.getText().toString())) {
-                           // delidb.addBook(deliverycylindersea.getText().toString(), Fillwith, volume,"no");
-                            myDB.addBook(godownfullrecptcylinder.getText().toString(),Fillwith,volume,"no");
+                            // delidb.addBook(deliverycylindersea.getText().toString(), Fillwith,
+                            // volume,"no");
+                            myDB.addBook(godownfullrecptcylinder.getText().toString(), Fillwith, volume, "no");
 
                             finish();
                             startActivity(getIntent());
@@ -390,29 +400,32 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
                     }
                 }
 
-//                finish();
-//                startActivity(getIntent());
+                // finish();
+                // startActivity(getIntent());
             }
         });
     }
-    void storeDataInArrays(){
+
+    void storeDataInArrays() {
         Cursor cursor = myDB.readAllData();
-        if(cursor.getCount() == 0){
-//            empty_imageview.setVisibility(View.VISIBLE);
+        if (cursor.getCount() == 0) {
+            // empty_imageview.setVisibility(View.VISIBLE);
             no_data.setVisibility(View.VISIBLE);
-        }else{
-            while (cursor.moveToNext()){
+        } else {
+            while (cursor.moveToNext()) {
                 book_id.add(cursor.getString(0));
                 book_title.add(cursor.getString(1));
                 fillwith.add(cursor.getString(2));
+                volume.add(cursor.getString(3));
                 cylinder.add(cursor.getString(1));
+                is_scan.add(cursor.getString(4));
 
-//                book_author.add(cursor.getString(2));
-//                book_pages.add(cursor.getString(3));
+                // book_author.add(cursor.getString(2));
+                // book_pages.add(cursor.getString(3));
             }
             int cou = cursor.getCount();
-            count= String.valueOf(cou);
-            //         empty_imageview.setVisibility(View.GONE);
+            count = String.valueOf(cou);
+            // empty_imageview.setVisibility(View.GONE);
             no_data.setVisibility(View.GONE);
         }
     }
@@ -431,7 +444,8 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         }
         return super.onOptionsItemSelected(item);
     }
-    void confirmDialog(){
+
+    void confirmDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Delete All?");
         builder.setMessage("Are you sure you want to delete all Data?");
@@ -439,7 +453,7 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 myDB.deleteAllData();
-                //Refresh Activity
+                // Refresh Activity
                 finish();
                 startActivity(getIntent());
             }
@@ -453,8 +467,8 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         builder.create().show();
     }
 
-    private void startCameraPreviewActivity(){
-        //   startActivity(new Intent(this, CameraPreviewActivity.class));
+    private void startCameraPreviewActivity() {
+        // startActivity(new Intent(this, CameraPreviewActivity.class));
     }
 
     /** Request permission and check */
@@ -462,9 +476,8 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(myDB != null)
+        if (myDB != null)
             myDB.close();
-
 
     }
 
@@ -484,19 +497,50 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
         if (poslocfixdel == 0) {
             dialog.dismiss();
             button.setEnabled(true);
-            MDToast.makeText(FullReciptMain.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            MDToast.makeText(FullReciptMain.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR)
+                    .show();
 
         } else if (poscustfixdel == 0) {
             dialog.dismiss();
             button.setEnabled(true);
-            MDToast.makeText(FullReciptMain.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            MDToast.makeText(FullReciptMain.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR)
+                    .show();
 
-
-        }  else {
+        } else {
             StringBuilder str = new StringBuilder("");
             for (String eachstring : cylinder) {
                 str.append(eachstring).append(",");
             }
+            final String commaseparatedlist = str.toString();
+
+            ArrayList<String> itemList = new ArrayList<>();
+            ArrayList<String> itemQList = new ArrayList<>();
+            ArrayList<String> quantityVolumeList = new ArrayList<>();
+
+            Cursor cursor = myDB.readcount();
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    // SUM(PAGES) at 1, COUNT(FILLED) at 2, FILLED at 3, PAGES at 4
+                    quantityVolumeList.add(cursor.getString(1));
+                    itemQList.add(cursor.getString(2));
+                    itemList.add(cursor.getString(3));
+                }
+            }
+
+            StringBuilder itemStr = new StringBuilder();
+            StringBuilder itemQStr = new StringBuilder();
+            StringBuilder volStr = new StringBuilder();
+
+            for (String s : itemList)
+                itemStr.append(s).append(",");
+            for (String s : itemQList)
+                itemQStr.append(s).append(",");
+            for (String s : quantityVolumeList)
+                volStr.append(s).append(",");
+
+            final String itemFinal = itemStr.toString();
+            final String itemQFinal = itemQStr.toString();
+            final String volFinal = volStr.toString();
 
             StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.godown_fullrecipt_entry,
                     new Response.Listener<String>() {
@@ -511,27 +555,29 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
                                     String msg = object.getString("msg");
 
                                     if (status.equals("success")) {
-                                        MDToast.makeText(FullReciptMain.this, "FullRecipt Entry Done!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                                        MDToast.makeText(FullReciptMain.this, "FullRecipt Entry Done!",
+                                                MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
                                         button.setVisibility(View.GONE);
                                         print.setVisibility(View.VISIBLE);
                                         srno = object.getString("srno");
 
-                                        //  SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
+                                        // SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
                                         dialog.dismiss();
 
-                                                Intent intent=new Intent(FullReciptMain.this, GodownFullRecpPrint.class);
-                                                intent.putExtra("durano", String.valueOf(cylinder));
-                                                intent.putExtra("custname",to_warehouse);
-                                                intent.putExtra("empb",srno);
-                                                intent.putExtra("sign_path",digitalSignPath);
-                                                intent.putExtra("count", count);
-                                                intent.putExtra("custcode",cust_code);
-                                                intent.putExtra("cylinder", String.valueOf(cylinder));
+                                        Intent intent = new Intent(FullReciptMain.this, GodownFullRecpPrint.class);
+                                        intent.putExtra("durano", String.valueOf(cylinder));
+                                        intent.putExtra("custname", to_warehouse);
+                                        intent.putExtra("empb", srno);
+                                        intent.putExtra("sign_path", digitalSignPath);
+                                        intent.putExtra("count", count);
+                                        intent.putExtra("custcode", cust_code);
+                                        intent.putExtra("cylinder", String.valueOf(cylinder));
                                         button.setEnabled(true);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                                         startActivity(intent);
 
-//                                        Toast.makeText(login.this, "msg " + msg, Toast.LENGTH_SHORT).show();
+                                        // Toast.makeText(login.this, "msg " + msg, Toast.LENGTH_SHORT).show();
 
                                     } else {
                                         button.setEnabled(true);
@@ -563,45 +609,76 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<>();
-                    params.put("dura_code", String.valueOf(cylinder));
+                    params.put("dura_code", android.text.TextUtils.join(",", cylinder));
+                    params.put("is_scan", android.text.TextUtils.join(",", is_scan));
                     params.put("from_warehouse", from_warehouse);
                     params.put("to_warehouse", to_warehouse);
                     params.put("transport_type", "OWN");
                     params.put("cust_code", cust_code);
-                    params.put("from_code",from_code);
+                    params.put("from_code", from_code);
                     params.put("lati", latitude);
                     params.put("logi", logitude);
-                    params.put("addr",address);
+                    params.put("addr", address);
                     params.put("sign", digital_sign);
+                    params.put("item", itemFinal);
+                    params.put("itemq", itemQFinal);
+                    params.put("item_volume", volFinal);
                     params.put("transport_no", SharedPref.getInstance(FullReciptMain.this).getVehicleNo());
                     params.put("driver", SharedPref.getInstance(FullReciptMain.this).getID());
                     params.put("email", SharedPref.getInstance(FullReciptMain.this).getEmail());
                     params.put("count", count);
-                    params.put("db_host",SharedPref.mInstance.getDBHost());
-                    params.put("db_username",SharedPref.mInstance.getDBUsername());
-                    params.put("db_password",SharedPref.mInstance.getDBPassword());
-                    params.put("db_name",SharedPref.mInstance.getDBName());
+                    params.put("db_host", SharedPref.mInstance.getDBHost());
+                    params.put("db_username", SharedPref.mInstance.getDBUsername());
+                    params.put("db_password", SharedPref.mInstance.getDBPassword());
+                    params.put("db_name", SharedPref.mInstance.getDBName());
                     return params;
                 }
             };
             VolleySingleton.getInstance(FullReciptMain.this).addToRequestQueue(stringRequest);
 
+        }
+    }
 
+    void check() {
+        name.clear();
+        tot.clear();
+        Cursor cursor = myDB.readAllData();
+        Map<String, Integer> counts = new HashMap<>();
+
+        if (cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                String fw = cursor.getString(2); // filled_with column (book_author)
+                if (fw == null || fw.isEmpty() || fw.equals("null"))
+                    fw = "Other";
+
+                if (counts.containsKey(fw)) {
+                    counts.put(fw, counts.get(fw) + 1);
+                } else {
+                    counts.put(fw, 1);
+                }
+            }
         }
+
+        for (Map.Entry<String, Integer> entry : counts.entrySet()) {
+            name.add(entry.getKey());
+            tot.add(String.valueOf(entry.getValue()));
         }
-    private BroadcastReceiver mServiceReceiver = new BroadcastReceiver(){
+        if (filledWithAdapter != null) {
+            filledWithAdapter.notifyDataSetChanged();
+        }
+    }
+
+    private BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            if(intent.getAction().equalsIgnoreCase("digital_sign")){
-                //Extract your data - better to use constants...
-                String Signed=intent.getStringExtra("Signed");
-                digitalSignPath=intent.getStringExtra("path");
-                if (Signed.equalsIgnoreCase("true"))
-                {
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equalsIgnoreCase("digital_sign")) {
+                // Extract your data - better to use constants...
+                String Signed = intent.getStringExtra("Signed");
+                digitalSignPath = intent.getStringExtra("path");
+                if (Signed.equalsIgnoreCase("true")) {
                     constraintSigned.setVisibility(View.VISIBLE);
-                    File imgFile = new  File(digitalSignPath);
-                    if(imgFile.exists()){
+                    File imgFile = new File(digitalSignPath);
+                    if (imgFile.exists()) {
                         Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                         digital_sign = Util.getImage(myBitmap);
                         signedImg.setImageBitmap(myBitmap);
@@ -611,7 +688,6 @@ public class  FullReciptMain extends AppCompatActivity implements Listener, Loca
 
         }
     };
-
 
     @Override
     public void onItemClick(int position) {

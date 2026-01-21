@@ -1,36 +1,45 @@
 {
   "project_info": {
-    "project_number": "481535983895",
-    "project_id": "arnichemapp-56ab4",
-    "storage_bucket": "arnichemapp-56ab4.appspot.com"
+    "project_number": "522663265265",
+    "project_id": "arnichem-4a0c1",
+    "storage_bucket": "arnichem-4a0c1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:481535983895:android:85a15d45af46749a357752",
+        "mobilesdk_app_id": "1:522663265265:android:74b72a415db1a1ee977a50",
         "android_client_info": {
           "package_name": "com.arnichem.arnichem_barcode"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "481535983895-i45cddi47b1g9n8natvf7d67jbm7u60p.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAOLp8SW5LzPSJNyva6kl-qgLCUkFE1ct8"
+          "current_key": "AIzaSyBqYP4RgJkROKAMQsf3yfVkRxQV1dVq-pk"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "481535983895-i45cddi47b1g9n8natvf7d67jbm7u60p.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522663265265:android:03ba687042722d0c977a50",
+        "android_client_info": {
+          "package_name": "com.example.authapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqYP4RgJkROKAMQsf3yfVkRxQV1dVq-pk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
         }
       }
     }

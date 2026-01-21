@@ -151,9 +151,16 @@ class Attendance_log : AppCompatActivity(), OnMapReadyCallback {
         timeValTxt = findViewById(R.id.timeValTxt)
         remarks_edt = findViewById(R.id.remarks)
         spinKitView = findViewById(R.id.spinnerKit)
-        timeValTxt.setOnClickListener(View.OnClickListener {
-                showTimePickerDialog();
-        })
+        
+        // Disable manual time editing - only current time allowed
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+        timeString = formatTime(hour, minute)
+        timeValTxt.text = simpleFormatTime(hour, minute)
+        
+        // Removed time picker listener
+
         usernamevalue.setText(
             SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName()
         )
@@ -234,30 +241,18 @@ class Attendance_log : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun showTimePickerDialog() {
-        val calendar = Calendar.getInstance()
-        val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
 
-        val timePickerDialog = TimePickerDialog(
-            this,
-            TimePickerDialog.OnTimeSetListener { view, hourOfDay, minute ->
-                // Handle the selected time
-                val selectedTime = simpleFormatTime(hourOfDay, minute)
-                timeString = formatTime(hourOfDay,minute)
-                timeValTxt!!.text = selectedTime
-            },
-            hourOfDay,
-            minute,
-            false // 24-hour format (true for 24-hour, false for AM/PM)
-        )
-
-        timePickerDialog.show()
-    }
 
 
 
     private fun postUsingRetrofit() {
+        // Refresh time to current system time before posting
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+        timeString = formatTime(hour, minute)
+        timeValTxt.text = simpleFormatTime(hour, minute)
+
 
 // Create a MultipartBody.Part from the image file
 // Create a MultipartBody.Part from the image file

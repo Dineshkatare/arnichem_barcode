@@ -196,14 +196,31 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
+                android:paddingTop="20dp"
                 android:layout_width="409dp"
                 android:layout_height="wrap_content"
-                android:paddingTop="20dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-                        <TextView
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                android:orientation="horizontal">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fillwithrec"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@color/white"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingTop="20dp" />
+            </LinearLayout>
+            <TextView
                             android:id="@+id/Totalscan"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -225,6 +242,8 @@
                             android:textSize="16dp"
                             android:textStyle="bold"
                             android:gravity="center_horizontal" />
+
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintSigned"
                 android:layout_width="225dp"

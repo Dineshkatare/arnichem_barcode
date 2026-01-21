@@ -190,37 +190,77 @@
                     >
                 </TextView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:layout_marginTop="10dp"-->
+<!--                    android:layout_weight="2">-->
+
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Cylinder No      :"-->
+<!--                        android:textAlignment="textStart"-->
+<!--                        android:paddingLeft="30dp"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:textStyle="bold"-->
+<!--                        android:textSize="20dp"-->
+<!--                        >-->
+<!--                    </TextView>-->
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text=""-->
+<!--                        android:id="@+id/cylindernumberempty"-->
+<!--                        android:gravity="center"-->
+<!--                        android:textStyle="bold"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:textSize="20dp"-->
+<!--                        >-->
+<!--                    </TextView>-->
+<!--                </LinearLayout>-->
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cylinder No"
+                android:paddingLeft="30dp"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textSize="20dp"
+                tools:ignore="RtlCompat">
+            </TextView>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/cyclinderNames"
+                    android:layout_width="409dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="2">
+                    android:layout_gravity="center_horizontal"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingTop="20dp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Cylinder No      :"
-                        android:textAlignment="textStart"
-                        android:paddingLeft="30dp"
-                        android:layout_weight="1"
-                        android:textStyle="bold"
-                        android:textSize="20dp"
-                        >
-                    </TextView>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:id="@+id/cylindernumberempty"
-                        android:gravity="center"
-                        android:textStyle="bold"
-                        android:layout_weight="1"
-                        android:textSize="20dp"
-                        >
-                    </TextView>
-                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/fillwithrec"
+                    android:layout_width="409dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingTop="20dp" />
+
+            </androidx.core.widget.NestedScrollView>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -252,6 +292,7 @@
                         >
                     </TextView>
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

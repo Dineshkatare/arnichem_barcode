@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
 public class MainSettings extends AppCompatActivity {
-    CardView changePassword,appversionbtn,TestptBtn,SyncBarcode,Logout;
+    CardView changePassword,appversionbtn,TestptBtn,SyncBarcode,Logout,switchUser;
     String status;
     SharedPreferences pref;
     LinearLayout linearLayout;
@@ -39,7 +39,10 @@ public class MainSettings extends AppCompatActivity {
         appversionbtn=findViewById(R.id.appversioncardview);
         TestptBtn=findViewById(R.id.testprintercardview);
         SyncBarcode = findViewById(R.id.inventorySync);
+        TestptBtn=findViewById(R.id.testprintercardview);
+        SyncBarcode = findViewById(R.id.inventorySync);
         Logout = findViewById(R.id.logout);
+        switchUser = findViewById(R.id.switchUser);
         pref = getSharedPreferences(constant.TAG,MODE_PRIVATE);
         status = SharedPref.getInstance(MainSettings.this).vLoggedInUser();
         linearLayout = findViewById(R.id.main);
@@ -69,6 +72,12 @@ public class MainSettings extends AppCompatActivity {
             public void onClick(View v) {
                 startActivity(new Intent(MainSettings.this, SyncInventoryActivity.class));
 
+            }
+        });
+        switchUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainSettings.this, SwitchDriverActivity.class));
             }
         });
         Logout.setOnClickListener(new View.OnClickListener() {

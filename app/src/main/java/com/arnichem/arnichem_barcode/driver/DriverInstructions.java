@@ -19,23 +19,22 @@ import com.arnichem.arnichem_barcode.report.ReportActivity;
 import com.arnichem.arnichem_barcode.view.Dashboard;
 
 public class DriverInstructions extends AppCompatActivity {
-    CardView pickCard,orderCard,reports;
+    CardView pickCard, orderCard, reports;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_instructions);
-        pickCard  = findViewById(R.id.pick);
+        pickCard = findViewById(R.id.pick);
         orderCard = findViewById(R.id.orderCard);
         reports = findViewById(R.id.report);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Driver Instructions");
 
-
         pickCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(DriverInstructions.this, PickActivity.class);
+                Intent i = new Intent(DriverInstructions.this, PickActivity.class);
                 startActivity(i);
 
             }
@@ -44,16 +43,23 @@ public class DriverInstructions extends AppCompatActivity {
         orderCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i=new Intent(DriverInstructions.this, OrderMainActivity.class);
+                Intent i = new Intent(DriverInstructions.this, OrderMainActivity.class);
                 startActivity(i);
             }
         });
         reports.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String email = com.arnichem.arnichem_barcode.util.SharedPref.getInstance(DriverInstructions.this)
+                        .getEmail();
+                String companyName = com.arnichem.arnichem_barcode.util.SharedPref.getInstance(DriverInstructions.this)
+                        .getCompanyShortName();
+                String url = "https://www.arnichem.co.in/intranet/reports_orders_app.php?email=" + email
+                        + "&company_name=" + companyName;
+
                 Intent intent = new Intent(DriverInstructions.this, ReportActivity.class);
                 intent.putExtra("title", "Reports");
-                intent.putExtra("url", "https://www.arnichem.co.in/intranet/reports_orders_app.php");
+                intent.putExtra("url", url);
                 startActivity(intent);
 
             }

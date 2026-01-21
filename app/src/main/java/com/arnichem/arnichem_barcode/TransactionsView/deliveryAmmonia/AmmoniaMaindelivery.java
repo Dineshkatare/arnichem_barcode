@@ -74,23 +74,23 @@ import java.util.List;
 import java.util.Map;
 
 public class AmmoniaMaindelivery extends AppCompatActivity {
-    ArrayList<String> id, cylindername,adempty,adfull,adnet;
+    ArrayList<String> id, cylindername, adempty, adfull, adnet;
     ProgressDialog dialog;
     ArrayList<String> book_id, book_title;
     ImageView closeImg;
     Button uploadSign;
-    String s="";
+    String s = "";
     boolean status = false;
 
     com.arnichem.arnichem_barcode.view.fromloccodehandler fromloccodehandler;
     RecyclerView recyclerView;
     FloatingActionButton add_button;
     FusedLocationProviderClient fusedLocationProviderClient;
-    ImageView empty_imageview,signedImg;
+    ImageView empty_imageview, signedImg;
     DatabaseHandler databaseHandlercustomer;
-    TextView no_data, vehiclevalue, usernamevalue, date, totalscanval,FullTv,emptyTv,netTv,cylinderTv;
+    TextView no_data, vehiclevalue, usernamevalue, date, totalscanval, FullTv, emptyTv, netTv, cylinderTv;
     Spinner spinner, customerspinnerdelivery;
-    String from_warehouse, to_warehouse, cust_code, srno, from_code,latitude="0",logitude="0",address="0";
+    String from_warehouse, to_warehouse, cust_code, srno, from_code, latitude = "0", logitude = "0", address = "0";
 
     int count;
     SharedPreferences pref;
@@ -107,13 +107,13 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
     syncHelper synchelper;
     AutoCompleteTextView deliverycylindersea;
 
-
     ConstraintLayout constraintSigned;
     String digital_sign = "", digitalSignPath = "";
 
     List<String> item;
     List<String> itemq;
     List<String> item_volume;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,15 +126,15 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         id = new ArrayList<String>();
         cylinder = new ArrayList<String>();
         lastnet = new ArrayList<String>();
-        cylindername= new ArrayList<String>();
+        cylindername = new ArrayList<String>();
         is_scan = new ArrayList<String>();
-        adempty=new ArrayList<String>();
-        adfull=new ArrayList<String>();
-        adnet=new ArrayList<String>();
+        adempty = new ArrayList<String>();
+        adfull = new ArrayList<String>();
+        adnet = new ArrayList<String>();
         item = new ArrayList<>();
         itemq = new ArrayList<>();
         item_volume = new ArrayList<>();
-        deliadapter = new ammoia_deliAdapter(AmmoniaMaindelivery.this, this,id,cylindername,adfull,adempty,adnet);
+        deliadapter = new ammoia_deliAdapter(AmmoniaMaindelivery.this, this, id, cylindername, adfull, adempty, adnet);
         spinner = findViewById(R.id.deliveryloc);
         deliverycylindersea = findViewById(R.id.deliverycylindersea);
         totalscanval = findViewById(R.id.totalscanval);
@@ -146,10 +146,10 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         poscustfixdel = Integer.parseInt(SharedPref.getInstance(this).getcustomersel());
         databaseHandlercustomer = new DatabaseHandler(AmmoniaMaindelivery.this);
         fromloccodehandler = new fromloccodehandler(AmmoniaMaindelivery.this);
-        FullTv=findViewById(R.id.fuulwt);
-        emptyTv=findViewById(R.id.emwt);
-        netTv=findViewById(R.id.netwt);
-        cylinderTv=findViewById(R.id.cylno);
+        FullTv = findViewById(R.id.fuulwt);
+        emptyTv = findViewById(R.id.emwt);
+        netTv = findViewById(R.id.netwt);
+        cylinderTv = findViewById(R.id.cylno);
         FullTv.setVisibility(GONE);
         emptyTv.setVisibility(GONE);
         netTv.setVisibility(GONE);
@@ -174,7 +174,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         date.setText(currentDateTimeString);
         recyclerView = findViewById(R.id.recyclerView);
 
-//        empty_imageview = findViewById(R.id.empty_imageview);
+        // empty_imageview = findViewById(R.id.empty_imageview);
         no_data = findViewById(R.id.no_data);
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -184,8 +184,8 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 SharedPref.getInstance(getApplicationContext()).storefrom_loc(String.valueOf(poslocfixdel));
                 Cursor cursor = fromloccodehandler.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
                         String col = cursor.getString(1);
@@ -212,8 +212,8 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 SharedPref.getInstance(getApplicationContext()).store_customersel(String.valueOf(poscustfixdel));
                 Cursor cursor = databaseHandlercustomer.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
                         String col = cursor.getString(1);
@@ -222,9 +222,10 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                             cust_code = col1;
 
                             if (cursor.getString(4) != null && !cursor.getString(4).isEmpty()) {
-                                String message = cursor.getString(4).replace("\\n", "\n"); // Replace literal "\n" with a newline
+                                String message = cursor.getString(4).replace("\\n", "\n"); // Replace literal "\n" with
+                                                                                           // a newline
                                 showCustomMsg(message);
-                                Log.d("chech",""+message);
+                                Log.d("chech", "" + message);
                             }
 
                         }
@@ -261,20 +262,19 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                status =true;
-                Intent intent =new Intent(AmmoniaMaindelivery.this, NewScanner.class);
+                status = true;
+                Intent intent = new Intent(AmmoniaMaindelivery.this, NewScanner.class);
                 intent.putExtra("type", "delivery");
                 startActivity(intent);
             }
         });
         book_id = new ArrayList<>();
         book_title = new ArrayList<>();
-        deliadapter = new ammoia_deliAdapter(AmmoniaMaindelivery.this, this,id,cylindername,adfull,adempty,adnet);
+        deliadapter = new ammoia_deliAdapter(AmmoniaMaindelivery.this, this, id, cylindername, adfull, adempty, adnet);
         storeDataInArrays();
         check();
         totalscanval.setText(String.valueOf(count));
-        if(count!=0)
-        {
+        if (count != 0) {
             FullTv.setVisibility(View.VISIBLE);
             emptyTv.setVisibility(View.VISIBLE);
             netTv.setVisibility(View.VISIBLE);
@@ -302,8 +302,6 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 new IntentFilter("digital_sign"));
         LocalBroadcastManager.getInstance(this).registerReceiver(ammonia_no_receiver,
                 new IntentFilter("ammonia_delivery"));
-
-
 
     }
 
@@ -341,7 +339,6 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         dialog.show();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -365,7 +362,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 delidb.deleteAllData();
-                //Refresh Activity
+                // Refresh Activity
                 finish();
                 startActivity(getIntent());
             }
@@ -389,26 +386,25 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         // Drop down layout style - list view with radio button
         customerdataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        //  data adapter to spinner
+        // data adapter to spinner
         customerspinnerdelivery.setAdapter(customerdataAdapter);
         if (poscustfixdel != 0) {
             customerspinnerdelivery.setSelection(poscustfixdel);
         }
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
-//            recreate();
+            // recreate();
         }
     }
 
     void storeDataInArrays() {
         Cursor cursor = delidb.readAllData();
         if (cursor.getCount() == 0) {
-//            empty_imageview.setVisibility(View.VISIBLE);
+            // empty_imageview.setVisibility(View.VISIBLE);
             no_data.setVisibility(View.VISIBLE);
         } else {
             while (cursor.moveToNext()) {
@@ -421,14 +417,14 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 lastnet.add(cursor.getString(4));
                 is_scan.add(cursor.getString(7));
             }
-            //         empty_imageview.setVisibility(View.GONE);
-           count = cursor.getCount();
-
+            // empty_imageview.setVisibility(View.GONE);
+            count = cursor.getCount();
 
             no_data.setVisibility(View.GONE);
         }
 
     }
+
     private void postUsingVolley() {
 
         dialog = new ProgressDialog(AmmoniaMaindelivery.this);
@@ -438,12 +434,14 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         dialog.show();
         if (poslocfixdel == 0) {
             dialog.dismiss();
-            MDToast.makeText(AmmoniaMaindelivery.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            MDToast.makeText(AmmoniaMaindelivery.this, "कृपया लोकेशन निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR)
+                    .show();
             button.setEnabled(true);
 
         } else if (poscustfixdel == 0) {
             dialog.dismiss();
-            MDToast.makeText(AmmoniaMaindelivery.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+            MDToast.makeText(AmmoniaMaindelivery.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR)
+                    .show();
 
             button.setEnabled(true);
 
@@ -466,16 +464,20 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                                     String msg = object.getString("msg");
 
                                     if (status.equals("success")) {
-                                        MDToast.makeText(AmmoniaMaindelivery.this, "Delivey Entry Done!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
-                                        MDToast.makeText(AmmoniaMaindelivery.this, "आता प्रिंट बटण दाबा !", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                                        MDToast.makeText(AmmoniaMaindelivery.this, "Delivey Entry Done!",
+                                                MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                                        MDToast.makeText(AmmoniaMaindelivery.this, "आता प्रिंट बटण दाबा !",
+                                                MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
 
                                         button.setVisibility(View.GONE);
                                         delprint.setVisibility(View.VISIBLE);
                                         srno = object.getString("srno");
 
-//                                        //  SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
+                                        // //
+                                        // SharedPref.getInstance(getApplicationContext()).(object.getString("lname"));
 
-                                        Intent intent = new Intent(AmmoniaMaindelivery.this, ammonia_deliveryprint.class);
+                                        Intent intent = new Intent(AmmoniaMaindelivery.this,
+                                                ammonia_deliveryprint.class);
                                         intent.putExtra("durano", String.valueOf(cylinder));
                                         intent.putExtra("custname", to_warehouse);
                                         intent.putExtra("custcode", cust_code);
@@ -485,7 +487,6 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                                         startActivity(intent);
                                         dialog.dismiss();
                                         button.setEnabled(true);
-
 
                                     } else {
                                         button.setEnabled(true);
@@ -512,7 +513,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                             dialog.dismiss();
                             button.setEnabled(true);
 
-                            Log.e("JSON", "> " +error.toString());
+                            Log.e("JSON", "> " + error.toString());
 
                         }
                     }) {
@@ -532,8 +533,8 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                     params.put("lati", latitude);
                     params.put("sign", digital_sign);
                     params.put("logi", logitude);
-                    params.put("addr",address);
-                    params.put("is_scan",String.valueOf(is_scan));
+                    params.put("addr", address);
+                    params.put("is_scan", String.valueOf(is_scan));
                     params.put("transport_no", SharedPref.getInstance(AmmoniaMaindelivery.this).getVehicleNo());
                     params.put("driver", SharedPref.getInstance(AmmoniaMaindelivery.this).getID());
                     params.put("email", SharedPref.getInstance(AmmoniaMaindelivery.this).getEmail());
@@ -547,17 +548,13 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
             };
             VolleySingleton.getInstance(AmmoniaMaindelivery.this).addToRequestQueue(stringRequest);
 
-
         }
 
     }
 
-
-
-    private  void  loadata()
-    {
-        List<ItemCode>  itemCodes=new ArrayList<>();
-        SearchAdapter searchAdapter=new SearchAdapter(getApplicationContext(),itemCodes);
+    private void loadata() {
+        List<ItemCode> itemCodes = new ArrayList<>();
+        SearchAdapter searchAdapter = new SearchAdapter(getApplicationContext(), itemCodes);
         deliverycylindersea.setThreshold(1);
         deliverycylindersea.setAdapter(searchAdapter);
         deliverycylindersea.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -565,19 +562,20 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = synchelper.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
                         String volume = cursor.getString(4);
                         String Fillwith = cursor.getString(5);
                         String col1 = cursor.getString(1);
                         if (col1.contentEquals(deliverycylindersea.getText().toString())) {
-                            login(deliverycylindersea.getText().toString(),"no",Fillwith,volume);
+                            login(deliverycylindersea.getText().toString(), "no", Fillwith, volume);
 
-                           // delidb.addBook(deliverycylindersea.getText().toString(), Fillwith, volume,"no");
-//                            finish();
-//                            startActivity(getIntent());
+                            // delidb.addBook(deliverycylindersea.getText().toString(), Fillwith,
+                            // volume,"no");
+                            // finish();
+                            // startActivity(getIntent());
                         }
                     }
                 }
@@ -586,15 +584,11 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         });
     }
 
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(delidb != null)
+        if (delidb != null)
             delidb.close();
-
 
     }
 
@@ -604,13 +598,13 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void login (String cyl,String is_scan,String fill_with,String volume) {
+    private void login(String cyl, String is_scan, String fill_with, String volume) {
         dialog = new ProgressDialog(AmmoniaMaindelivery.this);
         dialog.setTitle("Data Inserting");
         dialog.setMessage("Please wait....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
-        StringRequest stringRequest = new StringRequest(Request.Method.POST,APIClient.ammonia_del_update,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.ammonia_del_update,
                 new Response.Listener<String>() {
                     @SuppressLint("WrongConstant")
                     @Override
@@ -620,21 +614,20 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                             for (int i = 0; i < array.length(); i++) {
                                 object = array.getJSONObject(i);
                                 String status = object.getString("status");
-                                if(status.equalsIgnoreCase("success")){
+                                if (status.equalsIgnoreCase("success")) {
                                     String fullwt = object.getString("full_wt");
                                     String emtywt = object.getString("empty_wt");
                                     String netwt = object.getString("net_wt");
 
-                                    delidb.addBook(cyl,fullwt,emtywt,netwt,fill_with,volume,is_scan);
+                                    delidb.addBook(cyl, fullwt, emtywt, netwt, fill_with, volume, is_scan);
                                     finish();
                                     startActivity(getIntent());
                                     dialog.dismiss();
 
-                                }else {
+                                } else {
                                     String msg = object.getString("msg");
-                                    Toast.makeText(AmmoniaMaindelivery.this, ""+msg, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AmmoniaMaindelivery.this, "" + msg, Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
-
 
                                 }
 
@@ -648,18 +641,19 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                     @SuppressLint("WrongConstant")
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(AmmoniaMaindelivery.this, ""+error.toString(), Toast.LENGTH_SHORT).show();
-                        MDToast.makeText(AmmoniaMaindelivery.this, "कृपया इंटरनेट तपासा ", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                        Toast.makeText(AmmoniaMaindelivery.this, "" + error.toString(), Toast.LENGTH_SHORT).show();
+                        MDToast.makeText(AmmoniaMaindelivery.this, "कृपया इंटरनेट तपासा ", MDToast.LENGTH_SHORT,
+                                MDToast.TYPE_ERROR).show();
                         error.printStackTrace();
                     }
                 }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("ammoniacyl",cyl);
-                params.put("db_host",SharedPref.mInstance.getDBHost());
-                params.put("db_username",SharedPref.mInstance.getDBUsername());
-                params.put("db_password",SharedPref.mInstance.getDBPassword());
+                params.put("ammoniacyl", cyl);
+                params.put("db_host", SharedPref.mInstance.getDBHost());
+                params.put("db_username", SharedPref.mInstance.getDBUsername());
+                params.put("db_password", SharedPref.mInstance.getDBPassword());
                 params.put("db_name", SharedPref.mInstance.getDBName());
                 return params;
             }
@@ -671,7 +665,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase("digital_sign")) {
-                //Extract your data - better to use constants...
+                // Extract your data - better to use constants...
                 String Signed = intent.getStringExtra("Signed");
                 digitalSignPath = intent.getStringExtra("path");
                 if (Signed.equalsIgnoreCase("true")) {
@@ -691,14 +685,13 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase("ammonia_delivery")) {
-                //Extract your data - better to use constants...
-                s=intent.getStringExtra("ammonia_no");
-                String volume= intent.getStringExtra("volume");
-                String fill_with= intent.getStringExtra("fill_with");
+                // Extract your data - better to use constants...
+                s = intent.getStringExtra("ammonia_no");
+                String volume = intent.getStringExtra("volume");
+                String fill_with = intent.getStringExtra("fill_with");
 
-                if(s!=null)
-                {
-                    login(s,"yes",fill_with,volume);
+                if (s != null) {
+                    login(s, "yes", fill_with, volume);
                 }
             }
 
@@ -730,7 +723,6 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 item_volume.add(TMEDOXVOLUME);
                 itemq.add(String.valueOf(TMEDOXCOUNT));
             }
-
 
         }
     }

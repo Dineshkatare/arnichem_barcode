@@ -24,23 +24,23 @@ import com.google.zxing.Result;
 import java.util.StringTokenizer;
 
 public class AddFullReciptActivity extends AppCompatActivity {
-    Button add_button,finish;
+    Button add_button, finish;
     private CodeScanner mCodeScanner;
     FullReciptHelper myDB;
     syncHelper synchelper;
     FrameLayout frameLayout;
-    int i=1;
+    int i = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_full_recipt);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        frameLayout=findViewById(R.id.framelayoutempty);
-        myDB=new FullReciptHelper(AddFullReciptActivity.this);
-        synchelper=new syncHelper(AddFullReciptActivity.this);
-//        title_input = findViewById(R.id.title_input);
-//        add_button = findViewById(R.id.add_button);
+        frameLayout = findViewById(R.id.framelayoutempty);
+        myDB = new FullReciptHelper(AddFullReciptActivity.this);
+        synchelper = new syncHelper(AddFullReciptActivity.this);
+        // title_input = findViewById(R.id.title_input);
+        // add_button = findViewById(R.id.add_button);
         finish = findViewById(R.id.go);
         CodeScannerView scannerView = findViewById(R.id.outscannerview);
         mCodeScanner = new CodeScanner(this, scannerView);
@@ -50,41 +50,42 @@ public class AddFullReciptActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        String res= result.getText();
-                        if(res==null)
-                        {
+                        String res = result.getText();
+                        if (res == null) {
                             Toast.makeText(AddFullReciptActivity.this, "null", Toast.LENGTH_SHORT).show();
-                            //assign some value to result
-                        }
-                        else if(res.contains("="))
-                        {
+                            // assign some value to result
+                        } else if (res.contains("=")) {
                             StringTokenizer tokens = new StringTokenizer(res, "=");
                             String first = tokens.nextToken();// this will contain "Fruit"
                             String second = tokens.nextToken();
-//                            title_input.setText(second);
+                            // title_input.setText(second);
                             Cursor cursor = synchelper.readAllData();
                             if (cursor.getCount() == 0) {
-                                //      empty_imageview.setVisibility(View.VISIBLE);
-                                //      no_data.setVisibility(View.VISIBLE);
+                                // empty_imageview.setVisibility(View.VISIBLE);
+                                // no_data.setVisibility(View.VISIBLE);
                             } else {
                                 while (cursor.moveToNext()) {
-                                    String col=cursor.getString(1);
-                                    String col1 =cursor.getString(2);
-                                    if(col1.contentEquals(second))
-                                    {
-                                        if(i==1)
-                                        {
-                                        //    myDB.addBook(col,"no");
-                                            Snackbar.make(frameLayout, "तुमचा बारकोड नंबर सिलेंडर नंबर "+col+" शी जोडला आहे ", Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN).setTextColor(Color.BLACK).show();
+                                    String col = cursor.getString(1);
+                                    String col1 = cursor.getString(2);
+                                    String volume = cursor.getString(4);
+                                    String filledWith = cursor.getString(5);
+                                    if (col1.contentEquals(second)) {
+                                        if (i == 1) {
+                                            myDB.addBook(col, filledWith, volume, "no");
+                                            Snackbar.make(frameLayout,
+                                                    "तुमचा बारकोड नंबर सिलेंडर नंबर " + col + " शी जोडला आहे ",
+                                                    Snackbar.LENGTH_LONG).setBackgroundTint(Color.GREEN)
+                                                    .setTextColor(Color.BLACK).show();
                                             i++;
                                         }
                                     }
                                 }
                             }
 
-                        }
-                        else {
-                            Snackbar.make(frameLayout, "तुमचा स्कॅन आमच्या सिलेंडर नंबर शी मिळत नाही आहे कृपाया परत स्कॅन करा ", Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
+                        } else {
+                            Snackbar.make(frameLayout,
+                                    "तुमचा स्कॅन आमच्या सिलेंडर नंबर शी मिळत नाही आहे कृपाया परत स्कॅन करा ",
+                                    Snackbar.LENGTH_LONG).setBackgroundTint(Color.RED).setTextColor(Color.WHITE).show();
 
                         }
                     }
@@ -105,10 +106,7 @@ public class AddFullReciptActivity extends AppCompatActivity {
             }
         });
 
-
     }
-
-
 
     @Override
     protected void onResume() {
@@ -126,12 +124,11 @@ public class AddFullReciptActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(myDB != null)
+        if (myDB != null)
             myDB.close();
 
-        if(synchelper != null)
+        if (synchelper != null)
             synchelper.close();
-
 
     }
 }
