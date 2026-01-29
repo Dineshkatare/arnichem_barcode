@@ -24,6 +24,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -265,6 +266,18 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 status = true;
                 Intent intent = new Intent(AmmoniaMaindelivery.this, NewScanner.class);
                 intent.putExtra("type", "delivery");
+                startActivity(intent);
+            }
+        });
+
+        FloatingActionButton barcode_scan_fab = findViewById(R.id.barcode_scan_fab);
+        barcode_scan_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                status = true;
+                Intent intent = new Intent(AmmoniaMaindelivery.this,
+                        com.arnichem.arnichem_barcode.Barcode.LaserScannerActivity.class);
+                intent.putExtra("type", "ammonia_delivery");
                 startActivity(intent);
             }
         });
@@ -517,6 +530,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
 
                         }
                     }) {
+
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     Map<String, String> params = new HashMap<>();
@@ -545,6 +559,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                     params.put("db_name", SharedPref.mInstance.getDBName());
                     return params;
                 }
+
             };
             VolleySingleton.getInstance(AmmoniaMaindelivery.this).addToRequestQueue(stringRequest);
 
@@ -598,12 +613,100 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when returning from scanner or other activities
+        id.clear();
+        cylindername.clear();
+        cylinder.clear();
+        adfull.clear();
+        adempty.clear();
+        adnet.clear();
+        lastnet.clear();
+        is_scan.clear();
+
+        storeDataInArrays();
+        check();
+        totalscanval.setText(String.valueOf(count));
+
+        if (deliadapter != null) {
+            deliadapter.notifyDataSetChanged();
+        }
+
+        if (count != 0) {
+            FullTv.setVisibility(View.VISIBLE);
+            emptyTv.setVisibility(View.VISIBLE);
+            netTv.setVisibility(View.VISIBLE);
+            cylinderTv.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event == null) {
+            return false;
+        }
+        int action = event.getAction();
+        if (action == KeyEvent.ACTION_UP) {
+            char pressedKey = (char) event.getUnicodeChar();
+            if (pressedKey != 0) {
+                if (pressedKey == 10) { // Enter key
+                    String scannedCode = deliverycylindersea.getText().toString().trim();
+                    if (!scannedCode.isEmpty()) {
+                        processScannedCode(scannedCode);
+                        deliverycylindersea.setText("");
+                    }
+                } else {
+                    // Let the AutoCompleteTextView handle valid characters if focused,
+                    // or append if we were building a buffer (but here we rely on the view having
+                    // focus or getting text)
+                    // A simple approach for hardware scanners usually acting as keyboard:
+                    // They type into the focused field (deliverycylindersea) and send Enter.
+                }
+            }
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    private void processScannedCode(String scannedCode) {
+        Cursor cursor = synchelper.readAllData();
+        boolean found = false;
+        if (cursor.getCount() != 0) {
+            while (cursor.moveToNext()) {
+                String volume = cursor.getString(4);
+                String Fillwith = cursor.getString(5);
+                String col1 = cursor.getString(1); // Item Code
+                String barcode = cursor.getString(2); // Barcode
+
+                // Match against Item Code OR Barcode
+                if (col1.contentEquals(scannedCode) || barcode.contentEquals(scannedCode)) {
+                    // Use item code for the entry
+                    login(col1, "yes", Fillwith, volume);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found) {
+            // If not found in local syncDB, maybe try to add anyway or show error?
+            // Existing logic in manual entry only adds if found.
+            // But we can try to add whatever was scanned if strictly needed?
+            // Let's stick to existing pattern: If "No Data" toast in syncHelper?
+            // Actually manual entry (onItemClick) only does `login` if match found.
+            MDToast.makeText(AmmoniaMaindelivery.this, "Cylinder not found in local DB", MDToast.LENGTH_SHORT,
+                    MDToast.TYPE_WARNING).show();
+        }
+    }
+
     private void login(String cyl, String is_scan, String fill_with, String volume) {
         dialog = new ProgressDialog(AmmoniaMaindelivery.this);
         dialog.setTitle("Data Inserting");
         dialog.setMessage("Please wait....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.show();
+
         StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.ammonia_del_update,
                 new Response.Listener<String>() {
                     @SuppressLint("WrongConstant")
@@ -636,8 +739,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                },
-                new Response.ErrorListener() {
+                }, new Response.ErrorListener() {
                     @SuppressLint("WrongConstant")
                     @Override
                     public void onErrorResponse(VolleyError error) {
@@ -647,6 +749,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                         error.printStackTrace();
                     }
                 }) {
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
@@ -689,8 +792,29 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 s = intent.getStringExtra("ammonia_no");
                 String volume = intent.getStringExtra("volume");
                 String fill_with = intent.getStringExtra("fill_with");
+                String full_wt = intent.getStringExtra("full_wt");
+                String empty_wt = intent.getStringExtra("empty_wt");
+                String net_wt = intent.getStringExtra("net_wt");
+                String is_scan = intent.getStringExtra("is_scan");
 
-                if (s != null) {
+                // If coming from LaserScannerActivity with full details (API success)
+                if (full_wt != null && empty_wt != null) {
+                    // It is already added to DB in LaserScannerActivity?
+                    // If LaserScannerActivity adds to `delidb`, then we just need to refresh.
+                    // But if we want to rely on this broadcast to Add from LaserScanner:
+                    // Current LaserScannerActivity logic will change to add to delidb directly.
+                    // So we might just refresh here.
+
+                    // However, existing logic uses this receiver to call `login` which does API
+                    // call too?
+                    // No, `login` does API call `ammonia_del_update`.
+
+                    // If LaserScannerActivity ALREADY did API call, we shouldn't do it again here.
+                    // We should just refresh UI.
+                    storeDataInArrays(); // Refetch
+                    if (deliadapter != null)
+                        deliadapter.notifyDataSetChanged();
+                } else if (s != null) {
                     login(s, "yes", fill_with, volume);
                 }
             }

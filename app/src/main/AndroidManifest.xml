@@ -211,6 +211,18 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".other_entries.OtherEntriesSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".other_entries.CustomerEmptyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".other_entries.CustomerEmptyPrintActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".BarcodeScan"
             android:exported="true"
             android:screenOrientation="portrait" />

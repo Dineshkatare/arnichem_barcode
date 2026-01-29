@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".other_entries.CustomerEmptyPrintActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Customer Empty Receipt"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
+
+            <ImageView
+                android:id="@+id/phoneImg"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:layout_marginTop="10dp"/>
+
+            <ImageView
+                android:id="@+id/printImg"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:scaleType="fitXY"
+                android:layout_marginTop="10dp"/>
+
+            <!-- Date -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                <TextView android:text="Date:" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtDate" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"/>
+            </LinearLayout>
+
+            <!-- Customer -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                <TextView android:text="Customer:" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtCustomer" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"/>
+            </LinearLayout>
+
+            <!-- Location -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                <TextView android:text="Location:" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtLocation" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"/>
+            </LinearLayout>
+            
+             <!-- Vehicle -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                <TextView android:text="Vehicle:" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtVehicle" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"/>
+            </LinearLayout>
+
+            <!-- Description -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                <TextView android:text="Description:" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtDescription" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"/>
+            </LinearLayout>
+
+            <!-- Remarks -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                <TextView android:text="Remarks:" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtRemarks" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2"/>
+            </LinearLayout>
+
+            
+            <TextView android:id="@+id/signTxt" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:gravity="end" android:textStyle="bold" android:text="Authorized Signatory"/>
+
+            <Button
+                android:id="@+id/btnPrint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:text="Print"/>
+                
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

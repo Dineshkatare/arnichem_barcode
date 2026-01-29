@@ -150,6 +150,25 @@ public interface APIInterface {
                         @Part MultipartBody.Part sign);
 
         @Multipart
+        @POST(APIClient.empty_cust_main_entry)
+        Call<ResponseBody> uploadCustEmpty(
+                        @Part("cust_code") RequestBody custCode,
+                        @Part("transport_type") RequestBody transportType,
+                        @Part("transport_no") RequestBody transportNo,
+                        @Part("driver") RequestBody driver,
+                        @Part("empb") RequestBody empb,
+                        @Part("description") RequestBody description,
+                        @Part("remarks") RequestBody remarks,
+                        @Part("addr") RequestBody addr,
+                        @Part("lati") RequestBody lati,
+                        @Part("logi") RequestBody logi,
+                        @Part("email") RequestBody email,
+                        @Part("db_host") RequestBody dbHost,
+                        @Part("db_username") RequestBody dbUsername,
+                        @Part("db_password") RequestBody dbPassword,
+                        @Part("db_name") RequestBody dbName);
+
+        @Multipart
         @POST("dura_delivery_entry_v6.2.php") // Replace with your actual endpoint
         Call<MyResponseModel> uploadDeliveryData(
                         @Part("dura_code") RequestBody duraCode,
@@ -377,4 +396,21 @@ public interface APIInterface {
                         @Field("db_name") String dbName,
                         @Field("email") String email);
 
+        @FormUrlEncoded
+        @POST("get_device_list.php")
+        Call<ResponseBody> getDeviceList(
+                        @Field("db_host") String dbHost,
+                        @Field("db_username") String dbUsername,
+                        @Field("db_password") String dbPassword,
+                        @Field("db_name") String dbName);
+
+        @FormUrlEncoded
+        @POST("update_user_device.php")
+        Call<ResponseBody> updateUserDevice(
+                        @Field("db_host") String dbHost,
+                        @Field("db_username") String dbUsername,
+                        @Field("db_password") String dbPassword,
+                        @Field("db_name") String dbName,
+                        @Field("device_name") String deviceName,
+                        @Field("user_email") String userEmail);
 }

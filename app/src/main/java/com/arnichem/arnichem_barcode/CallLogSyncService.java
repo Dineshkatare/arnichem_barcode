@@ -85,13 +85,15 @@ public class CallLogSyncService extends Service {
         Log.d("CallLogSyncService", "Fetched call logs: " + callLogs.size());
 
         // Upload the call logs
-      //  uploadCallLogs(callLogs);
+        uploadCallLogs(callLogs); // Uncommented to enable upload
     }
 
     private void uploadCallLogs(List<LogObject> callLogs) {
         // Convert call logs to JSON
         Gson gson = new Gson();
         String callLogsJson = gson.toJson(callLogs);
+
+        Log.d("CallLogSyncService", "API Request Data (Call Logs): " + callLogsJson); // Added log
 
         // Create API instance and make the call
         APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);

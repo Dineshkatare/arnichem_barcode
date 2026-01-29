@@ -30,6 +30,21 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/barcodeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="Barcode Mode"
+                android:textSize="18sp"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:textStyle="bold"
+                app:showText="true"
+                android:thumb="@drawable/thumb_selector"
+                app:track="@drawable/track_selector" />
+
             <LinearLayout
                 android:id="@+id/selectManifold"
                 android:layout_width="match_parent"

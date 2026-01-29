@@ -216,7 +216,7 @@ public class SwitchDriverActivity extends AppCompatActivity {
                 params.put("app_pin", pinvalue.toString());
                 params.put("ipaddress", ipstr);
                 params.put("imei", imeistr);
-                params.put("appversion", "9.4");
+                params.put("appversion", "10.0");
                 params.put("lati", "0"); // No location needed for switch?
                 params.put("logi", "0");
                 params.put("addr", "Switch User");

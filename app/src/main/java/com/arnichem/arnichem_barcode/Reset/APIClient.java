@@ -27,6 +27,7 @@ public class APIClient {
     public static final String other_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/other_entry_v6.2.php";// DONE
 
     public static final String godown_empty_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_empty_entry_v8.5.php";// DONE
+    public static final String empty_cust_main_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/empty_cust_main.php";
 
     public static final String full_recipt_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/full_recipt_entry_v4.5.php"; // DONE
     public static final String godown_fullrecipt_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/godown_fullrecipt_entry_v4.5.php";// DONE

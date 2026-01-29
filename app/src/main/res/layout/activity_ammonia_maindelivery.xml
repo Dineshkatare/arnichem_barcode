@@ -387,6 +387,19 @@
 
     </ScrollView>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/barcode_scan_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/deliveryscan"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:backgroundTint="@color/teal_200"
+        app:srcCompat="@drawable/barcode" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/deliveryscan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -396,7 +409,7 @@
         android:layout_marginBottom="28dp"
         android:clickable="true"
         android:focusable="true"
-        app:srcCompat="@drawable/barcode" />
+        app:srcCompat="@drawable/baseline_camera_alt_24" />
 
 
 </RelativeLayout>

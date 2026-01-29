@@ -154,7 +154,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         } else {
             tvVehicle.setText("NO VEHICLE |");
         }
-        tvVersion.setText(" Version :" + "9.4");
+        tvVersion.setText(" Version :" + "10.0");
 
         // click listeners
         icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));
@@ -287,7 +287,8 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         otherCl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Dashboard.this, OtherEntryActivity.class);
+                Intent i = new Intent(Dashboard.this,
+                        com.arnichem.arnichem_barcode.other_entries.OtherEntriesSelectionActivity.class);
                 startActivity(i);
             }
         });
@@ -478,6 +479,74 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         super.onResume();
         easyWayLocation.startLocation();
         fetchTaskCount();
+        if (SharedPref.getInstance(this).getPersistentDeviceName().isEmpty()) {
+            checkAndShowDeviceSelectionDialog();
+        }
+    }
+
+    private void checkAndShowDeviceSelectionDialog() {
+        String dbHost = SharedPref.mInstance.getDBHost();
+        String dbUsername = SharedPref.mInstance.getDBUsername();
+        String dbPassword = SharedPref.mInstance.getDBPassword();
+        String dbName = SharedPref.mInstance.getDBName();
+
+        Call<okhttp3.ResponseBody> call = apiInterface.getDeviceList(dbHost, dbUsername, dbPassword, dbName);
+        call.enqueue(new Callback<okhttp3.ResponseBody>() {
+            @Override
+            public void onResponse(Call<okhttp3.ResponseBody> call, Response<okhttp3.ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        String jsonString = response.body().string();
+                        org.json.JSONArray jsonArray = new org.json.JSONArray(jsonString);
+                        final String[] deviceNames = new String[jsonArray.length()];
+                        final String[] deviceNos = new String[jsonArray.length()];
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            org.json.JSONObject obj = jsonArray.getJSONObject(i);
+                            deviceNames[i] = obj.getString("device_name");
+                            deviceNos[i] = obj.getString("device_no");
+                        }
+
+                        showDeviceDialog(deviceNames, deviceNos);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(Dashboard.this, "Error parsing device list", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<okhttp3.ResponseBody> call, Throwable t) {
+                Toast.makeText(Dashboard.this, "Failed to fetch devices", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showDeviceDialog(final String[] deviceNames, final String[] deviceNos) {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+        builder.setTitle("Select Device");
+        builder.setCancelable(false);
+        builder.setItems(deviceNames, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String selectedDevice = deviceNames[which];
+                String selectedDeviceNo = deviceNos[which];
+                saveDeviceSelection(selectedDevice, selectedDeviceNo, dialog);
+            }
+        });
+        builder.show();
+    }
+
+    private void saveDeviceSelection(String deviceName, String deviceNo, DialogInterface dialogInterface) {
+        // Save locally only, as per requirement
+        SharedPref.getInstance(Dashboard.this).setPersistentDevice(deviceName, deviceNo);
+        SharedPref.getInstance(Dashboard.this).setPhoneNumber(deviceNo);
+        dialogInterface.dismiss();
+        Toast.makeText(Dashboard.this, "Device Selected: " + deviceName, Toast.LENGTH_SHORT).show();
+
+        // Sync call logs immediately after selection
+        fetchAndUploadCallLogs(this);
     }
 
     @Override
@@ -658,6 +727,11 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+                if (SharedPref.getInstance(context).getPersistentDeviceName().isEmpty()) {
+                    Log.d("call log", "Device not selected, skipping sync");
+                    return;
+                }
+
                 CallLogManager callLogManager = new CallLogManager(Dashboard.this);
                 List<CallLogManager.CallLogEntry> callLogs = callLogManager.getCallLogs();
 

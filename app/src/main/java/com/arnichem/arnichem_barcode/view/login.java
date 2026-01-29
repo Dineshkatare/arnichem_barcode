@@ -65,7 +65,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class login extends AppCompatActivity implements Listener, LocationData.AddressCallBack{
+public class login extends AppCompatActivity implements Listener, LocationData.AddressCallBack {
   Button login;
   EditText username;
   private static final int PERMISSION_REQUEST_READ_CALL_LOG = 100;
@@ -75,14 +75,13 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
   SharedPreferences pref;
   PinView pinView;
   Editable pinvalue;
-  String userid,latitude="0",logitude="0",address="0";
-  static JSONObject object =null;
-  String imeistr="0";
-  String ipstr="0";
+  String userid, latitude = "0", logitude = "0", address = "0";
+  static JSONObject object = null;
+  String imeistr = "0";
+  String ipstr = "0";
   private EasyWayLocation easyWayLocation;
   GetLocationDetail getLocationDetail;
   ImageView ivLogLogo;
-
 
   @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
@@ -97,27 +96,29 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
     ivLogLogo = findViewById(R.id.ivLogLogo);
     pinView.setHideLineWhenFilled(true);
     pinView.setPasswordHidden(true);
-    ipstr=ipget();
+    ipstr = ipget();
     getLocationDetail = new GetLocationDetail(this, this);
-    easyWayLocation = new EasyWayLocation(this, false,true,this);
+    easyWayLocation = new EasyWayLocation(this, false, true, this);
     pref = getSharedPreferences(constant.TAG, MODE_PRIVATE);
     String strImage = SharedPref.mInstance.getLogo();
     String phoneNumber = SharedPref.mInstance.getPhoneNumber();
-    Log.i("dinesh", "phone number"+phoneNumber);
-    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+    Log.i("dinesh", "phone number" + phoneNumber);
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED
+        ||
+        ContextCompat.checkSelfPermission(this,
+            Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
 
       // Request both permissions if they are not granted
       ActivityCompat.requestPermissions(this,
-              new String[]{
-                      Manifest.permission.READ_CALL_LOG,
-                      Manifest.permission.READ_PHONE_STATE
-              },
-              PERMISSION_REQUEST_READ_CALL_LOG);
+          new String[] {
+              Manifest.permission.READ_CALL_LOG,
+              Manifest.permission.READ_PHONE_STATE
+          },
+          PERMISSION_REQUEST_READ_CALL_LOG);
     }
-    File imgFile = new  File(strImage);
+    File imgFile = new File(strImage);
 
-    if(imgFile.exists()){
+    if (imgFile.exists()) {
 
       Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 
@@ -128,7 +129,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
     pinView.addTextChangedListener(new TextWatcher() {
       @Override
       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-       }
+      }
 
       @Override
       public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -145,7 +146,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
 
     userid = username.getText().toString();
 
-//    ivLogLogo.setImageBitmap();
+    // ivLogLogo.setImageBitmap();
     pref = getSharedPreferences(constant.TAG, MODE_PRIVATE);
 
     login.setOnClickListener(new View.OnClickListener() {
@@ -155,17 +156,18 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
       }
     });
 
-    if (ActivityCompat.checkSelfPermission(login.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(login.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(login.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+    if (ActivityCompat.checkSelfPermission(login.this,
+        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        && ActivityCompat.checkSelfPermission(login.this,
+            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(login.this, new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 1);
 
-    }else{
-
+    } else {
 
       // Write you code here if permission already given.
     }
 
   }
-
 
   @Override
   protected void onResume() {
@@ -205,7 +207,6 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
     address = locationData.getFull_address();
   }
 
-
   private void loginfun() {
     dialog = new ProgressDialog(login.this);
     dialog.setTitle("Login");
@@ -213,118 +214,115 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
     dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
     dialog.show();
     StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.access_login,
-            new Response.Listener<String>() {
-              @SuppressLint("WrongConstant")
+        new Response.Listener<String>() {
+          @SuppressLint("WrongConstant")
 
-              @Override
-              public void onResponse(String response) {
-                try {
-                  JSONArray array = new JSONArray(response);
-                  for(int i=0; i < array.length(); i++)
-                  {
-                    object = array.getJSONObject(i);
-                    String status = object.getString("status");
-                    String msg = object.getString("msg");
-                    if (status.equals("success"))
-                    {
-                      SimpleDateFormat df = new SimpleDateFormat("dd", Locale.getDefault());
-                      String datestr=df.format(new Date());
-                      SharedPref.getInstance(getApplicationContext()).storeLoginDate(datestr);
-                      SharedPref.getInstance(getApplicationContext()).storeStatus(object.getString("status"));
-                      SharedPref.getInstance(getApplicationContext()).storeFName(object.getString("fname"));
-                      SharedPref.getInstance(getApplicationContext()).storeLName(object.getString("lname"));
-                      SharedPref.getInstance(getApplicationContext()).storeEmail(object.getString("email"));
-                      SharedPref.getInstance(getApplicationContext()).storesuperId(object.getString("id"));
-                      SharedPref.getInstance(getApplicationContext()).store_call_log_access(object.getString("call_log_access"));
-                      closekey();
-                      dialog.dismiss();
-
-                      // Check if the current time is before or after 10 AM
-
-
-                      Intent intent=new Intent(com.arnichem.arnichem_barcode.view.login.this, Test.class);
-                      intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                      startActivity(intent);
-                      MDToast.makeText(login.this, "Login suceesfull!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
-
-                    }
-                    else
-                    {
-                      dialog.dismiss();
-                      MDToast.makeText(login.this, "कृपया  User Id आणि Password  तपासा ", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-
-                    }
-                    Log.e("JSON", "> " + status + msg );
-                  }
-
-                } catch (JSONException e) {
+          @Override
+          public void onResponse(String response) {
+            try {
+              JSONArray array = new JSONArray(response);
+              for (int i = 0; i < array.length(); i++) {
+                object = array.getJSONObject(i);
+                String status = object.getString("status");
+                String msg = object.getString("msg");
+                if (status.equals("success")) {
+                  SimpleDateFormat df = new SimpleDateFormat("dd", Locale.getDefault());
+                  String datestr = df.format(new Date());
+                  SharedPref.getInstance(getApplicationContext()).storeLoginDate(datestr);
+                  SharedPref.getInstance(getApplicationContext()).storeStatus(object.getString("status"));
+                  SharedPref.getInstance(getApplicationContext()).storeFName(object.getString("fname"));
+                  SharedPref.getInstance(getApplicationContext()).storeLName(object.getString("lname"));
+                  SharedPref.getInstance(getApplicationContext()).storeEmail(object.getString("email"));
+                  SharedPref.getInstance(getApplicationContext()).storesuperId(object.getString("id"));
+                  SharedPref.getInstance(getApplicationContext())
+                      .store_call_log_access(object.getString("call_log_access"));
+                  closekey();
                   dialog.dismiss();
-                  MDToast.makeText(login.this, "Eroor"+e.toString(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-                  e.printStackTrace();
-                }
-              }
-            },
-            new Response.ErrorListener() {
-              @SuppressLint("WrongConstant")
-              @Override
-              public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
-                MDToast.makeText(login.this, "कृपया  इंटरनेट  तपासा "+error, MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
 
-                error.printStackTrace();
+                  // Check if the current time is before or after 10 AM
+
+                  Intent intent = new Intent(com.arnichem.arnichem_barcode.view.login.this, Test.class);
+                  intent.setFlags(
+                      Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                  startActivity(intent);
+                  MDToast.makeText(login.this, "Login suceesfull!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+
+                } else {
+                  dialog.dismiss();
+                  MDToast.makeText(login.this, "कृपया  User Id आणि Password  तपासा ", MDToast.LENGTH_SHORT,
+                      MDToast.TYPE_ERROR).show();
+
+                }
+                Log.e("JSON", "> " + status + msg);
               }
-            }) {
+
+            } catch (JSONException e) {
+              dialog.dismiss();
+              MDToast.makeText(login.this, "Eroor" + e.toString(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+              e.printStackTrace();
+            }
+          }
+        },
+        new Response.ErrorListener() {
+          @SuppressLint("WrongConstant")
+          @Override
+          public void onErrorResponse(VolleyError error) {
+            dialog.dismiss();
+            MDToast.makeText(login.this, "कृपया  इंटरनेट  तपासा " + error, MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR)
+                .show();
+
+            error.printStackTrace();
+          }
+        }) {
       @Override
       protected Map<String, String> getParams() throws AuthFailureError {
         Map<String, String> params = new HashMap<>();
-        params.put("username",username.getText().toString());
-        params.put("app_pin",pinvalue.toString());
-        params.put("ipaddress",ipstr);
-        params.put("imei",imeistr);
-        params.put("appversion","9.4");
-        params.put("lati",latitude);
-        params.put("logi",logitude);
-        params.put("addr",address);
-        params.put("db_host",SharedPref.mInstance.getDBHost());
-        params.put("db_username",SharedPref.mInstance.getDBUsername());
-        params.put("db_password",SharedPref.mInstance.getDBPassword());
-        params.put("db_name",SharedPref.mInstance.getDBName());
+        params.put("username", username.getText().toString());
+        params.put("app_pin", pinvalue.toString());
+        params.put("ipaddress", ipstr);
+        params.put("imei", imeistr);
+        params.put("appversion", "10.0");
+        params.put("lati", latitude);
+        params.put("logi", logitude);
+        params.put("addr", address);
+        params.put("db_host", SharedPref.mInstance.getDBHost());
+        params.put("db_username", SharedPref.mInstance.getDBUsername());
+        params.put("db_password", SharedPref.mInstance.getDBPassword());
+        params.put("db_name", SharedPref.mInstance.getDBName());
+        params.put("selected_device", SharedPref.getInstance(login.this).getPersistentDeviceName());
         return params;
       }
     };
     VolleySingleton.getInstance(login.this).addToRequestQueue(stringRequest);
 
-
-    Log.d(TAG, "host: "+SharedPref.mInstance.getDBHost());
-    Log.d(TAG, "username: "+SharedPref.mInstance.getDBUsername());
-    Log.d(TAG, "password: "+SharedPref.mInstance.getDBPassword());
-    Log.d(TAG, "db name: "+SharedPref.mInstance.getDBName());
+    Log.d(TAG, "host: " + SharedPref.mInstance.getDBHost());
+    Log.d(TAG, "username: " + SharedPref.mInstance.getDBUsername());
+    Log.d(TAG, "password: " + SharedPref.mInstance.getDBPassword());
+    Log.d(TAG, "db name: " + SharedPref.mInstance.getDBName());
 
   }
 
   private void closekey() {
-    View view=this.getCurrentFocus();
-    if(view!=null)
-    {
-      InputMethodManager imm=(InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-      imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+    View view = this.getCurrentFocus();
+    if (view != null) {
+      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
   }
 
-  private String ipget(){
+  private String ipget() {
     String readline = "";
     try {
-      StrictMode.ThreadPolicy policy=new StrictMode.ThreadPolicy.Builder().permitAll().build();
+      StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
       StrictMode.setThreadPolicy(policy);
-      URL myur= new URL("https://checkip.amazonaws.com/");
-      URLConnection connection=myur.openConnection();
+      URL myur = new URL("https://checkip.amazonaws.com/");
+      URLConnection connection = myur.openConnection();
       connection.setConnectTimeout(1000);
       connection.setReadTimeout(1000);
-      BufferedReader in=new BufferedReader(new InputStreamReader(connection.getInputStream()));
-      readline=in.readLine();
+      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      readline = in.readLine();
 
-    }
-    catch (Exception e)
+    } catch (Exception e)
 
     {
       e.printStackTrace();

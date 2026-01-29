@@ -16,6 +16,7 @@ public class vehicle_logout extends AppCompatActivity {
     ProgressDialog dialog;
     SharedPreferences pref;
     SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +27,9 @@ public class vehicle_logout extends AppCompatActivity {
         dialog.setMessage("Please wait....");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         SharedPref.getInstance(getApplicationContext()).storeVStatus("failed");
+        SharedPref.getInstance(getApplicationContext()).storeVehicleNumber("");
         dialog.show();
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {

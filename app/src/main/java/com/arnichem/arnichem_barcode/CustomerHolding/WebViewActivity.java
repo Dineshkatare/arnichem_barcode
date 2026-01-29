@@ -25,6 +25,7 @@ public class WebViewActivity extends AppCompatActivity {
     WebView mywebview;
     String cust_code = "";
     SpinKitView spinKitView;
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class WebViewActivity extends AppCompatActivity {
         spinKitView = findViewById(R.id.spin_kit);
         mywebview = (WebView) findViewById(R.id.webView);
         Intent intent = getIntent();
-        cust_code = intent.getExtras().getString("code","");
+        cust_code = intent.getExtras().getString("code", "");
         spinKitView.setVisibility(View.VISIBLE);
 
         mywebview.getSettings().setJavaScriptEnabled(true); // enable javascript
@@ -48,6 +49,7 @@ public class WebViewActivity extends AppCompatActivity {
                 spinKitView.setVisibility(View.GONE);
 
             }
+
             @TargetApi(android.os.Build.VERSION_CODES.M)
             @Override
             public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
@@ -61,12 +63,14 @@ public class WebViewActivity extends AppCompatActivity {
         String username = SharedPref.getInstance(this).getEmail();
         String companyName = SharedPref.getInstance(this).getCompanyShortName();
 
-
-       // String fullUrl = "http://arnichem.co.in/intranet/1239812038120831.php?code=" + cust_code + "&username=" + SharedPref.getInstance(WebViewActivity.this).getEmail();
-        String fullUrl = "https://arnisol.com/intranet/verify_pin.php?target=holding&username=" + username + "&company_name="
-                + companyName;
-        Log.d("url",""+fullUrl);
-         mywebview.loadUrl(fullUrl);
+        // String fullUrl = "http://arnichem.co.in/intranet/1239812038120831.php?code="
+        // + cust_code + "&username=" +
+        // SharedPref.getInstance(WebViewActivity.this).getEmail();
+        String fullUrl = "https://arnisol.com/intranet/verify_pin.php?target=holding&username=" + username
+                + "&company_name="
+                + companyName + "&code=" + cust_code;
+        Log.d("url", "" + fullUrl);
+        mywebview.loadUrl(fullUrl);
         mywebview.setWebViewClient(new WebViewClient() {
             public void onPageFinished(WebView view, String url) {
                 // do your stuff here
@@ -75,8 +79,8 @@ public class WebViewActivity extends AppCompatActivity {
             }
         });
 
-
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

@@ -45,9 +45,8 @@ public class CallLogManager {
                 CallLog.Calls.CONTENT_URI,
                 null,
                 CallLog.Calls.DATE + " >= ?",
-                new String[]{String.valueOf(thirtyDaysAgo)},
-                CallLog.Calls.DATE + " DESC"
-        );
+                new String[] { String.valueOf(thirtyDaysAgo) },
+                CallLog.Calls.DATE + " DESC");
 
         if (cursor != null) {
             try {
@@ -79,10 +78,13 @@ public class CallLogManager {
                     String callUniqueId = removeCountryCode(phoneNumber) + "_" + callDate;
 
                     // Create CallLogEntry object
-                    CallLogEntry callLogEntry = new CallLogEntry(
-                            SharedPref.getInstance(context).getEmail(),phoneNumber, contactName, callTypeStr, callDate, callDuration, callUniqueId, simSlot, simSerialNumber
-                    );
+                    String deviceName = SharedPref.getInstance(context).getPersistentDeviceName();
+                 //   String deviceNo = SharedPref.getInstance(context).getPersistentDeviceNumber();
 
+                    CallLogEntry callLogEntry = new CallLogEntry(
+                            SharedPref.getInstance(context).getEmail(), phoneNumber, contactName, callTypeStr, callDate,
+                            callDuration, callUniqueId, simSlot, simSerialNumber,
+                            deviceName);
                     callLogList.add(callLogEntry);
                 }
             } finally {
@@ -97,6 +99,7 @@ public class CallLogManager {
         calendar.add(Calendar.DAY_OF_YEAR, -30);
         return calendar.getTimeInMillis();
     }
+
     private long getTwoDaysAgoTimestamp() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_YEAR, -2); // Subtract 2 days
@@ -105,9 +108,11 @@ public class CallLogManager {
 
     private String removeCountryCode(String phoneNumber) {
         if (phoneNumber.startsWith("+")) {
-            // Remove the leading "+" and trim the next 1-3 digits depending on the country code length
+            // Remove the leading "+" and trim the next 1-3 digits depending on the country
+            // code length
             // Assuming country codes are between 1 and 3 digits
-            // Adjust the length if you have a fixed length or use a library to handle country codes
+            // Adjust the length if you have a fixed length or use a library to handle
+            // country codes
             String trimmedNumber = phoneNumber.replaceFirst("^\\+\\d{1,3}", "");
             return trimmedNumber;
         } else {
@@ -115,6 +120,7 @@ public class CallLogManager {
             return phoneNumber;
         }
     }
+
     private String getCallTypeString(int callType) {
         switch (callType) {
             case CallLog.Calls.INCOMING_TYPE:
@@ -132,7 +138,8 @@ public class CallLogManager {
         SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
 
         // Check for permission
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context,
+                android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             return "Permission Denied";
         }
 
@@ -148,12 +155,12 @@ public class CallLogManager {
         return "Unknown";
     }
 
-
     private String getSimSerialNumber(String phoneAccountId) {
         SubscriptionManager subscriptionManager = SubscriptionManager.from(context);
 
         // Check for READ_PHONE_STATE permission
-        if (ActivityCompat.checkSelfPermission(context, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(context,
+                android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             return "Permission Denied";
         }
 
@@ -162,7 +169,7 @@ public class CallLogManager {
             for (SubscriptionInfo info : subscriptionInfoList) {
                 Log.d("SIMInfo", "IccId: " + info.getIccId());
                 if (info.getIccId().equals(phoneAccountId)) {
-                    return info.getIccId();  // SIM Serial Number
+                    return info.getIccId(); // SIM Serial Number
                 }
             }
         }
@@ -175,8 +182,9 @@ public class CallLogManager {
             Gson gson = new Gson();
             String callLogsJson = gson.toJson(callLogs); // Convert list to JSON string
 
-
-            Call<ApiResponse> call = apiInterface.sendCallLogs( SharedPref.mInstance.getDBHost(), SharedPref.mInstance.getDBUsername(), SharedPref.mInstance.getDBPassword(), SharedPref.mInstance.getDBName(),callLogsJson);
+            Call<ApiResponse> call = apiInterface.sendCallLogs(SharedPref.mInstance.getDBHost(),
+                    SharedPref.mInstance.getDBUsername(), SharedPref.mInstance.getDBPassword(),
+                    SharedPref.mInstance.getDBName(), callLogsJson);
             try {
                 call.execute();
             } catch (Exception e) {
@@ -213,7 +221,11 @@ public class CallLogManager {
         @SerializedName("sim_serial_number")
         private final String simSerialNumber;
 
-        public CallLogEntry(String userName, String phoneNumber, String contactName, String callType, long callDate, String callDuration, String callUniqueId, String simSlot, String simSerialNumber) {
+        @SerializedName("user_phone_no")
+        private final String userPhoneNo;
+
+        public CallLogEntry(String userName, String phoneNumber, String contactName, String callType, long callDate,
+                String callDuration, String callUniqueId, String simSlot, String simSerialNumber, String deviceName) {
             user_name = userName;
             this.phoneNumber = phoneNumber;
             this.contactName = contactName;
@@ -223,6 +235,7 @@ public class CallLogManager {
             this.callUniqueId = callUniqueId;
             this.simSlot = simSlot;
             this.simSerialNumber = simSerialNumber;
+            this.userPhoneNo = deviceName;
         }
     }
 }

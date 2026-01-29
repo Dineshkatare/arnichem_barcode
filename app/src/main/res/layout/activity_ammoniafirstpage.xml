@@ -372,6 +372,7 @@
 
 
                 </LinearLayout>
+
                 <Button
                     android:id="@+id/nextpage"
                     android:layout_width="200dp"

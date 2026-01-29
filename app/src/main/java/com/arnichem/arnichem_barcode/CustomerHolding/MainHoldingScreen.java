@@ -25,8 +25,9 @@ public class MainHoldingScreen extends AppCompatActivity {
     Spinner customerspinnerdelivery;
     public int poslocfixdel, poscustfixdel;
     DatabaseHandler databaseHandlercustomer;
-    String to_warehouse,cust_code;
+    String to_warehouse, cust_code, cust_invoice;
     Button submitBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,7 @@ public class MainHoldingScreen extends AppCompatActivity {
                         String invoice = cursor.getString(3);
                         if (col.contentEquals(to_warehouse)) {
                             cust_code = col1;
+                            cust_invoice = invoice;
                         }
                     }
                 }
@@ -67,10 +69,11 @@ public class MainHoldingScreen extends AppCompatActivity {
         submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(poscustfixdel==0){
-                    MDToast.makeText(MainHoldingScreen.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                if (poscustfixdel == 0) {
+                    MDToast.makeText(MainHoldingScreen.this, "कृपया ग्राहक निवडा !", MDToast.LENGTH_SHORT,
+                            MDToast.TYPE_ERROR).show();
 
-                }else {
+                } else {
                     nextScreeen();
                 }
             }
@@ -78,8 +81,9 @@ public class MainHoldingScreen extends AppCompatActivity {
     }
 
     private void nextScreeen() {
-        Intent intent = new Intent(MainHoldingScreen.this,WebViewActivity.class);
-        intent.putExtra("code",cust_code);
+        Intent intent = new Intent(MainHoldingScreen.this, WebViewActivity.class);
+        intent.putExtra("code", cust_code);
+        intent.putExtra("customer_id", cust_invoice);
         startActivity(intent);
     }
 
@@ -93,7 +97,7 @@ public class MainHoldingScreen extends AppCompatActivity {
         // Drop down layout style - list view with radio button
         customerdataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        //  data adapter to spinner
+        // data adapter to spinner
         customerspinnerdelivery.setAdapter(customerdataAdapter);
         if (poscustfixdel != 0) {
             customerspinnerdelivery.setSelection(poscustfixdel);

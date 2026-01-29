@@ -353,7 +353,66 @@ public class SecondValidateDcActivity extends AppCompatActivity implements OnIte
 
     // dispatchKeyEvent removed. Logic moved to OnKeyListener.
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event == null) {
+            return false;
+        }
 
+        int action = event.getAction();
+
+        try {
+            if (action == KeyEvent.ACTION_DOWN) {
+                Log.d("KEYDOWN", event.getKeyCode() + "");
+            } else if (action == KeyEvent.ACTION_UP) {
+                char pressedKey = (char) event.getUnicodeChar();
+                Log.d("pressedKey != 0", pressedKey + "");
+                if (pressedKey != 0) {
+                    if (pressedKey == ',' || pressedKey == 10) {
+                        Log.d("pressedKey != ','", "inputHolder " + this.inputHolder);
+                        // Perform action based on inputHolder value
+                        // registerID(this.inputHolder); // Replace with your actual method call
+                        this.inputHolder = "";
+                    } else {
+                        this.inputHolder += pressedKey;
+                        Log.d("pressedKey", pressedKey + "");
+                    }
+                }
+                Log.d("KEYUP", event.getKeyCode() + "");
+            }
+
+            Log.d("load", newScan.getText().toString() + "");
+            android.os.Handler handler = new Handler();
+
+            // Create a runnable that will be executed after 1000 milliseconds (1 second)
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Do something here
+
+                    String text = newScan.getText().toString();
+                    if (!text.isEmpty()) {
+                        // Replace with your actual method call
+                        validateCylinder(text);
+                        Log.d("load1", newScan.getText().toString() + text);
+                    }
+                    newScan.setText("");
+                    newScan.requestFocus();
+                }
+            };
+
+            // Schedule the runnable to be executed after 1000 milliseconds
+            handler.postDelayed(runnable, 500);
+            // Delay the call to the `call()` method by 1000 milliseconds
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("DispatchKeyEvent", "An exception occurred: " + e.getMessage());
+        }
+
+        Log.d("KEY", event.getKeyCode() + "");
+        return false;
+    }
 
     @Override
     public void locationOn() {

@@ -18,12 +18,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.arnichem.arnichem_barcode.GodownView.godowndelivery.GodownDeliveryHelper;
 import com.arnichem.arnichem_barcode.GodownView.godownempty.GodownEmptyHelper;
 import com.arnichem.arnichem_barcode.OnItemClickListener;
+import com.arnichem.arnichem_barcode.Producation.NewAmmonia.ammadaoter;
+import com.arnichem.arnichem_barcode.Producation.NewAmmonia.ammoniaHelper;
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.TransactionsView.Empty.AddClyHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.InWard.InWardCustomAdapter;
@@ -32,7 +35,23 @@ import com.arnichem.arnichem_barcode.TransactionsView.Outward.CustomAdapter;
 import com.arnichem.arnichem_barcode.TransactionsView.Outward.MyDatabaseHelper;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.FilledWithAdapter;
 import com.arnichem.arnichem_barcode.TransactionsView.deliverynew.deliDB;
+import com.arnichem.arnichem_barcode.TransactionsView.deliveryAmmonia.ammoia_deliAdapter;
 import com.arnichem.arnichem_barcode.view.syncHelper;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.Reset.APIClient;
+import com.arnichem.arnichem_barcode.util.SharedPref;
+import com.arnichem.arnichem_barcode.view.VolleySingleton;
+import android.widget.Toast;
+import java.util.HashMap;
+import java.util.Map;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +79,10 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
     CustomAdapter outwardCustomAdapter;
     FilledWithAdapter filledWithAdapter;
     MyDatabaseHelper outwatdMyDB;
+    ammoniaHelper ammoniaHelperDB;
+    ammadaoter ammoniaAdapter;
+    ammoia_deliAdapter ammoniaDeliveryAdapter;
+    com.arnichem.arnichem_barcode.TransactionsView.deliveryAmmonia.deliDB ammoniaDeliveryDB;
 
     // Data Holders
     String count;
@@ -69,6 +92,9 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
     String dis = "";
     ArrayList<String> name, tot, volume;
     ArrayList<String> cylIdList, cyclinderNameList, fillwith;
+    // Ammonia Arrays
+    ArrayList<String> ammonia_id, ammonia_cylname, ammonia_mani, ammonia_vol, ammonia_distfull, ammonia_distnet;
+    ArrayList<String> ad_id, ad_cylname, ad_full, ad_empty, ad_net;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +124,9 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         synchelper = new syncHelper(LaserScannerActivity.this);
         addClyHelper = new AddClyHelper(LaserScannerActivity.this);
         godownDeliveryHelper = new GodownDeliveryHelper(LaserScannerActivity.this);
-        godownEmptyHelper = new GodownEmptyHelper(LaserScannerActivity.this);
+        godownEmptyHelper = new GodownEmptyHelper(this);
+        ammoniaHelperDB = new ammoniaHelper(this);
+        ammoniaDeliveryDB = new com.arnichem.arnichem_barcode.TransactionsView.deliveryAmmonia.deliDB(this);
         myDB = new InWardDatabaseHelper(LaserScannerActivity.this);
         delidb = new deliDB(LaserScannerActivity.this);
         outwatdMyDB = new MyDatabaseHelper(LaserScannerActivity.this);
@@ -114,6 +142,18 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         name = new ArrayList<>();
         tot = new ArrayList<>();
         volume = new ArrayList<>();
+        // Initialize Ammonia Arrays
+        ammonia_id = new ArrayList<>();
+        ammonia_cylname = new ArrayList<>();
+        ammonia_mani = new ArrayList<>();
+        ammonia_vol = new ArrayList<>();
+        ammonia_distfull = new ArrayList<>();
+        ammonia_distnet = new ArrayList<>();
+        ad_id = new ArrayList<>();
+        ad_cylname = new ArrayList<>();
+        ad_full = new ArrayList<>();
+        ad_empty = new ArrayList<>();
+        ad_net = new ArrayList<>();
 
         // Setup Scanner Input Resilience and Focus Management
         setupScannerInput();
@@ -274,6 +314,17 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             } else {
                 filledWithAdapter.notifyDataSetChanged();
             }
+        } else if (type.equalsIgnoreCase("ammonia_delivery")) {
+            storeAmmoniaDeliveryValues();
+            if (ammoniaDeliveryAdapter == null) {
+                ammoniaDeliveryAdapter = new ammoia_deliAdapter(LaserScannerActivity.this, LaserScannerActivity.this,
+                        ad_id, ad_cylname, ad_full, ad_empty, ad_net);
+                recyclerView.setAdapter(ammoniaDeliveryAdapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(LaserScannerActivity.this));
+            } else {
+                ammoniaDeliveryAdapter.notifyDataSetChanged();
+            }
+            Totalscanvalue.setText(count);
         }
 
         // 3. Update Text
@@ -367,6 +418,68 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
         }
     }
 
+    void storeAmmoniaValues() {
+        Cursor cursor = ammoniaHelperDB.readAllData();
+        // Clear previous data
+        ammonia_id.clear();
+        ammonia_cylname.clear();
+        ammonia_mani.clear();
+        ammonia_vol.clear();
+        ammonia_distfull.clear();
+        ammonia_distnet.clear();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                ammonia_id.add(cursor.getString(0));
+                ammonia_cylname.add(cursor.getString(1));
+                ammonia_distfull.add(cursor.getString(3));
+                ammonia_vol.add(cursor.getString(4));
+                ammonia_mani.add(cursor.getString(5));
+                ammonia_distnet.add(cursor.getString(6));
+            }
+            count = String.valueOf(cursor.getCount());
+        } else {
+            count = "0";
+        }
+        if (cursor != null)
+            cursor.close();
+    }
+
+    void storeAmmoniaDeliveryValues() {
+        Cursor cursor = ammoniaDeliveryDB.readAllData();
+        // Clear previous data
+        ad_id.clear();
+        ad_cylname.clear();
+        ad_full.clear();
+        ad_empty.clear();
+        ad_net.clear();
+
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
+                // Table: my_library
+                // 0: _id
+                // 1: cylname
+                // 2: fullcl (Full)
+                // 3: empty (Empty)
+                // 4: net (Net)
+                // 5: fill
+                // 6: vol
+                // 7: is_scan
+
+                ad_id.add(cursor.getString(0));
+                ad_cylname.add(cursor.getString(1));
+                ad_full.add(cursor.getString(2));
+                ad_empty.add(cursor.getString(3));
+                ad_net.add(cursor.getString(4));
+            }
+            count = String.valueOf(cursor.getCount());
+        } else {
+            count = "0";
+        }
+        if (cursor != null)
+            cursor.close();
+    }
+
     private void scanned(String displayValue) {
         // Basic Validation
         if (displayValue == null || displayValue.isEmpty())
@@ -409,6 +522,100 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
                 // Match found! Add to appropriate DB
                 if (type.equalsIgnoreCase("inward")) {
                     myDB.addBook(col, "B");
+                } else if (type.equalsIgnoreCase("ammonia_delivery")) {
+                    // API Call for Ammonia Delivery
+                    String finalCol = col;
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.ammonia_del_update,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    try {
+                                        JSONArray array = new JSONArray(response);
+                                        for (int i = 0; i < array.length(); i++) {
+                                            JSONObject object = array.getJSONObject(i);
+                                            String status = object.getString("status");
+                                            if (status.equalsIgnoreCase("success")) {
+                                                String fullwt = object.getString("full_wt");
+                                                String emtywt = object.getString("empty_wt");
+                                                String netwt = object.getString("net_wt");
+
+                                                String volume = "60"; // Default
+                                                String fill_with = "AMMONIA"; // Default
+
+                                                // Lookup local details
+                                                Cursor cursor = synchelper.readAllData();
+                                                if (cursor != null) {
+                                                    while (cursor.moveToNext()) {
+                                                        String colCode = cursor.getString(1);
+                                                        String barcode = cursor.getString(2);
+                                                        if (colCode.equals(displayValue)
+                                                                || barcode.equals(displayValue)) {
+                                                            volume = cursor.getString(4);
+                                                            fill_with = cursor.getString(5);
+                                                            break;
+                                                        }
+                                                    }
+                                                    cursor.close();
+                                                }
+
+                                                String cylinderName = (finalCol != null && !finalCol.isEmpty())
+                                                        ? finalCol
+                                                        : displayValue;
+                                                String volumeToUse = (volume != null && !volume.isEmpty()) ? volume
+                                                        : "60";
+
+                                                // Add to Delivery DB directly (Ammonia DB)
+                                                // addBook(cyname, full, empty, net, fill_with, vol, is_scan)
+                                                ammoniaDeliveryDB.addBook(cylinderName, fullwt, emtywt, netwt,
+                                                        fill_with, volumeToUse, "yes");
+
+                                                // Broadcast result to refresh Main UI
+                                                Intent intent = new Intent("ammonia_delivery");
+                                                intent.putExtra("ammonia_no", cylinderName);
+                                                intent.putExtra("volume", volumeToUse);
+                                                intent.putExtra("fill_with", fill_with);
+                                                intent.putExtra("full_wt", fullwt);
+                                                intent.putExtra("empty_wt", emtywt);
+                                                intent.putExtra("net_wt", netwt);
+                                                intent.putExtra("is_scan", "yes");
+                                                LocalBroadcastManager.getInstance(LaserScannerActivity.this)
+                                                        .sendBroadcast(intent);
+
+                                                refreshUI();
+                                                editText.setText("");
+                                                editText.requestFocus();
+
+                                            } else {
+                                                String msg = object.getString("msg");
+                                                Toast.makeText(LaserScannerActivity.this, msg, Toast.LENGTH_SHORT)
+                                                        .show();
+                                            }
+                                        }
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(LaserScannerActivity.this, "Network Error", Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            }) {
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("ammoniacyl", displayValue);
+                            params.put("db_host", SharedPref.mInstance.getDBHost());
+                            params.put("db_username", SharedPref.mInstance.getDBUsername());
+                            params.put("db_password", SharedPref.mInstance.getDBPassword());
+                            params.put("db_name", SharedPref.mInstance.getDBName());
+                            return params;
+                        }
+                    };
+                    VolleySingleton.getInstance(LaserScannerActivity.this).addToRequestQueue(stringRequest);
+
                 } else if (type.equalsIgnoreCase("empty")) {
                     addClyHelper.addBook(col, filledWith, volume, "B");
                 } else if (type.equalsIgnoreCase("godown_empty")) {
@@ -489,6 +696,8 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
             godownEmptyHelper.close();
         if (synchelper != null)
             synchelper.close();
+        if (ammoniaHelperDB != null)
+            ammoniaHelperDB.close();
     }
 
     @Override

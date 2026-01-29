@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductionLaserScannerActivity extends AppCompatActivity implements OnItemClickListener {
-    ArrayList<String> id, cylindername,dis,vol,disname,distot,iddist,distotvol;
+    ArrayList<String> id, cylindername, dis, vol, disname, distot, iddist, distotvol;
 
     RecyclerView recyclerView;
     syncHelper synchelper;
@@ -59,10 +59,9 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
     NitrogenHelper nitrogenHelper;
 
     Co2Helper co2Helper;
-
+    com.arnichem.arnichem_barcode.Producation.NewAmmonia.ammoniaHelper ammoniaHelper;
 
     OxygenAdapter oxygenAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,19 +87,21 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
             getSupportActionBar().setTitle("CO2 Scan");
         } else if (type.contentEquals("air")) {
             getSupportActionBar().setTitle("Zero Air Scan");
+        } else if (type.contentEquals("ammonia")) {
+            getSupportActionBar().setTitle("Ammonia Scan");
         }
         id = new ArrayList<>();
-        cylindername =new ArrayList<>();
-        dis=new ArrayList<>();
-        vol=new ArrayList<>();
-
+        cylindername = new ArrayList<>();
+        dis = new ArrayList<>();
+        vol = new ArrayList<>();
 
         recyclerView = findViewById(R.id.recyclerView);
         synchelper = new syncHelper(ProductionLaserScannerActivity.this);
         oxygenHelper = new OxygenHelper(ProductionLaserScannerActivity.this);
         nitrogenHelper = new NitrogenHelper(ProductionLaserScannerActivity.this);
         co2Helper = new Co2Helper(ProductionLaserScannerActivity.this);
-        zeroAirHelper=new ZeroAirHelper(this);
+        zeroAirHelper = new ZeroAirHelper(this);
+        ammoniaHelper = new com.arnichem.arnichem_barcode.Producation.NewAmmonia.ammoniaHelper(this);
 
         Totalscanvalue = findViewById(R.id.Totalscanvalue);
         doneBtn = findViewById(R.id.doneBtn);
@@ -109,19 +110,19 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
         cylinder = new ArrayList<String>();
         is_scan = new ArrayList<>();
 
-
         editText = findViewById(R.id.newScan);
         editText.requestFocus();
 
         // Fix: Remove unstable dispatchKeyEvent and usage of timer.
-        // Instead, use a direct OnKeyListener to detect the ENTER key sent by the scanner.
+        // Instead, use a direct OnKeyListener to detect the ENTER key sent by the
+        // scanner.
         editText.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // Handle both standard Enter (66) and Numpad Enter (160)
                 if ((keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)
                         && event.getAction() == KeyEvent.ACTION_UP) {
-                    
+
                     String text = editText.getText().toString().trim();
                     if (!text.isEmpty()) {
                         Log.d("ScannerFix", "Enter detected. Scanned: " + text);
@@ -155,10 +156,10 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
         closeKeypad(this);
         storeDataInArrays();
 
-        oxygenAdapter = new OxygenAdapter(ProductionLaserScannerActivity.this, this, id, cylindername, dis, vol,this,type);
+        oxygenAdapter = new OxygenAdapter(ProductionLaserScannerActivity.this, this, id, cylindername, dis, vol, this,
+                type);
         recyclerView.setAdapter(oxygenAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(ProductionLaserScannerActivity.this));
-
 
         doneBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,7 +168,6 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
             }
         });
     }
-
 
     void storeDataInArrays() {
         Cursor cursor = null;
@@ -179,11 +179,12 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
             cursor = co2Helper.readAllDataWithoutOrder();
         } else if (type.contentEquals("air")) {
             cursor = zeroAirHelper.readAllDataWithoutOrder();
+        } else if (type.contentEquals("ammonia")) {
+            cursor = ammoniaHelper.readAllData();
         }
 
-
         if (cursor.getCount() == 0) {
-//            empty_imageview.setVisibility(View.VISIBLE);
+            // empty_imageview.setVisibility(View.VISIBLE);
 
         } else {
             while (cursor.moveToNext()) {
@@ -200,7 +201,6 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
 
         }
     }
-
 
     // dispatchKeyEvent removed as it caused delays and race conditions.
     // Logic moved to editText.setOnKeyListener in onCreate.
@@ -222,7 +222,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
 
                         if (col1.contentEquals(displayValue)) {
                             status = false;
-                            oxygenHelper.addBook(col, disStr, tempvol,"B");
+                            oxygenHelper.addBook(col, disStr, tempvol, "B");
                             editText.setText("");
                             editText.requestFocus();
 
@@ -234,9 +234,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
                     editText.setText("");
                     editText.requestFocus();
 
-
                 }
-
 
             } else if (type.equalsIgnoreCase("no2")) {
 
@@ -251,7 +249,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
 
                         if (col1.contentEquals(displayValue)) {
                             status = false;
-                            nitrogenHelper.addBook(col, disStr, tempvol,"B");
+                            nitrogenHelper.addBook(col, disStr, tempvol, "B");
                             editText.setText("");
                             editText.requestFocus();
 
@@ -266,8 +264,8 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
             } else if (type.equalsIgnoreCase("co2")) {
                 Cursor cursor = synchelper.readAllData();
                 if (cursor.getCount() == 0) {
-                    //      empty_imageview.setVisibility(View.VISIBLE);
-                    //      no_data.setVisibility(View.VISIBLE);
+                    // empty_imageview.setVisibility(View.VISIBLE);
+                    // no_data.setVisibility(View.VISIBLE);
                 } else {
                     while (cursor.moveToNext()) {
                         String volume = cursor.getString(4);
@@ -279,7 +277,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
                         Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
 
                         if (col1.contentEquals(displayValue)) {
-                            co2Helper.addBook(col, disStr, tempvol,"B");
+                            co2Helper.addBook(col, disStr, tempvol, "B");
                             finish();
                             startActivity(getIntent());
                             break;
@@ -288,6 +286,35 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
                     editText.setText("");
                     editText.requestFocus();
                 }
+
+            } else if (type.equalsIgnoreCase("ammonia")) {
+                Cursor cursor = synchelper.readAllData();
+                if (cursor.getCount() == 0) {
+                } else {
+                    while (cursor.moveToNext()) {
+                        String col1 = cursor.getString(2); // Barcode
+                        String col = cursor.getString(1); // Cylinder No
+                        String weight = cursor.getString(3); // Weight
+                        String tempvol = cursor.getString(4); // Volume
+
+                        // Assuming disStr is passed/available, otherwise use default or empty
+                        // Existing code uses global 'disStr'
+
+                        if (col1.contentEquals(displayValue)) {
+                            // addBook(String cyname,String dis,String mani,String vol,String full,String
+                            // net,String actual, String weight)
+                            // Mapping: cyname=col, dis=disStr, mani="", vol=tempvol, full="", net="",
+                            // actual="", weight=weight
+                            ammoniaHelper.addBook(col, disStr, "", tempvol, "", "", "", weight);
+                            finish();
+                            startActivity(getIntent());
+                            break;
+                        }
+                    }
+                    editText.setText("");
+                    editText.requestFocus();
+                }
+
             } else {
                 Cursor cursor = synchelper.readAllData();
                 if (cursor.getCount() == 0) {
@@ -308,7 +335,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
 
                             Log.e("col1", "An exception occurred: " + col1 + " " + displayValue);
 
-                            zeroAirHelper.addBook(col, disStr, tempvol,"B");
+                            zeroAirHelper.addBook(col, disStr, tempvol, "B");
                             finish();
                             startActivity(getIntent());
                         }
@@ -316,18 +343,17 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
                     editText.setText("");
                     editText.requestFocus();
 
-
                 }
 
             }
-
 
         }
 
     }
 
     public static void closeKeypad(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) activity
+                .getSystemService(Activity.INPUT_METHOD_SERVICE);
         View currentFocusedView = activity.getCurrentFocus();
         if (currentFocusedView != null) {
             inputMethodManager.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
@@ -377,9 +403,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
         if (nitrogenHelper != null)
             nitrogenHelper.close();
 
-
     }
-
 
     @Override
     public void onItemClick(int position) {
