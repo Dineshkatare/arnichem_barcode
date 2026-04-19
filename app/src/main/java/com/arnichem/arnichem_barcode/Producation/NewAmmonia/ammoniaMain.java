@@ -84,6 +84,8 @@ public class ammoniaMain extends AppCompatActivity {
     List<String> manifolds;
     List<String> netwts;
     List<String> Selected;
+    List<String> is_scan_list;
+    String current_is_scan = "N";
     String temp = "", tempvol;
     int finalAI_qty, finaldist_qty, totvolume;
     String sm, em, after_tank_pressure, after_tank_liquid_liter, before_tank_pressure, before_tank_liquid_liter;
@@ -132,6 +134,12 @@ public class ammoniaMain extends AppCompatActivity {
                 }
             }
         });
+
+        // Restore switch state from intent if available
+        if (getIntent().hasExtra("barcode_switch_state")) {
+            boolean isChecked = getIntent().getBooleanExtra("barcode_switch_state", false);
+            barcodeSwitch.setChecked(isChecked);
+        }
         cylinderTv = findViewById(R.id.cylno);
         sfuulwt = findViewById(R.id.sfuulwt);
         semwt = findViewById(R.id.semwt);
@@ -151,6 +159,7 @@ public class ammoniaMain extends AppCompatActivity {
         actual_wts = new ArrayList<String>();
         manifolds = new ArrayList<String>();
         netwts = new ArrayList<String>();
+        is_scan_list = new ArrayList<>();
         cylindervolume = findViewById(R.id.cylinderempty);
         adapter = ArrayAdapter.createFromResource(this, R.array.ammoniamanifold, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -254,9 +263,12 @@ public class ammoniaMain extends AppCompatActivity {
                         String finalres = String.valueOf(res);
                         oxygenHelper.addBook(cylindernumber.getText().toString(), distributorname, manifoldval,
                                 finalres, cylinderfull.getText().toString(), cylindervolume.getText().toString(),
-                                actual_wt.getText().toString());
+                                actual_wt.getText().toString(), current_is_scan);
+                        current_is_scan = "N";
                         finish();
-                        startActivity(getIntent());
+                        Intent intent = getIntent();
+                        intent.putExtra("barcode_switch_state", barcodeSwitch.isChecked());
+                        startActivity(intent);
                     } else {
                         Double fullcheck = Double.parseDouble(cylinderfull.getText().toString());
                         Double emptycheck = Double.parseDouble(cylindervolume.getText().toString());
@@ -264,9 +276,12 @@ public class ammoniaMain extends AppCompatActivity {
                         String finalres = String.valueOf(res);
                         oxygenHelper.addBook(cylindernumber1.getText().toString(), distributorname, manifoldval,
                                 finalres, cylinderfull.getText().toString(), cylindervolume.getText().toString(),
-                                actual_wt.getText().toString());
+                                actual_wt.getText().toString(), current_is_scan);
+                        current_is_scan = "N";
                         finish();
-                        startActivity(getIntent());
+                        Intent intent = getIntent();
+                        intent.putExtra("barcode_switch_state", barcodeSwitch.isChecked());
+                        startActivity(intent);
 
                     }
 
@@ -381,19 +396,20 @@ public class ammoniaMain extends AppCompatActivity {
         if (cursor.getCount() > 0) {
             // empty_imageview.setVisibility(View.VISIBLE);
             while (cursor.moveToNext()) {
-                id.add(cursor.getString(0));
-                cylindername.add(cursor.getString(1));
-                cylinder.add(cursor.getString(1));
-                dis.add(cursor.getString(2));
-                vol.add(cursor.getString(4));
-                cubic.add(cursor.getString(4));
-                distfull.add(cursor.getString(3));
-                fullwts.add(cursor.getString(3));
-                actual_wts.add(cursor.getString(7));
-                mani.add(cursor.getString(5));
-                manifolds.add(cursor.getString(5));
-                distnet.add(cursor.getString(6));
-                netwts.add(cursor.getString(6));
+                id.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_ID)));
+                cylindername.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_cylname)));
+                cylinder.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_cylname)));
+                dis.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_dis)));
+                vol.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_vol)));
+                cubic.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_vol)));
+                distfull.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_full)));
+                fullwts.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_full)));
+                actual_wts.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_Actual)));
+                mani.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_mani)));
+                manifolds.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_mani)));
+                distnet.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_net)));
+                netwts.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_net)));
+                is_scan_list.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_is_scan)));
 
                 Cursor distcursor = distributorHelper.readAllData();
                 if (cursor.getString(2).equalsIgnoreCase(SharedPref.getInstance(ammoniaMain.this).getOwnCode())) {
@@ -450,6 +466,7 @@ public class ammoniaMain extends AppCompatActivity {
         cylindernumber.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                current_is_scan = "N";
                 if (manifoldpos == 0) {
                     cylindernumber.setText("");
                     MDToast.makeText(ammoniaMain.this, "कृपया manifold निवडा !", MDToast.LENGTH_SHORT,
@@ -476,10 +493,10 @@ public class ammoniaMain extends AppCompatActivity {
                             }
                         }
                         if (!foundVol.isEmpty()) {
-                            cylindervolume.setText(foundVol);
+                            cylindervolume.setText(formatTwoDecimal(foundVol));
                         }
                         if (!foundActualWt.isEmpty()) {
-                            actual_wt.setText(foundActualWt);
+                            // actual_wt.setText(formatTwoDecimal(foundActualWt));
                         }
                     }
 
@@ -570,6 +587,7 @@ public class ammoniaMain extends AppCompatActivity {
                 params.put("actual_wt", String.valueOf(actual_wts));
                 params.put("emt_wt", String.valueOf(cubic));
                 params.put("net_wt", String.valueOf(netwts));
+                params.put("is_scan", String.valueOf(is_scan_list));
                 params.put("totcubic", String.valueOf(totvolume));
                 params.put("manifold_no", String.valueOf(manifolds));
                 params.put("cyl_quan", String.valueOf(count));
@@ -587,6 +605,7 @@ public class ammoniaMain extends AppCompatActivity {
                 params.put("db_username", SharedPref.mInstance.getDBUsername());
                 params.put("db_password", SharedPref.mInstance.getDBPassword());
                 params.put("db_name", SharedPref.mInstance.getDBName());
+                Log.d("ammoniaMain", "Oxygenpost params: " + params.toString());
                 return params;
             }
         };
@@ -607,25 +626,11 @@ public class ammoniaMain extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String ammonia_no = intent.getStringExtra("ammonia_no");
-            String volume = intent.getStringExtra("volume");
-            String fill_with = intent.getStringExtra("fill_with");
-
-            if (cylindernumber.getVisibility() == View.VISIBLE) {
-                cylindernumber.setText(ammonia_no);
-                cylindernumber.dismissDropDown();
-            } else {
-                cylindernumber1.setText(ammonia_no);
-                cylindernumber1.dismissDropDown();
+            // We use the name received to lookup full details (weights) to ensure
+            // consistency
+            if (ammonia_no != null && !ammonia_no.isEmpty()) {
+                lookupAndPopulate(ammonia_no, "C");
             }
-
-            if (volume != null && !volume.isEmpty()) {
-                cylindervolume.setText(volume);
-            }
-
-            // Focus full weight for manual entry
-            cylinderfull.requestFocus();
-            MDToast.makeText(ammoniaMain.this, "Scanned: " + ammonia_no, MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS)
-                    .show();
         }
     };
 
@@ -662,7 +667,7 @@ public class ammoniaMain extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                processScannedCode(scannedCode);
+                                lookupAndPopulate(scannedCode, "B");
                             }
                         });
                     }
@@ -674,37 +679,93 @@ public class ammoniaMain extends AppCompatActivity {
     }
 
     private void processScannedCode(String scannedCode) {
-        if (cylindernumber.getVisibility() == View.VISIBLE) {
-            cylindernumber.setText(scannedCode);
-            cylindernumber.dismissDropDown();
-        } else {
-            cylindernumber1.setText(scannedCode);
-            cylindernumber1.dismissDropDown();
-        }
+        lookupAndPopulate(scannedCode, "B");
+    }
 
+    private void lookupAndPopulate(String scannedInput, String scanMode) {
         Cursor cursor = sync.readAllData();
+        String foundName = "";
         String foundVol = "";
         String foundActualWt = "";
+        boolean found = false;
+
         if (cursor.getCount() != 0) {
             while (cursor.moveToNext()) {
-                String col = cursor.getString(1); // Cylinder No
-                if (col.contentEquals(scannedCode)) {
+                String itemCode = cursor.getString(1); // Cylinder No
+                String barcode = cursor.getString(2); // Barcode
+
+                // Check for Barcode Match First
+                if (barcode != null && barcode.equalsIgnoreCase(scannedInput)) {
+                    foundName = itemCode;
                     foundVol = cursor.getString(3); // Weight -> Empty Weight
                     foundActualWt = cursor.getString(4); // Volume -> Actual Weight
+                    found = true;
                     break;
+                }
+            }
+
+            // If strictly not found by barcode, try item code (fallback)
+            if (!found) {
+                cursor.moveToFirst(); // Reset cursor
+                while (cursor.moveToNext()) {
+                    String itemCode = cursor.getString(1);
+                    if (itemCode != null && itemCode.equalsIgnoreCase(scannedInput)) {
+                        foundName = itemCode;
+                        foundVol = cursor.getString(3);
+                        foundActualWt = cursor.getString(4);
+                        found = true;
+                        break;
+                    }
                 }
             }
         }
 
-        if (!foundVol.isEmpty()) {
-            cylindervolume.setText(foundVol);
-        }
-        if (!foundActualWt.isEmpty()) {
-            actual_wt.setText(foundActualWt);
-        }
+        if (found) {
+            if (cylindernumber.getVisibility() == View.VISIBLE) {
+                cylindernumber.setText(foundName);
+                cylindernumber.dismissDropDown();
+            } else {
+                cylindernumber1.setText(foundName);
+                cylindernumber1.dismissDropDown();
+            }
 
-        // Focus full weight for manual entry or validation
-        cylinderfull.requestFocus();
-        MDToast.makeText(this, "Scanned: " + scannedCode, MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+            if (!foundVol.isEmpty()) {
+                cylindervolume.setText(formatTwoDecimal(foundVol));
+            }
+            if (!foundActualWt.isEmpty()) {
+                // actual_wt.setText(formatTwoDecimal(foundActualWt));
+            }
+            current_is_scan = scanMode;
+
+            MDToast.makeText(this, "Scanned: " + foundName, MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+            // Focus full weight for manual entry or validation
+            cylinderfull.requestFocus();
+        } else {
+            // Fallback if not found in DB at all, just set the text to scanned input
+            if (cylindernumber.getVisibility() == View.VISIBLE) {
+                cylindernumber.setText(scannedInput);
+                cylindernumber.dismissDropDown();
+            } else {
+                cylindernumber1.setText(scannedInput);
+                cylindernumber1.dismissDropDown();
+            }
+            current_is_scan = scanMode;
+            MDToast.makeText(this, "Item not found in database", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+            cylinderfull.requestFocus();
+        }
     }
+
+    private String formatTwoDecimal(String value) {
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
+        try {
+            double doubleVal = Double.parseDouble(value);
+            return String.format("%.2f", doubleVal);
+        } catch (NumberFormatException e) {
+            // If it's not a valid number, return original string
+            return value;
+        }
+    }
+
 }

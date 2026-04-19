@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.arnichem.arnichem_barcode" />
-                  <option name="mobileSdkAppId" value="1:481535983895:android:85a15d45af46749a357752" />
-                  <option name="projectId" value="arnichemapp-56ab4" />
-                  <option name="projectNumber" value="481535983895" />
+                  <option name="mobileSdkAppId" value="1:522663265265:android:74b72a415db1a1ee977a50" />
+                  <option name="projectId" value="arnichem-4a0c1" />
+                  <option name="projectNumber" value="522663265265" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

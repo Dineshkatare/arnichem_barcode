@@ -68,11 +68,11 @@ import retrofit2.Response;
 
 public class FileUploadSubActivity extends AppCompatActivity {
 
-    private String type="",path="";
+    private String type = "", path = "";
     ProgressDialog dialog;
 
     private Button uploadBtn;
-    private ImageView camera,gallery,uploaded_image_view;
+    private ImageView camera, gallery, uploaded_image_view;
     CardView uploaded_image;
     ConstraintLayout imageCl;
     LinearLayout upload_linear;
@@ -82,20 +82,19 @@ public class FileUploadSubActivity extends AppCompatActivity {
     private FileUploadManager fileUploadManager;
     EditText docNumber;
 
-    private Boolean isCapture= false;
-    private File  file;
-
+    private Boolean isCapture = false;
+    private File file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_upload_sub);
         uploadBtn = findViewById(R.id.uploadBtn);
-        camera  = findViewById(R.id.camera);
+        camera = findViewById(R.id.camera);
         gallery = findViewById(R.id.gallery);
         imageCl = findViewById(R.id.image_cl);
         upload_linear = findViewById(R.id.upload_linear);
-        uploaded_image =findViewById(R.id.uploaded_image);
+        uploaded_image = findViewById(R.id.uploaded_image);
         uploaded_image_view = findViewById(R.id.uploaded_image_view);
         docNumber = findViewById(R.id.name);
         Intent intent = getIntent();
@@ -105,7 +104,7 @@ public class FileUploadSubActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(mServiceReceiver,
                 new IntentFilter("camera_data"));
 
-        getSupportActionBar().setTitle(type +" File Upload");
+        getSupportActionBar().setTitle(type + " File Upload");
         camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,26 +137,27 @@ public class FileUploadSubActivity extends AppCompatActivity {
                 dialog.show();
                 if (docNumber.getText().toString().trim().isEmpty()) {
                     dialog.dismiss();
-                    MDToast.makeText(FileUploadSubActivity.this, "Please Enter Number!", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
-                }else {
-                    uploadImageWithText(type,docNumber.getText().toString(),SharedPref.getInstance(FileUploadSubActivity.this).getEmail());
+                    MDToast.makeText(FileUploadSubActivity.this, "Please Enter Number!", MDToast.LENGTH_SHORT,
+                            MDToast.TYPE_ERROR).show();
+                } else {
+                    uploadImageWithText(type, docNumber.getText().toString(),
+                            SharedPref.getInstance(FileUploadSubActivity.this).getEmail());
                 }
 
             }
 
         });
 
-
     }
 
     private void startCamera() {
-        Intent intent = new Intent(FileUploadSubActivity.this,NewCamerActivity.class);
-        intent.putExtra("type","check");
+        Intent intent = new Intent(FileUploadSubActivity.this, NewCamerActivity.class);
+        intent.putExtra("type", "check");
         startActivity(intent);
 
     }
 
-    private void uploadImageWithText(String type,String docNumber,String email) {
+    private void uploadImageWithText(String type, String docNumber, String email) {
         fileUploadManager = new FileUploadManager();
 
         long fileSize = file.length();
@@ -169,19 +169,26 @@ public class FileUploadSubActivity extends AppCompatActivity {
         RequestBody docNumberBody = RequestBody.create(MediaType.parse("multipart/form-data"), docNumber);
         RequestBody sizeBody = RequestBody.create(MediaType.parse("multipart/form-data"), String.valueOf(fileSize));
         RequestBody emailBody = RequestBody.create(MediaType.parse("multipart/form-data"), email);
-        RequestBody username = RequestBody.create(MediaType.parse("multipart/form-data"), SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
-        RequestBody host = RequestBody.create(MediaType.parse("multipart/form-data"), SharedPref.getInstance(this).getDBHost());
-        RequestBody db_username = RequestBody.create(MediaType.parse("multipart/form-data"), SharedPref.getInstance(this).getDBUsername());
-        RequestBody password = RequestBody.create(MediaType.parse("multipart/form-data"), SharedPref.getInstance(this).getDBPassword());
-        RequestBody db_name = RequestBody.create(MediaType.parse("multipart/form-data"), SharedPref.getInstance(this).getDBName());
+        RequestBody username = RequestBody.create(MediaType.parse("multipart/form-data"),
+                SharedPref.getInstance(this).FirstName() + " " + SharedPref.getInstance(this).LastName());
+        RequestBody host = RequestBody.create(MediaType.parse("multipart/form-data"),
+                SharedPref.getInstance(this).getDBHost());
+        RequestBody db_username = RequestBody.create(MediaType.parse("multipart/form-data"),
+                SharedPref.getInstance(this).getDBUsername());
+        RequestBody password = RequestBody.create(MediaType.parse("multipart/form-data"),
+                SharedPref.getInstance(this).getDBPassword());
+        RequestBody db_name = RequestBody.create(MediaType.parse("multipart/form-data"),
+                SharedPref.getInstance(this).getDBName());
 
-        FileUploadData data = new FileUploadData(typeBody, docNumberBody, sizeBody, emailBody, file,host,db_username,password,db_name,username);
+        FileUploadData data = new FileUploadData(typeBody, docNumberBody, sizeBody, emailBody, file, host, db_username,
+                password, db_name, username);
 
         fileUploadManager.uploadFile(data, new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 dialog.dismiss();
-                MDToast.makeText(FileUploadSubActivity.this, "File uploaded successfully!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                MDToast.makeText(FileUploadSubActivity.this, "File uploaded successfully!", MDToast.LENGTH_SHORT,
+                        MDToast.TYPE_SUCCESS).show();
 
                 Intent intent = new Intent(FileUploadSubActivity.this, FIleUploadMainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -191,38 +198,35 @@ public class FileUploadSubActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<ApiResponse> call, Throwable t) {
                 dialog.dismiss();
-                MDToast.makeText(FileUploadSubActivity.this, "Failed!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                MDToast.makeText(FileUploadSubActivity.this, "Failed!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS)
+                        .show();
 
             }
         });
 
     }
-    private final BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals("camera_data")) {
-            if(!isCapture){
-                isCapture =true;
-                path = intent.getStringExtra("url");
-                file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "my_image.jpg");
 
-                UCrop.of(Uri.parse(path),Uri.fromFile(file))
-                        .start(FileUploadSubActivity.this);
+    private final BroadcastReceiver mServiceReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("camera_data")) {
+                if (!isCapture) {
+                    isCapture = true;
+                    path = intent.getStringExtra("url");
+                    file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "my_image.jpg");
+
+                    UCrop.of(Uri.parse(path), Uri.fromFile(file))
+                            .start(FileUploadSubActivity.this);
+                }
             }
-        }}
+        }
 
     };
-
-
-
-
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
-
-
 
     private void pickImageFromGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -235,21 +239,21 @@ public class FileUploadSubActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
-
             Uri uri = data.getData();
             path = getPath(uri);
             file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "my_image.jpg");
 
             // Convert the Uri to File
 
-            UCrop.of(uri,Uri.fromFile(file))
+            UCrop.of(uri, Uri.fromFile(file))
                     .start(FileUploadSubActivity.this);
 
         }
         if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             final Uri croppedUri = UCrop.getOutput(data);
             try {
-                Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(FileUploadSubActivity.this.getContentResolver(), croppedUri);
+                Bitmap originalBitmap = MediaStore.Images.Media
+                        .getBitmap(FileUploadSubActivity.this.getContentResolver(), croppedUri);
 
                 // Compress the bitmap to 50% quality
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -274,9 +278,10 @@ public class FileUploadSubActivity extends AppCompatActivity {
     }
 
     private String getPath(Uri uri) {
-        String[] projection = {MediaStore.Images.Media.DATA};
+        String[] projection = { MediaStore.Images.Media.DATA };
         Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-        if (cursor == null) return null;
+        if (cursor == null)
+            return null;
         int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
         String s = cursor.getString(column_index);
@@ -288,20 +293,34 @@ public class FileUploadSubActivity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
-    private boolean checkGalleryPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA },
+                CAMERA_PERMISSION_REQUEST_CODE);
     }
 
-    private void requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+    private boolean checkGalleryPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        }
     }
 
     private void requestGalleryPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, GALLERY_PERMISSION_REQUEST_CODE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.READ_MEDIA_IMAGES },
+                    GALLERY_PERMISSION_REQUEST_CODE);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+                    GALLERY_PERMISSION_REQUEST_CODE);
+        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case CAMERA_PERMISSION_REQUEST_CODE:
@@ -316,7 +335,6 @@ public class FileUploadSubActivity extends AppCompatActivity {
                 break;
         }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

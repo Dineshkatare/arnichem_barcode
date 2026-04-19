@@ -187,7 +187,7 @@
 
                 <TextView
                     android:id="@+id/cylno"
-                    android:layout_width="120dp"
+                    android:layout_width="100dp"
                     android:layout_height="20dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
@@ -199,26 +199,38 @@
 
                 <TextView
                     android:id="@+id/fuulwt"
-                    android:layout_width="120dp"
+                    android:layout_width="80dp"
                     android:layout_height="20dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
                     android:text="Full Wt"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="16dp"
+                    android:textSize="14dp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/netwt"
-                    android:layout_width="120dp"
+                    android:id="@+id/empty_header"
+                    android:layout_width="80dp"
+                    android:layout_height="20dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:text="Empty"
+                    android:textAlignment="center"
+                    android:textColor="@color/black"
+                    android:textSize="14dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/netwt_header"
+                    android:layout_width="80dp"
                     android:layout_height="20dp"
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
                     android:text="Net Wt"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="16dp"
+                    android:textSize="14dp"
                     android:textStyle="bold" />
             </LinearLayout>
 

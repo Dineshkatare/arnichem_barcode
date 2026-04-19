@@ -305,7 +305,7 @@ public class ProductionLaserScannerActivity extends AppCompatActivity implements
                             // net,String actual, String weight)
                             // Mapping: cyname=col, dis=disStr, mani="", vol=tempvol, full="", net="",
                             // actual="", weight=weight
-                            ammoniaHelper.addBook(col, disStr, "", tempvol, "", "", "", weight);
+                            ammoniaHelper.addBook(col, disStr, "", tempvol, "", "", "", weight, "B");
                             finish();
                             startActivity(getIntent());
                             break;

@@ -13,18 +13,19 @@ public class ammoniaHelper extends SQLiteOpenHelper {
 
     private Context context;
     private static final String DATABASE_NAME = "ammoniaHelper.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String TABLE_NAME = "my_library";
-    private static final String COLUMN_ID = "_id";
-    private static final String COLUMN_cylname = "cylname";
-    private static final String COLUMN_dis = "dis";
-    private static final String COLUMN_vol = "vol";
-    private static final String COLUMN_full = "fullcl";
-    private static final String COLUMN_net = "net";
-    private static final String COLUMN_mani = "mani";
+    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_cylname = "cylname";
+    public static final String COLUMN_dis = "dis";
+    public static final String COLUMN_vol = "vol";
+    public static final String COLUMN_full = "fullcl";
+    public static final String COLUMN_net = "net";
+    public static final String COLUMN_mani = "mani";
+    public static final String COLUMN_is_scan = "is_scan";
 
-    private static final String COLUMN_Actual = "actual";
-    private static final String COLUMN_weight = "weight";
+    public static final String COLUMN_Actual = "actual";
+    public static final String COLUMN_weight = "weight";
 
     public ammoniaHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,6 +43,7 @@ public class ammoniaHelper extends SQLiteOpenHelper {
                 COLUMN_mani + " TEXT, " +
                 COLUMN_vol + " TEXT, " +
                 COLUMN_weight + " TEXT, " +
+                COLUMN_is_scan + " TEXT, " +
                 COLUMN_Actual + " TEXT);";
         db.execSQL(query);
     }
@@ -53,7 +55,7 @@ public class ammoniaHelper extends SQLiteOpenHelper {
     }
 
     public void addBook(String cyname, String dis, String mani, String vol, String full, String net, String actual,
-            String weight) {
+            String weight, String is_scan) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
@@ -65,6 +67,7 @@ public class ammoniaHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_vol, vol);
         cv.put(COLUMN_Actual, actual);
         cv.put(COLUMN_weight, weight);
+        cv.put(COLUMN_is_scan, is_scan);
 
         long result = db.insertWithOnConflict(TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_REPLACE);
 
@@ -79,8 +82,8 @@ public class ammoniaHelper extends SQLiteOpenHelper {
 
     }
 
-    public void addBook(String cyname, String dis, String mani, String net, String full, String vol, String actual) {
-        addBook(cyname, dis, mani, vol, full, net, actual, "0");
+    public void addBook(String cyname, String dis, String mani, String net, String full, String vol, String actual, String is_scan) {
+        addBook(cyname, dis, mani, vol, full, net, actual, "0", is_scan);
     }
 
     public Cursor readAllData() {

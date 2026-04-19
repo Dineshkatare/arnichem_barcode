@@ -47,7 +47,7 @@ public class ammoniaprintAdapter extends RecyclerView.Adapter<ammoniaprintAdapte
     @Override
     public void onBindViewHolder(@NonNull @NotNull distHolder holder, int position) {
         holder.cylindername.setText(String.valueOf(distcyliname.get(position)));
-       // holder.fullwt.setText(String.valueOf(disfull.get(position)));
+        holder.fullwt.setText(String.valueOf(disfull.get(position)));
         holder.emptywt.setText(String.valueOf(distempty.get(position)));
         holder.netwt.setText(String.valueOf(disnet.get(position)));
        // holder.manitv.setText(String.valueOf(mani.get(position)));
@@ -72,7 +72,7 @@ public class ammoniaprintAdapter extends RecyclerView.Adapter<ammoniaprintAdapte
             super(itemView);
 
             cylindername = itemView.findViewById(R.id.cylindername);
-          //  fullwt = itemView.findViewById(R.id.fullwt);
+            fullwt = itemView.findViewById(R.id.fullwt);
             emptywt = itemView.findViewById(R.id.emptywt);
             netwt = itemView.findViewById(R.id.netwt);
         //    manitv=  itemView.findViewById(R.id.manitv);

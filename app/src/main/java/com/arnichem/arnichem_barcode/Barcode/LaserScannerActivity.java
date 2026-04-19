@@ -524,7 +524,11 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
                     myDB.addBook(col, "B");
                 } else if (type.equalsIgnoreCase("ammonia_delivery")) {
                     // API Call for Ammonia Delivery
-                    String finalCol = col;
+                    final String finalCol = col;
+                    final String finalVolume = (volume != null && !volume.isEmpty()) ? volume : "60";
+                    final String finalFilledWith = (filledWith != null && !filledWith.isEmpty()) ? filledWith
+                            : "AMMONIA";
+
                     StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.ammonia_del_update,
                             new Response.Listener<String>() {
                                 @Override
@@ -539,41 +543,16 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
                                                 String emtywt = object.getString("empty_wt");
                                                 String netwt = object.getString("net_wt");
 
-                                                String volume = "60"; // Default
-                                                String fill_with = "AMMONIA"; // Default
-
-                                                // Lookup local details
-                                                Cursor cursor = synchelper.readAllData();
-                                                if (cursor != null) {
-                                                    while (cursor.moveToNext()) {
-                                                        String colCode = cursor.getString(1);
-                                                        String barcode = cursor.getString(2);
-                                                        if (colCode.equals(displayValue)
-                                                                || barcode.equals(displayValue)) {
-                                                            volume = cursor.getString(4);
-                                                            fill_with = cursor.getString(5);
-                                                            break;
-                                                        }
-                                                    }
-                                                    cursor.close();
-                                                }
-
-                                                String cylinderName = (finalCol != null && !finalCol.isEmpty())
-                                                        ? finalCol
-                                                        : displayValue;
-                                                String volumeToUse = (volume != null && !volume.isEmpty()) ? volume
-                                                        : "60";
-
                                                 // Add to Delivery DB directly (Ammonia DB)
                                                 // addBook(cyname, full, empty, net, fill_with, vol, is_scan)
-                                                ammoniaDeliveryDB.addBook(cylinderName, fullwt, emtywt, netwt,
-                                                        fill_with, volumeToUse, "yes");
+                                                ammoniaDeliveryDB.addBook(finalCol, fullwt, emtywt, netwt,
+                                                        finalFilledWith, finalVolume, "yes");
 
                                                 // Broadcast result to refresh Main UI
                                                 Intent intent = new Intent("ammonia_delivery");
-                                                intent.putExtra("ammonia_no", cylinderName);
-                                                intent.putExtra("volume", volumeToUse);
-                                                intent.putExtra("fill_with", fill_with);
+                                                intent.putExtra("ammonia_no", finalCol);
+                                                intent.putExtra("volume", finalVolume);
+                                                intent.putExtra("fill_with", finalFilledWith);
                                                 intent.putExtra("full_wt", fullwt);
                                                 intent.putExtra("empty_wt", emtywt);
                                                 intent.putExtra("net_wt", netwt);
@@ -606,7 +585,8 @@ public class LaserScannerActivity extends AppCompatActivity implements OnItemCli
                         @Override
                         protected Map<String, String> getParams() throws AuthFailureError {
                             Map<String, String> params = new HashMap<>();
-                            params.put("ammoniacyl", displayValue);
+                            // Send the resolved Cylinder Number, not the raw barcode/scan input
+                            params.put("ammoniacyl", finalCol);
                             params.put("db_host", SharedPref.mInstance.getDBHost());
                             params.put("db_username", SharedPref.mInstance.getDBUsername());
                             params.put("db_password", SharedPref.mInstance.getDBPassword());

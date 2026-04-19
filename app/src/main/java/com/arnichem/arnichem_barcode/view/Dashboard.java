@@ -154,7 +154,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         } else {
             tvVehicle.setText("NO VEHICLE |");
         }
-        tvVersion.setText(" Version :" + "10.0");
+        tvVersion.setText(" Version :" + "10.4");
 
         // click listeners
         icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));

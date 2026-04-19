@@ -248,18 +248,18 @@ public class ammoniaprint extends AppCompatActivity {
 
         }else{
             while (cursor.moveToNext()){
-                id.add(cursor.getString(0));
-                cylindername.add(cursor.getString(1));
-                cylinder.add(cursor.getString(1));
-                dis.add(cursor.getString(2));
-                vol.add(cursor.getString(4));
-                cubic.add(cursor.getString(4));
-                distfull.add(cursor.getString(3));
-                fullwts.add(cursor.getString(3));
-                mani.add(cursor.getString(5));
-                manifolds.add(cursor.getString(5));
-                distnet.add(cursor.getString(6));
-                netwts.add(cursor.getString(6));
+                id.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_ID)));
+                cylindername.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_cylname)));
+                cylinder.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_cylname)));
+                dis.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_dis)));
+                vol.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_vol)));
+                cubic.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_vol)));
+                distfull.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_full)));
+                fullwts.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_full)));
+                mani.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_mani)));
+                manifolds.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_mani)));
+                distnet.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_net)));
+                netwts.add(cursor.getString(cursor.getColumnIndex(ammoniaHelper.COLUMN_net)));
                 Toast.makeText(ammoniaprint.this, ""+cursor.getString(5), Toast.LENGTH_SHORT).show();
 
 
@@ -309,7 +309,7 @@ public class ammoniaprint extends AppCompatActivity {
                         "ll'>Batch ID  :"+batchID+"</font>\n" +
                         "[C]<font size='small'>Tank Start Volume :"+starttimevolume+"</font>\n" +
                         "[C]<font size='small'>Tank End Volume   :"+endtimevolume+"</font>\n" +
-                        "[C]<font size='small'>cylinder No - Tare Wt - Net Wt </font>\n" +
+                        "[C]<font size='small'>cylinder No - Full Wt - Tare Wt - Net Wt </font>\n" +
                         "[L]<font size='small'>"+forlooping()+"</font>\n" +
                         "[C]<font size='small'>"+ SharedPref.getInstance(this).FirstName()+" "+SharedPref.getInstance(this).LastName()+"</font>\n"+
                         "[C]<font size='small'>Supervisor</font>\n"
@@ -320,7 +320,7 @@ public class ammoniaprint extends AppCompatActivity {
     public Serializable forlooping() {
         StringBuffer text = new StringBuffer();
         for(int i=0; i<Selected.size();i++) {
-            text.append(" "+cylinder.get(i)).append("       ").append(cubic.get(i)).append("     ").append(netwts.get(i)).append('\n');
+            text.append(" "+cylinder.get(i)).append("       ").append(distfull.get(i)).append("     ").append(cubic.get(i)).append("     ").append(netwts.get(i)).append('\n');
         }
         return text;
     }

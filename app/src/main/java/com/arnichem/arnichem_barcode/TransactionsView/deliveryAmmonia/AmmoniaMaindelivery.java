@@ -557,6 +557,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                     params.put("db_username", SharedPref.mInstance.getDBUsername());
                     params.put("db_password", SharedPref.mInstance.getDBPassword());
                     params.put("db_name", SharedPref.mInstance.getDBName());
+                    Log.d("AmmoniaMaindelivery", "postUsingVolley params: " + params.toString());
                     return params;
                 }
 
@@ -690,11 +691,6 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
         }
 
         if (!found) {
-            // If not found in local syncDB, maybe try to add anyway or show error?
-            // Existing logic in manual entry only adds if found.
-            // But we can try to add whatever was scanned if strictly needed?
-            // Let's stick to existing pattern: If "No Data" toast in syncHelper?
-            // Actually manual entry (onItemClick) only does `login` if match found.
             MDToast.makeText(AmmoniaMaindelivery.this, "Cylinder not found in local DB", MDToast.LENGTH_SHORT,
                     MDToast.TYPE_WARNING).show();
         }
@@ -758,6 +754,7 @@ public class AmmoniaMaindelivery extends AppCompatActivity {
                 params.put("db_username", SharedPref.mInstance.getDBUsername());
                 params.put("db_password", SharedPref.mInstance.getDBPassword());
                 params.put("db_name", SharedPref.mInstance.getDBName());
+                Log.d("AmmoniaMaindelivery", "login params: " + params.toString());
                 return params;
             }
         };
