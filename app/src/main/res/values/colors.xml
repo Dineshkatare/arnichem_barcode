@@ -12,4 +12,17 @@
   <color name="myColor">#FF0000</color>
   <color name="scanner_line">#00ceff</color>
   <color name="red">#FC1A09</color>
+
+  <!-- Premium Palette -->
+  <color name="primary">#2E3192</color>
+  <color name="primary_light">#4E52B3</color>
+  <color name="accent">#3182CE</color>
+  <color name="background">#F7FAFC</color>
+  <color name="surface">#FFFFFF</color>
+  <color name="text_primary">#1A202C</color>
+  <color name="text_secondary">#4A5568</color>
+  <color name="text_muted">#718096</color>
+  <color name="success">#48BB78</color>
+  <color name="error">#F56565</color>
+  <color name="border">#E2E8F0</color>
 </resources>

@@ -404,6 +404,16 @@
                 android:layout_gravity="center"
                 android:text="Print"></Button>
 
+            <Button
+                android:id="@+id/holdingCheckBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:layout_gravity="center"
+                android:backgroundTint="#3182CE"
+                android:text="Check Customer Holding"></Button>
+
         </LinearLayout>
     </ScrollView>
 

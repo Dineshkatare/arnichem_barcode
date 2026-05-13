@@ -64,8 +64,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class login extends AppCompatActivity implements Listener, LocationData.AddressCallBack {
+  private static final String TAG = "login";
   Button login;
   EditText username;
   private static final int PERMISSION_REQUEST_READ_CALL_LOG = 100;
@@ -238,14 +240,9 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
                       .store_call_log_access(object.getString("call_log_access"));
                   closekey();
                   dialog.dismiss();
-
-                  // Check if the current time is before or after 10 AM
-
-                  Intent intent = new Intent(com.arnichem.arnichem_barcode.view.login.this, Test.class);
-                  intent.setFlags(
-                      Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                  startActivity(intent);
                   MDToast.makeText(login.this, "Login suceesfull!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                  // Fetch roles & FCM token BEFORE navigating away so the activity stays alive
+                  fetchUserRoles(username.getText().toString());
 
                 } else {
                   dialog.dismiss();
@@ -281,7 +278,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
         params.put("app_pin", pinvalue.toString());
         params.put("ipaddress", ipstr);
         params.put("imei", imeistr);
-        params.put("appversion", "10.4");
+        params.put("appversion", "10.6");
         params.put("lati", latitude);
         params.put("logi", logitude);
         params.put("addr", address);
@@ -295,11 +292,121 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
     };
     VolleySingleton.getInstance(login.this).addToRequestQueue(stringRequest);
 
-    Log.d(TAG, "host: " + SharedPref.mInstance.getDBHost());
-    Log.d(TAG, "username: " + SharedPref.mInstance.getDBUsername());
-    Log.d(TAG, "password: " + SharedPref.mInstance.getDBPassword());
     Log.d(TAG, "db name: " + SharedPref.mInstance.getDBName());
 
+  }
+
+  private void fetchUserRoles(final String usernameStr) {
+    Log.d(TAG, "fetchUserRoles called for: " + usernameStr);
+    StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.fetch_user_roles,
+        response -> {
+          Log.d(TAG, "fetchUserRoles response: " + response);
+          try {
+            JSONObject obj = new JSONObject(response);
+            if (obj.getString("status").equals("success")) {
+              String roles = obj.getString("roles");
+              SharedPref.getInstance(getApplicationContext()).storeRoleKey(roles);
+              Log.d(TAG, "Role stored: " + roles);
+            }
+          } catch (Exception e) {
+            Log.e(TAG, "fetchUserRoles parse error: " + e.getMessage());
+            e.printStackTrace();
+          }
+          syncFcmToken();
+        },
+        error -> {
+          Log.e(TAG, "Error fetching roles: " + error.getMessage());
+          // Still sync FCM token even if roles fail, then navigate
+          syncFcmToken();
+        }) {
+      @Override
+      protected Map<String, String> getParams() {
+        Map<String, String> params = new HashMap<>();
+        params.put("username", usernameStr);
+        params.put("db_host", SharedPref.mInstance.getDBHost());
+        params.put("db_username", SharedPref.mInstance.getDBUsername());
+        params.put("db_password", SharedPref.mInstance.getDBPassword());
+        params.put("db_name", SharedPref.mInstance.getDBName());
+        return params;
+      }
+    };
+    VolleySingleton.getInstance(login.this).addToRequestQueue(stringRequest);
+  }
+
+  private void syncFcmToken() {
+    FirebaseMessaging.getInstance().getToken()
+        .addOnCompleteListener(task -> {
+          if (!task.isSuccessful()) {
+            Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+            return;
+          }
+
+          // Get new FCM registration token
+          String token = task.getResult();
+          Log.d("FCM", "Token: " + token);
+
+          SharedPref.getInstance(login.this).storeFcmToken(token);
+          sendTokenToServer(token);
+        });
+  }
+
+  private void sendTokenToServer(String token) {
+    String appUsername = username.getText().toString().trim();   // login EditText value
+    String roleKey = SharedPref.getInstance(login.this).getRoleKey();
+
+    if (appUsername.isEmpty()) {
+      Log.e(TAG, "sendTokenToServer: username is empty, skipping");
+      navigateToHome();
+      return;
+    }
+
+    Log.d(TAG, "sendTokenToServer: username=" + appUsername + " | role=" + roleKey + " | token=" + token);
+
+    StringRequest stringRequest = new StringRequest(Request.Method.POST, APIClient.register_fcm_token,
+        response -> {
+          // PHP returns: {"status":"success","message":"Token registered successfully"}
+          //           or {"status":"error","message":"..."}
+          try {
+            JSONObject obj = new JSONObject(response);
+            String status = obj.getString("status");
+            String message = obj.getString("message");
+            if (status.equals("success")) {
+              Log.d(TAG, "FCM token registered successfully: " + message);
+            } else {
+              Log.e(TAG, "FCM token registration error from server: " + message);
+            }
+          } catch (JSONException e) {
+            Log.e(TAG, "FCM token response parse error: " + e.getMessage() + " | raw=" + response);
+          }
+          navigateToHome();
+        },
+        error -> {
+          Log.e(TAG, "FCM Token registration network error: " + error.getMessage());
+          navigateToHome();
+        }) {
+      @Override
+      protected Map<String, String> getParams() {
+        Map<String, String> params = new HashMap<>();
+        params.put("username", appUsername);          // was "user_id"
+        params.put("fcm_token", token);
+        params.put("device_type", "android");
+        params.put("role_key", roleKey != null ? roleKey : "");
+        params.put("db_host", SharedPref.mInstance.getDBHost());
+        params.put("db_username", SharedPref.mInstance.getDBUsername());
+        params.put("db_password", SharedPref.mInstance.getDBPassword());
+        params.put("db_name", SharedPref.mInstance.getDBName());
+        return params;
+      }
+    };
+    VolleySingleton.getInstance(login.this).addToRequestQueue(stringRequest);
+  }
+
+
+  private void navigateToHome() {
+    Intent intent = new Intent(login.this, Test.class);
+    intent.setFlags(
+        Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
   }
 
   private void closekey() {

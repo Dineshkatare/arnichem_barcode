@@ -99,6 +99,15 @@
         <activity
             android:name=".TransactionsView.validate_dc.FirstValidateDcActivity"
             android:exported="false" />
+
+        <activity
+            android:name="com.arnichem.arnichem_barcode.CustomerHolding.MobileHoldingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".view.NotificationHistoryActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".TransactionsView.validate_dc.EnterValidateActivity"
             android:exported="false" />
@@ -156,6 +165,7 @@
             android:exported="false"
             android:parentActivityName=".view.Dashboard"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".order.OrderMainActivity"
             android:exported="false"
@@ -165,6 +175,11 @@
             android:name=".leave.LeaveApplicationActivity"
             android:exported="false"
             android:parentActivityName=".driver.HrActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".leave.LeaveViewActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
             android:screenOrientation="portrait" />
         <activity
             android:name=".TransactionsView.DryIce.ViewDryIcePrintActivity"
@@ -234,6 +249,11 @@
         <activity
             android:name=".attendance.Attendance_log"
             android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".attendance.AttendanceViewActivity"
+            android:exported="false"
+            android:parentActivityName=".view.Dashboard"
             android:screenOrientation="portrait" />
         <activity
             android:name=".TransactionsView.DryIce.dry_ice_print"
@@ -809,6 +829,21 @@
         <!-- <receiver -->
         <!-- android:name=".CallLogSyncReceiver" -->
         <!-- android:exported="false" /> &lt;!&ndash; Handle alarms after device boot &ndash;&gt; -->
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/logo" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/purple_500" />
+
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"

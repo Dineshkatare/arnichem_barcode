@@ -337,6 +337,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:weightSum="2"
         android:padding="10dp">
 
         <Button
@@ -348,6 +349,15 @@
             android:text="Print">
         </Button>
 
+        <Button
+            android:id="@+id/holdingCheckBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/accent"
+            android:text="Check Holding"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

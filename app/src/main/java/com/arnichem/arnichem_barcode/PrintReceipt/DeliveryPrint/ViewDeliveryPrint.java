@@ -152,6 +152,17 @@ public class ViewDeliveryPrint extends AppCompatActivity {
         empbid.setText(dcno);
         //  postrequ();
         fetchGasTypes();
+        Button holdingCheckBtn = findViewById(R.id.holdingCheckBtn);
+        holdingCheckBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewDeliveryPrint.this, com.arnichem.arnichem_barcode.CustomerHolding.MobileHoldingActivity.class);
+                intent.putExtra("code", custcode);
+                intent.putExtra("dc_no", dcno);
+                startActivity(intent);
+            }
+        });
+
         duradelprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

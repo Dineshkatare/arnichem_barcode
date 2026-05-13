@@ -43,14 +43,9 @@ class LoginActivity : AppCompatActivity() {
 
         val loginButton = findViewById<Button>(R.id.loginButton)
         loginButton.setOnClickListener {
-            val email = emailEditText.text.toString().trim()
-            val password = passwordEditText.text.toString().trim()
-
-
-//            startActivity(Intent(this,HomeActivity::class.java))
-            if (validateInput(email, password)) {
-                login(email, password)
-            }
+            // UI-flow mode: skip API call and navigate directly to Dashboard
+            startActivity(Intent(this, Dashboard::class.java))
+            finish()
         }
     }
 
@@ -75,7 +70,10 @@ class LoginActivity : AppCompatActivity() {
                     if (response.status == "success") {
                         // Handle successful login (e.g., navigate to main activity, store user data)
                         Toast.makeText(this@LoginActivity, "Login successful!", Toast.LENGTH_SHORT).show()
-                        // ...
+                        
+                        val intent = Intent(this@LoginActivity, Dashboard::class.java)
+                        startActivity(intent)
+                        finish()
                     } else {
                         Toast.makeText(this@LoginActivity, response.message, Toast.LENGTH_SHORT).show()
                     }

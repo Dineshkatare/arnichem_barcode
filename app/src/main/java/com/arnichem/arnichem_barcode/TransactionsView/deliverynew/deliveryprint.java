@@ -100,6 +100,7 @@ public class deliveryprint extends AppCompatActivity {
     Bitmap printLogoDr,phoneNumberDr,digital_sign;
     ImageView printImg,phoneImg,custnamesign;
     TextView arnichemsignTxt,termsTxt;
+    Button holdingCheckBtn;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +121,16 @@ public class deliveryprint extends AppCompatActivity {
         arnichemsignTxt = findViewById(R.id.arnichemsignTxt);
         custnamesign = findViewById(R.id.custnamesign);
         termsTxt = findViewById(R.id.termsTxt);
+        holdingCheckBtn = findViewById(R.id.holdingCheckBtn);
+        holdingCheckBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(deliveryprint.this, com.arnichem.arnichem_barcode.CustomerHolding.MobileHoldingActivity.class);
+                intent.putExtra("code", custcode);
+                intent.putExtra("dc_no", empb);
+                startActivity(intent);
+            }
+        });
         deliveryPrintDB=new DeliveryPrintDB(this);
         Intent i=getIntent();
         custname=i.getStringExtra("custname");

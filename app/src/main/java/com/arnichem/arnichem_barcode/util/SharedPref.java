@@ -68,6 +68,8 @@ public class SharedPref {
     public static final String batch_prefix = "batch_prefix";
 
     public static final String cyc_prefix = "cyc_prefix";
+    public static final String FCM_TOKEN = "fcm_token";
+    public static final String ROLE_KEY = "role_key";
 
     public static SharedPref mInstance;
     public static Context mCtx;
@@ -707,5 +709,29 @@ public class SharedPref {
     public String getPersistentDeviceNumber() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(PERM_PREF_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString(DEVICE_NO, "");
+    }
+
+    public void storeFcmToken(String token) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(FCM_TOKEN, token);
+        editor.apply();
+    }
+
+    public String getFcmToken() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(FCM_TOKEN, "");
+    }
+
+    public void storeRoleKey(String role) {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(ROLE_KEY, role);
+        editor.apply();
+    }
+
+    public String getRoleKey() {
+        SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(ROLE_KEY, "");
     }
 }

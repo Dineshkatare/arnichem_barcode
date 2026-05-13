@@ -157,109 +157,169 @@ public class Test extends AppCompatActivity {
 
     private void loadAllOtherData(List<OtherItem> otherItemList, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (OtherItem item : otherItemList) {
-                otherItemsHandler.addItems(item.getItem_code(), item.getShort_description());
+            try {
+                if (otherItemList != null) {
+                    for (OtherItem item : otherItemList) {
+                        otherItemsHandler.addItems(item.getItem_code(), item.getShort_description());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadAllBusinessPartner(List<BusinessPartner> businessPartnerAllList, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (BusinessPartner partner : businessPartnerAllList) {
-                businessPartnersHandler.add(partner.getName(), partner.getCode());
+            try {
+                if (businessPartnerAllList != null) {
+                    for (BusinessPartner partner : businessPartnerAllList) {
+                        businessPartnersHandler.add(partner.getName(), partner.getCode());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadAllEmployee(List<Employe> employeList, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (Employe employee : employeList) {
-                employeHandler.addEmployee(employee.getName(), employee.getCode());
+            try {
+                if (employeList != null) {
+                    for (Employe employee : employeList) {
+                        employeHandler.addEmployee(employee.getName(), employee.getCode());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadDuraCylinder(List<DuraCylinder> duraCylinder, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (DuraCylinder cylinder : duraCylinder) {
-                durasyncHelper.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith());
+            try {
+                if (duraCylinder != null) {
+                    for (DuraCylinder cylinder : duraCylinder) {
+                        durasyncHelper.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadDistributor(List<Distributor> distributor, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (Distributor dist : distributor) {
-                distributorHelper.addcust(dist.getName(), dist.getCode());
+            try {
+                if (distributor != null) {
+                    for (Distributor dist : distributor) {
+                        distributorHelper.addcust(dist.getName(), dist.getCode());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadVehicleDetail(List<VehicleDetail> vehicleDetails, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (VehicleDetail detail : vehicleDetails) {
-                vehicleHandler.insertLabel(detail.getName());
+            try {
+                if (vehicleDetails != null) {
+                    for (VehicleDetail detail : vehicleDetails) {
+                        vehicleHandler.insertLabel(detail.getName());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadLocationCode(List<LocationCode> locationCode, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (LocationCode code : locationCode) {
-                fromloccodehandler.addcust(code.getName(), code.getCode());
+            try {
+                if (locationCode != null) {
+                    for (LocationCode code : locationCode) {
+                        fromloccodehandler.addcust(code.getName(), code.getCode());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadInventoryLiquid(List<InventoryLiquid> inventoryLiquid, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (InventoryLiquid liquid : inventoryLiquid) {
-                delivery_type_liquidHandler.insertLabel(liquid.getName(), liquid.getCode(), liquid.getUnit(), liquid.getConvFactor(), liquid.getHsn(), liquid.getGst());
+            try {
+                if (inventoryLiquid != null) {
+                    for (InventoryLiquid liquid : inventoryLiquid) {
+                        delivery_type_liquidHandler.insertLabel(liquid.getName(), liquid.getCode(), liquid.getUnit(), liquid.getConvFactor(), liquid.getHsn(), liquid.getGst());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadInventoryCylinders(List<InventoryCylinder> inventoryCylinders, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (InventoryCylinder cylinder : inventoryCylinders) {
-                sync.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith(), cylinder.getSerial_no(), cylinder.getHydrotest_date(), cylinder.getOwner(), cylinder.getStatus(),cylinder.getWater_capacity(),cylinder.getMfg(), cylinder.getLocation());
+            try {
+                if (inventoryCylinders != null) {
+                    for (InventoryCylinder cylinder : inventoryCylinders) {
+                        sync.addBook(cylinder.getItemCode(), cylinder.getBarcode(), cylinder.getWeight(), cylinder.getVolume(), cylinder.getFilledWith(), cylinder.getSerial_no(), cylinder.getHydrotest_date(), cylinder.getOwner(), cylinder.getStatus(),cylinder.getWater_capacity(),cylinder.getMfg(), cylinder.getLocation());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadBusinessPartners(List<BusinessPartner> businessPartners, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (BusinessPartner partner : businessPartners) {
-                databaseHandlercustomer.addcust(partner.getName(), partner.getCode(), partner.getInvoice(),partner.getDel_instructions());
+            try {
+                if (businessPartners != null) {
+                    for (BusinessPartner partner : businessPartners) {
+                        databaseHandlercustomer.addcust(partner.getName(), partner.getCode(), partner.getInvoice(),partner.getDel_instructions());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadBPContact(List<BpContact> bpContact, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (BpContact contact : bpContact) {
-                bp_contact_handler.addcust(contact.getName(), contact.getCode());
+            try {
+                if (bpContact != null) {
+                    for (BpContact contact : bpContact) {
+                        bp_contact_handler.addcust(contact.getName(), contact.getCode());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
     }
 
     private void loadInventoryGases(List<InventoryGa> inventoryGa, CountDownLatch latch) {
         Executors.newSingleThreadExecutor().execute(() -> {
-            for (InventoryGa gas : inventoryGa) {
-                inventoryGases.addGas(gas.getGasName(), gas.getItem_code());
+            try {
+                if (inventoryGa != null) {
+                    for (InventoryGa gas : inventoryGa) {
+                        inventoryGases.addGas(gas.getGasName(), gas.getItem_code());
+                    }
+                }
+            } finally {
+                latch.countDown();
             }
-            latch.countDown();
         });
 
     }

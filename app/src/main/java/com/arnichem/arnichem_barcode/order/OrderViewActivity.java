@@ -1,5 +1,6 @@
 package com.arnichem.arnichem_barcode.order;
 
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -13,13 +14,24 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
 import com.arnichem.arnichem_barcode.R;
+import com.arnichem.arnichem_barcode.util.SharedPref;
 import com.arnichem.arnichem_barcode.view.Dashboard;
+import com.arnichem.arnichem_barcode.view.VolleySingleton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class OrderViewActivity extends AppCompatActivity {
 
     private TextView dateTextView, codeTextView, nameTextView, messageTextView, remarksTextView, itemsTextView, linkTextView;
     private LinearLayout copyIcon, shareIcon;
+    private android.widget.ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +50,11 @@ public class OrderViewActivity extends AppCompatActivity {
         String items = getIntent().getStringExtra("items");
         String link = getIntent().getStringExtra("link");
 
+        // If srno is missing but order_id is present, fetch data dynamically (from notification)
+        String notificationOrderId = getIntent().getStringExtra("order_id");
+
+        android.util.Log.d("OrderViewActivity", "onCreate: srno=" + srno + ", order_id=" + notificationOrderId);
+
         // Find views
         dateTextView = findViewById(R.id.cddateid);
         codeTextView = findViewById(R.id.codeid);
@@ -48,22 +65,79 @@ public class OrderViewActivity extends AppCompatActivity {
 
         copyIcon = findViewById(R.id.text_copy);
         shareIcon = findViewById(R.id.text_whatsapp);
+        progressBar = findViewById(R.id.progressBar);
 
+        if (srno == null && notificationOrderId != null) {
+            android.util.Log.d("OrderViewActivity", "Triggering dynamic fetch for order_id: " + notificationOrderId);
+            fetchOrderDetails(notificationOrderId);
+        } else {
+            android.util.Log.d("OrderViewActivity", "Populating UI from Intent extras");
+            populateUI(srno, date, code, name, message, remarks, items, link);
+        }
+    }
+
+    private void fetchOrderDetails(String orderId) {
+        if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_order_by_id.php",
+                response -> {
+                    if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                    android.util.Log.d("OrderViewActivity", "API Response: " + response);
+                    try {
+                        JSONObject obj = new JSONObject(response);
+                        if ("success".equals(obj.optString("status"))) {
+                            String srno = obj.optString("srno", "");
+                            String date = obj.optString("date_added", "");
+                            String code = obj.optString("code", "");
+                            String name = obj.optString("name", "");
+                            String message = obj.optString("message", "");
+                            String remarks = obj.optString("remarks", "");
+                            String link = obj.optString("link", "");
+                            populateUI(srno, date, code, name, message, remarks, "", link);
+                        } else {
+                            Toast.makeText(this, "API Error: " + obj.optString("message"), Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        android.util.Log.e("OrderViewActivity", "Parse error", e);
+                        Toast.makeText(this, "Parse error. Server returned: " + response, Toast.LENGTH_LONG).show();
+                    }
+                },
+                error -> {
+                    if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
+                    Toast.makeText(this, "Network error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("db_host", SharedPref.getInstance(OrderViewActivity.this).getDBHost());
+                params.put("db_username", SharedPref.getInstance(OrderViewActivity.this).getDBUsername());
+                params.put("db_password", SharedPref.getInstance(OrderViewActivity.this).getDBPassword());
+                params.put("db_name", SharedPref.getInstance(OrderViewActivity.this).getDBName());
+                params.put("order_id", orderId);
+                return params;
+            }
+        };
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
+    }
+
+    private void populateUI(String srno, String date, String code, String name, String message, String remarks, String items, String link) {
         // Set the text in the TextViews
         dateTextView.setText(date);
         codeTextView.setText(code);
         nameTextView.setText(name);
         messageTextView.setText(message);
         remarksTextView.setText(remarks);
-        linkTextView.setText(link);  // Set your URL as text
-        Linkify.addLinks(linkTextView, Linkify.WEB_URLS);  // Make it clickable
-        linkTextView.setMovementMethod(LinkMovementMethod.getInstance());  // Allow clicking
+        linkTextView.setText(link);
+        Linkify.addLinks(linkTextView, Linkify.WEB_URLS);
+        linkTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        // Set the copy data functionality
-        copyIcon.setOnClickListener(v -> copyData(srno,date, code, name, message, remarks, items, link));
-
-        // Set the share data functionality
-        shareIcon.setOnClickListener(v -> shareData(srno,date, code, name, message, remarks, items, link));
+        // Set listeners with current data
+        copyIcon.setOnClickListener(v -> copyData(srno, date, code, name, message, remarks, items, link));
+        shareIcon.setOnClickListener(v -> shareData(srno, date, code, name, message, remarks, items, link));
     }
 
     // Function to copy data to clipboard
@@ -109,9 +183,16 @@ public class OrderViewActivity extends AppCompatActivity {
         }
     }
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    public boolean onSupportNavigateUp() {
         startActivity(new Intent(OrderViewActivity.this, Dashboard.class));
+        finish();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(OrderViewActivity.this, Dashboard.class));
+        finish();
     }
 
 }

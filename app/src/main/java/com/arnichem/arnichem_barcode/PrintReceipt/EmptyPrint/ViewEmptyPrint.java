@@ -111,6 +111,17 @@ public class ViewEmptyPrint extends AppCompatActivity {
         postrequ();
         empbid.setText(empno);
 
+        Button holdingCheckBtn = findViewById(R.id.holdingCheckBtn);
+        holdingCheckBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ViewEmptyPrint.this, com.arnichem.arnichem_barcode.CustomerHolding.MobileHoldingActivity.class);
+                intent.putExtra("code", cust_code);
+                intent.putExtra("dc_no", empno);
+                startActivity(intent);
+            }
+        });
+
         duradelprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

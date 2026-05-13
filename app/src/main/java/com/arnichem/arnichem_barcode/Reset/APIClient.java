@@ -20,6 +20,11 @@ public class APIClient {
     public static final String barcode_registration = "http://arnichem.co.in/intranet/barcode/APP/app_apis/barcode_registration_v8.5.php"; // DONE
     public static final String crm_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/crm_entry.php";
     public static final String bpcontact_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/bpcontact_entry.php";
+    public static final String register_fcm_token = "http://arnichem.co.in/intranet/barcode/APP/app_apis/register_fcm_token.php";
+    public static final String fetch_user_roles = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_user_roles.php";
+    public static final String get_notification_history = "http://arnichem.co.in/intranet/barcode/APP/app_apis/get_notification_history.php";
+    public static final String update_notification_status = "http://arnichem.co.in/intranet/barcode/APP/app_apis/update_notification_status.php";
+    public static final String fetch_order_by_id = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_order_by_id.php";
 
     public static final String diesel_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/diesel_entry.php";
     public static final String closing_stock_entry = "http://arnichem.co.in/intranet/barcode/APP/app_apis/closing_stock_entry.php";
@@ -57,6 +62,8 @@ public class APIClient {
     public static final String fetch_print_data_empty_main = "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_print_data_empty_main.php";
     public static final String change_password = "http://arnichem.co.in/intranet/barcode/APP/app_apis/change_password.php";
     public static final String check_dual_delivery = "http://arnichem.co.in/intranet/barcode/APP/app_apis/check_dual_delivery.php";
+    public static final String fetch_customer_holding = "fetch_customer_holding.php";
+    public static final String save_customer_holding = "save_holding_report.php";
 
     public static final String check_attendance_status = "http://arnichem.co.in/intranet/barcode/APP/app_apis/get_emp_attendance_status.php";
 

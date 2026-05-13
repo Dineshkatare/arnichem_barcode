@@ -112,7 +112,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
     private EasyWayLocation easyWayLocation;
     GetLocationDetail getLocationDetail;
     CardView vehicle, Barcode, transactions, Producation, GooglePay, Godown, file_upload, setting, Payment_Receipt, CRM,
-            DieselEntry, customerHoldCl, otherCl, report, order, resource, contactSearchCl, tasksCl, printhistory;
+            DieselEntry, customerHoldCl, otherCl, report, order, resource, contactSearchCl, tasksCl, printhistory, notificationHistoryCl;
     SharedPreferences pref;
     ScrollView scrollView;
     boolean doubleBackToExitPressedOnce = false;
@@ -154,7 +154,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         } else {
             tvVehicle.setText("NO VEHICLE |");
         }
-        tvVersion.setText(" Version :" + "10.4");
+        tvVersion.setText(" Version :" + "10.6");
 
         // click listeners
         icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));
@@ -218,6 +218,8 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         tasksCl = findViewById(R.id.tasksCl);
         tvTaskCount = findViewById(R.id.tvTaskCount);
         printhistory = findViewById(R.id.printhistory);
+        notificationHistoryCl = findViewById(R.id.notificationHistoryCl);
+        notificationHistoryCl.setVisibility(View.GONE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")) {
             report.setVisibility(View.VISIBLE);
@@ -446,6 +448,14 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             }
         });
 
+        notificationHistoryCl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(Dashboard.this, NotificationHistoryActivity.class);
+                startActivity(i);
+            }
+        });
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(this,
                     Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
@@ -454,6 +464,10 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
 
             }
         }
+        
+        // Sync roles and FCM token
+        fetchUserRoles(SharedPref.getInstance(this).getEmail());
+        
         getReport();
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
@@ -606,7 +620,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
             }
         }
         if (requestCode == PERMISSION_REQUEST_READ_CALL_LOG) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, proceed with fetching and uploading call logs
                 retrieveAndUploadLogs(this);
             } else {
@@ -839,6 +853,82 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
                 Log.e("Dashboard", "Task count failed", t);
             }
         });
+    }
+
+    private void fetchUserRoles(final String usernameStr) {
+        if(usernameStr == null || usernameStr.isEmpty()) return;
+        com.android.volley.toolbox.StringRequest stringRequest = new com.android.volley.toolbox.StringRequest(com.android.volley.Request.Method.POST, APIClient.fetch_user_roles,
+                response -> {
+                    try {
+                        org.json.JSONObject obj = new org.json.JSONObject(response);
+                        if (obj.getString("status").equals("success")) {
+                            String roles = obj.getString("roles");
+                            SharedPref.getInstance(getApplicationContext()).storeRoleKey(roles);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    syncFcmToken();
+                },
+                error -> {
+                    Log.e("Roles", "Error fetching roles: " + error.getMessage());
+                    syncFcmToken();
+                }) {
+            @Override
+            protected java.util.Map<String, String> getParams() {
+                java.util.Map<String, String> params = new java.util.HashMap<>();
+                params.put("username", usernameStr);
+                params.put("db_host", SharedPref.mInstance.getDBHost());
+                params.put("db_username", SharedPref.mInstance.getDBUsername());
+                params.put("db_password", SharedPref.mInstance.getDBPassword());
+                params.put("db_name", SharedPref.mInstance.getDBName());
+                return params;
+            }
+        };
+        com.arnichem.arnichem_barcode.view.VolleySingleton.getInstance(Dashboard.this).addToRequestQueue(stringRequest);
+    }
+
+    private void syncFcmToken() {
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+                    Log.d("FCM", "Token: " + token);
+
+                    SharedPref.getInstance(Dashboard.this).storeFcmToken(token);
+                    sendTokenToServer(token);
+                });
+    }
+
+    private void sendTokenToServer(String token) {
+        String appUsername = SharedPref.getInstance(Dashboard.this).UserName(); // Use UserName() instead of Id()
+        if (appUsername == null || appUsername.isEmpty()) {
+            return;
+        }
+
+        com.android.volley.toolbox.StringRequest stringRequest = new com.android.volley.toolbox.StringRequest(com.android.volley.Request.Method.POST, APIClient.register_fcm_token,
+                response -> Log.d("FCM", "Token registered: " + response),
+                error -> Log.e("FCM", "Token registration failed: " + error.getMessage())) {
+            @Override
+            protected java.util.Map<String, String> getParams() {
+                java.util.Map<String, String> params = new java.util.HashMap<>();
+                params.put("username", appUsername); // Use "username" to match PHP script
+                params.put("fcm_token", token);
+                params.put("device_type", "android");
+                params.put("db_host", SharedPref.mInstance.getDBHost());
+                params.put("db_username", SharedPref.mInstance.getDBUsername());
+                params.put("db_password", SharedPref.mInstance.getDBPassword());
+                params.put("db_name", SharedPref.mInstance.getDBName());
+                params.put("role_key", SharedPref.getInstance(Dashboard.this).getRoleKey());
+                return params;
+            }
+        };
+        com.arnichem.arnichem_barcode.view.VolleySingleton.getInstance(Dashboard.this).addToRequestQueue(stringRequest);
     }
 
 }

@@ -441,7 +441,7 @@ public class CRM_Main extends AppCompatActivity implements Listener, LocationDat
                                         intent.putExtra("meeting_type", meeting_type_name);
                                         intent.putExtra("discussion", discussionVal.getText().toString());
                                         intent.putExtra("link",
-                                                "https://arnichem.co.in/intranet/bpview.php?code=" + cust_code);
+                                                "https://arnisol.com/intranet/view_business_partner.php?code=" + cust_code);
                                         startActivity(intent);
 
                                     } else {

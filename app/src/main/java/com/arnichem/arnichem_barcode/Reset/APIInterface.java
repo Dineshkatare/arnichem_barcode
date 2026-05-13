@@ -1,6 +1,7 @@
 package com.arnichem.arnichem_barcode.Reset;
 
 import com.arnichem.arnichem_barcode.CallLogManager;
+import com.arnichem.arnichem_barcode.CustomerHolding.HoldingResponse;
 import com.arnichem.arnichem_barcode.FileUpload.ApiResponse;
 import com.arnichem.arnichem_barcode.FileUpload.FileUploadData;
 import com.arnichem.arnichem_barcode.GetData.GetDataResponse;
@@ -79,7 +80,7 @@ public interface APIInterface {
                         @Field("db_name") String db_name);
 
         @Multipart
-        @POST("attendance_log6.0.php") // Update with your actual endpoint
+        @POST("attendance_log_10.6.php") // Update with your actual endpoint
         Call<MyResponseModel> uploadImageWithTextData(
                         @Part("time") RequestBody time,
                         @Part("remarks") RequestBody remarks,
@@ -306,13 +307,12 @@ public interface APIInterface {
                         @Field("call_logs") String callLogsJson);
 
         @FormUrlEncoded
-        @POST("apply_leave.php") // Example: "leave/submit_leave.php"
+        @POST("apply_leave_10.6.php") // Example: "leave/submit_leave.php"
         Call<LeaveResponse> submitLeaveApplication(
                         @Field("db_host") String dbHost,
                         @Field("db_username") String dbUsername,
                         @Field("db_password") String dbPassword,
                         @Field("db_name") String dbName,
-
                         @Field("emp_id") String empId,
                         @Field("from_date") String fromDate,
                         @Field("to_date") String toDate,
@@ -339,7 +339,7 @@ public interface APIInterface {
         );
 
         @FormUrlEncoded
-        @POST("order_main.php")
+        @POST("order_main_10.6.php")
         Call<LeaveResponse> submitOrder(
                         @Field("db_host") String dbHost,
                         @Field("db_username") String dbUsername,
@@ -352,7 +352,7 @@ public interface APIInterface {
                         @Field("date_added") String date_added);
 
         @FormUrlEncoded
-        @POST("pick_entry.php")
+        @POST("pick_entry_10.6.php")
         Call<OrderResponse> submitPick(
                         @Field("db_host") String dbHost,
                         @Field("db_username") String dbUsername,
@@ -413,4 +413,40 @@ public interface APIInterface {
                         @Field("db_name") String dbName,
                         @Field("device_name") String deviceName,
                         @Field("user_email") String userEmail);
+    @FormUrlEncoded
+    @POST("fetch_customer_holding.php")
+    Call<HoldingResponse> getCustomerHolding(
+            @Field("cust_code") String custCode,
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName);
+
+    @FormUrlEncoded
+    @POST("save_holding_report.php")
+    Call<ResponseBody> saveHoldingReport(
+            @Field("json_data") String jsonData,
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName);
+
+    @FormUrlEncoded
+    @POST("get_notification_history.php")
+    Call<ResponseBody> getNotificationHistory(
+            @Field("user_id") String userId,
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName);
+
+    @FormUrlEncoded
+    @POST("update_notification_status.php")
+    Call<ResponseBody> updateNotificationStatus(
+            @Field("notification_id") String notificationId,
+            @Field("status") String status,
+            @Field("db_host") String dbHost,
+            @Field("db_username") String dbUsername,
+            @Field("db_password") String dbPassword,
+            @Field("db_name") String dbName);
 }

@@ -17,6 +17,8 @@ import com.arnichem.arnichem_barcode.util.MyApplication;
 import com.arnichem.arnichem_barcode.util.SharedPref;
 
 import java.util.Calendar;
+import com.arnichem.arnichem_barcode.order.OrderViewActivity;
+import com.arnichem.arnichem_barcode.view.Dashboard;
 
 public class SplashScreen extends AppCompatActivity {
     SharedPreferences pref;
@@ -27,6 +29,8 @@ public class SplashScreen extends AppCompatActivity {
         getSupportActionBar().hide();
         MyApplication myApplication=new MyApplication();
         ProcessLifecycleOwner.get().getLifecycle().addObserver(myApplication);
+
+        checkNotificationIntent();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         pref = getSharedPreferences(constant.TAG,MODE_PRIVATE);
@@ -58,8 +62,16 @@ public class SplashScreen extends AppCompatActivity {
 //                    {
                         if (status.equals("success"))
                         {
-                            Intent intent = new Intent(getApplicationContext(),Dashboard.class);
-                            startActivity(intent);
+                            Intent nextIntent;
+                            String eventType = getIntent().getStringExtra("event_type");
+                            
+                            if ("new_order".equals(eventType)) {
+                                nextIntent = new Intent(getApplicationContext(), OrderViewActivity.class);
+                                nextIntent.putExtra("order_id", getIntent().getStringExtra("order_id"));
+                            } else {
+                                nextIntent = new Intent(getApplicationContext(), Dashboard.class);
+                            }
+                            startActivity(nextIntent);
                         } else {
                             Intent intent = new Intent(getApplicationContext(),SelectCompanyActivity.class);
                             startActivity(intent);
@@ -76,5 +88,36 @@ public class SplashScreen extends AppCompatActivity {
                 super.run();
             }
         }.start();
+    }
+
+    private void checkNotificationIntent() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("notification_id")) {
+            String notificationId = intent.getStringExtra("notification_id");
+            if (notificationId != null) {
+                String dbHost = SharedPref.mInstance.getDBHost();
+                String dbUsername = SharedPref.mInstance.getDBUsername();
+                String dbPassword = SharedPref.mInstance.getDBPassword();
+                String dbName = SharedPref.mInstance.getDBName();
+
+                com.arnichem.arnichem_barcode.Reset.APIInterface apiInterface =
+                        com.arnichem.arnichem_barcode.Reset.APIClient.getClient().create(com.arnichem.arnichem_barcode.Reset.APIInterface.class);
+
+                retrofit2.Call<okhttp3.ResponseBody> call = apiInterface.updateNotificationStatus(
+                        notificationId, "opened", dbHost, dbUsername, dbPassword, dbName);
+
+                call.enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+                    @Override
+                    public void onResponse(retrofit2.Call<okhttp3.ResponseBody> call, retrofit2.Response<okhttp3.ResponseBody> response) {
+                        // Status updated successfully
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<okhttp3.ResponseBody> call, Throwable t) {
+                        // Error updating status
+                    }
+                });
+            }
+        }
     }
 }

@@ -19,6 +19,15 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.arnichem.arnichem_barcode.R;
 import com.arnichem.arnichem_barcode.view.Dashboard;
+import com.android.volley.Request;
+import com.android.volley.toolbox.StringRequest;
+import com.arnichem.arnichem_barcode.view.VolleySingleton;
+import com.arnichem.arnichem_barcode.util.SharedPref;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.HashMap;
+import java.util.Map;
+import android.app.ProgressDialog;
 
 public class PickViewActivity extends AppCompatActivity {
     private TextView dateTextView, codeTextView, nameTextView, messageTextView, remarksTextView, itemsTextView, linkTextView;
@@ -32,7 +41,8 @@ public class PickViewActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("PICK ENTRY");
 
         // Retrieve data passed from the previous activity
-        int srno = getIntent().getIntExtra("srno", 0); // Default -1 if not found
+        int srnoInt = getIntent().getIntExtra("srno", 0); 
+        String srno = srnoInt != 0 ? String.valueOf(srnoInt) : null;
         String date = getIntent().getStringExtra("date_added");
         String code = getIntent().getStringExtra("code");
         String name = getIntent().getStringExtra("name");
@@ -40,6 +50,11 @@ public class PickViewActivity extends AppCompatActivity {
         String remarks = getIntent().getStringExtra("remarks");
         String items = getIntent().getStringExtra("items");
         String link = getIntent().getStringExtra("link");
+
+        // If srno is missing but pick_id is present, fetch data dynamically (from notification)
+        String notificationPickId = getIntent().getStringExtra("pick_id");
+
+        android.util.Log.d("PickViewActivity", "onCreate: srno=" + srno + ", pick_id=" + notificationPickId);
 
         // Find views
         dateTextView = findViewById(R.id.cddateid);
@@ -52,22 +67,80 @@ public class PickViewActivity extends AppCompatActivity {
         copyIcon = findViewById(R.id.text_copy);
         shareIcon = findViewById(R.id.text_whatsapp);
 
+        if (srno == null && notificationPickId != null) {
+            android.util.Log.d("PickViewActivity", "Triggering dynamic fetch for pick_id: " + notificationPickId);
+            fetchPickDetails(notificationPickId);
+        } else {
+            android.util.Log.d("PickViewActivity", "Populating UI from Intent extras");
+            populateUI(srno, date, code, name, message, remarks, items, link);
+        }
+    }
+
+    private void fetchPickDetails(String pickId) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading pick details...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                "http://arnichem.co.in/intranet/barcode/APP/app_apis/fetch_pick_by_id.php",
+                response -> {
+                    progressDialog.dismiss();
+                    android.util.Log.d("PickViewActivity", "API Response: " + response);
+                    try {
+                        JSONObject obj = new JSONObject(response);
+                        if ("success".equals(obj.optString("status"))) {
+                            String srno = obj.optString("srno", "");
+                            String date = obj.optString("date_added", "");
+                            String code = obj.optString("code", "");
+                            String name = obj.optString("name", "");
+                            String message = obj.optString("message", "");
+                            String remarks = obj.optString("remarks", "");
+                            String link = obj.optString("link", "");
+                            populateUI(srno, date, code, name, message, remarks, "", link);
+                        } else {
+                            Toast.makeText(this, "API Error: " + obj.optString("message"), Toast.LENGTH_LONG).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        android.util.Log.e("PickViewActivity", "Parse error", e);
+                        Toast.makeText(this, "Parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                },
+                error -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(this, "Network error: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("db_host", SharedPref.getInstance(PickViewActivity.this).getDBHost());
+                params.put("db_username", SharedPref.getInstance(PickViewActivity.this).getDBUsername());
+                params.put("db_password", SharedPref.getInstance(PickViewActivity.this).getDBPassword());
+                params.put("db_name", SharedPref.getInstance(PickViewActivity.this).getDBName());
+                params.put("pick_id", pickId);
+                return params;
+            }
+        };
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
+    }
+
+    private void populateUI(String srno, String date, String code, String name, String message, String remarks, String items, String link) {
         // Set the text in the TextViews
         dateTextView.setText(date);
         codeTextView.setText(code);
         nameTextView.setText(name);
         messageTextView.setText(message);
         remarksTextView.setText(remarks);
-        linkTextView.setText(link);  // Set your URL as text
-        Linkify.addLinks(linkTextView, Linkify.WEB_URLS);  // Make it clickable
-        linkTextView.setMovementMethod(LinkMovementMethod.getInstance());  // Allow clicking
+        linkTextView.setText(link);
+        Linkify.addLinks(linkTextView, Linkify.WEB_URLS);
+        linkTextView.setMovementMethod(LinkMovementMethod.getInstance());
 
-        // Set the copy data functionality
-        copyIcon.setOnClickListener(v -> copyData(String.valueOf(srno),date, code, name, message, remarks, items, link));
-
-        // Set the share data functionality
-        shareIcon.setOnClickListener(v -> shareData(String.valueOf(srno),date, code, name, message, remarks, items, link));
-
+        // Set listeners with current data
+        copyIcon.setOnClickListener(v -> copyData(srno, date, code, name, message, remarks, items, link));
+        shareIcon.setOnClickListener(v -> shareData(srno, date, code, name, message, remarks, items, link));
     }
     private void copyData(String srno,String date, String code, String name, String message, String remarks, String items, String link) {
         String dataToCopy = "*New Holding Pick Details*\n" +
@@ -111,9 +184,16 @@ public class PickViewActivity extends AppCompatActivity {
         }
     }
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    public boolean onSupportNavigateUp() {
         startActivity(new Intent(PickViewActivity.this, Dashboard.class));
+        finish();
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(PickViewActivity.this, Dashboard.class));
+        finish();
     }
 
 }

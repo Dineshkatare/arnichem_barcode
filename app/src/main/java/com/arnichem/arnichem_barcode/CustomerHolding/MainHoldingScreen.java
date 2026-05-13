@@ -81,9 +81,9 @@ public class MainHoldingScreen extends AppCompatActivity {
     }
 
     private void nextScreeen() {
-        Intent intent = new Intent(MainHoldingScreen.this, WebViewActivity.class);
+        Intent intent = new Intent(MainHoldingScreen.this, MobileHoldingActivity.class);
         intent.putExtra("code", cust_code);
-        intent.putExtra("customer_id", cust_invoice);
+        intent.putExtra("dc_no", cust_invoice);
         startActivity(intent);
     }
 

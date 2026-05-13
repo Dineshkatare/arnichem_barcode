@@ -121,6 +121,17 @@ public class Empty_Print extends AppCompatActivity {
         vehicleno.setText(SharedPref.getInstance(this).getVehicleNo());
         arnichemdignprint.setText(SharedPref.getInstance(this).FirstName() + SharedPref.getInstance(this).LastName());
 
+        Button holdingCheckBtn = findViewById(R.id.holdingCheckBtn);
+        holdingCheckBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Empty_Print.this, com.arnichem.arnichem_barcode.CustomerHolding.MobileHoldingActivity.class);
+                intent.putExtra("code", cust_code);
+                intent.putExtra("dc_no", empb);
+                startActivity(intent);
+            }
+        });
+
         duradelprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

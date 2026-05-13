@@ -4,53 +4,76 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".CustomerHolding.MainHoldingScreen">
 
+    <View
+        android:id="@+id/header_bg"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/primary"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/custnamespintxt"
+        android:id="@+id/header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="40dp"
+        android:text="Select\nCustomer"
+        android:textColor="@color/white"
+        android:textSize="32sp"
+        android:fontFamily="sans-serif-black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_margin="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="-40dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:layout_constraintTop_toBottomOf="@id/header_bg">
 
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center_horizontal"
-        android:text="Customer Name"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="16dp"
-        android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CUSTOMER"
+                android:textColor="@color/text_muted"
+                android:textSize="12sp"
+                android:letterSpacing="0.1"
+                android:textStyle="bold" />
 
+            <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                android:id="@+id/customerspin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/editbox"
+                android:backgroundTint="@color/background"
+                android:paddingHorizontal="12dp" />
 
-    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
-        android:id="@+id/customerspin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/custnamespintxt"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/editbox"
-        android:textAlignment="center" />
+            <Button
+                android:id="@+id/submitBtn"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/rounded_corner"
+                android:backgroundTint="@color/accent"
+                android:text="GET HOLDING DETAILS"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:letterSpacing="0.05"
+                android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/submitBtn"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/rounded_corner"
-        android:text="Submit"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="20dp"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="20dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

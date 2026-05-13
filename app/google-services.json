@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "522663265265",
-    "project_id": "arnichem-4a0c1",
-    "storage_bucket": "arnichem-4a0c1.firebasestorage.app"
+    "project_number": "793323622173",
+    "project_id": "arnisol-erp",
+    "storage_bucket": "arnisol-erp.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:522663265265:android:74b72a415db1a1ee977a50",
+        "mobilesdk_app_id": "1:793323622173:android:1b337d8e266d5a8d881bf4",
         "android_client_info": {
           "package_name": "com.arnichem.arnichem_barcode"
         }
@@ -15,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBqYP4RgJkROKAMQsf3yfVkRxQV1dVq-pk"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:522663265265:android:03ba687042722d0c977a50",
-        "android_client_info": {
-          "package_name": "com.example.authapp"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBqYP4RgJkROKAMQsf3yfVkRxQV1dVq-pk"
+          "current_key": "AIzaSyCPxixjR4Ai_bF83m8VfAX7vpTL44gYSwQ"
         }
       ],
       "services": {
