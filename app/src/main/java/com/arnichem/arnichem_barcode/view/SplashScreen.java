@@ -60,17 +60,35 @@ public class SplashScreen extends AppCompatActivity {
                     Thread.sleep(2000);
 //                    if(SharedPref.getInstance(SplashScreen.this).isSelectedCompany())
 //                    {
-                        if (status.equals("success"))
+                    if (status.equals("success"))
                         {
                             Intent nextIntent;
-                            String eventType = getIntent().getStringExtra("event_type");
-                            
-                            if ("new_order".equals(eventType)) {
+                            String orderId  = getIntent().getStringExtra("order_id");
+                            String pickId   = getIntent().getStringExtra("pick_id");
+                            String leaveId  = getIntent().getStringExtra("leave_id");
+                            String logId    = getIntent().getStringExtra("log_id");
+
+                            if (orderId != null && !orderId.isEmpty()) {
                                 nextIntent = new Intent(getApplicationContext(), OrderViewActivity.class);
-                                nextIntent.putExtra("order_id", getIntent().getStringExtra("order_id"));
+                            } else if (pickId != null && !pickId.isEmpty()) {
+                                nextIntent = new Intent(getApplicationContext(),
+                                        com.arnichem.arnichem_barcode.order.PickViewActivity.class);
+                            } else if (leaveId != null && !leaveId.isEmpty()) {
+                                nextIntent = new Intent(getApplicationContext(),
+                                        com.arnichem.arnichem_barcode.leave.LeaveViewActivity.class);
+                            } else if (logId != null && !logId.isEmpty()) {
+                                nextIntent = new Intent(getApplicationContext(),
+                                        com.arnichem.arnichem_barcode.attendance.AttendanceViewActivity.class);
                             } else {
                                 nextIntent = new Intent(getApplicationContext(), Dashboard.class);
                             }
+
+                            // Forward ALL notification data extras to the target activity
+                            android.os.Bundle extras = getIntent().getExtras();
+                            if (extras != null) {
+                                nextIntent.putExtras(extras);
+                            }
+
                             startActivity(nextIntent);
                         } else {
                             Intent intent = new Intent(getApplicationContext(),SelectCompanyActivity.class);

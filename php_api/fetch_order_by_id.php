@@ -5,13 +5,14 @@
 header('Content-Type: application/json');
 
 // DB credentials
-if (isset($_POST['db_host']) && isset($_POST['db_username']) && isset($_POST['db_password']) && isset($_POST['db_name'])) {
+// Validate database parameters - using !empty to avoid empty strings causing MySQL errors
+if (!empty($_POST['db_host']) && !empty($_POST['db_username']) && !empty($_POST['db_name'])) {
     $servername = $_POST['db_host'];
     $db_user    = $_POST['db_username'];
-    $db_pass    = $_POST['db_password'];
+    $db_pass    = isset($_POST['db_password']) ? $_POST['db_password'] : '';
     $dbname     = $_POST['db_name'];
 } else {
-    echo json_encode(array("status" => "error", "message" => "Missing database credentials"));
+    echo json_encode(array("status" => "error", "message" => "Missing or incomplete database credentials"));
     exit;
 }
 
@@ -22,15 +23,18 @@ if ($order_id <= 0) {
 }
 
 // Establish Database Connection
+// NOTE: We try to avoid connect_app.php if it might output plain text errors
 if (file_exists(__DIR__ . "/connect_app.php")) {
-    include(__DIR__ . "/connect_app.php");
-} else {
+    // We suppress warnings and check if connection was actually established
+    @include(__DIR__ . "/connect_app.php");
+}
+
+if (!isset($conn) || !$conn || $conn->connect_error) {
     $conn = new mysqli($servername, $db_user, $db_pass, $dbname);
 }
 
-if (!$conn || $conn->connect_error) {
-    $err = (isset($conn->connect_error) && $conn->connect_error) ? $conn->connect_error : 'Unknown connection error';
-    echo json_encode(["status" => "error", "message" => "Database connection failed: " . $err]);
+if ($conn->connect_error) {
+    echo json_encode(["status" => "error", "message" => "Database connection failed: " . $conn->connect_error]);
     exit();
 }
 

@@ -52,7 +52,6 @@ if ($role_key) {
     );
 }
 
-if ($result && $result->num_rows > 0) {
     $fcm_file = __DIR__ . '/send_fcm_notification.php';
     if (!file_exists($fcm_file)) {
         echo json_encode(array("status" => "error", "message" => "Required file missing: " . $fcm_file));
@@ -68,40 +67,8 @@ if ($result && $result->num_rows > 0) {
         'name' => $dbname
     ];
 
-    $sender        = new FCMSender($serviceAccountPath, $dbConfig);
-    $success_count = 0;
-    $fail_count    = 0;
-
-    while ($row = $result->fetch_assoc()) {
-        $fcm_token = $row['fcm_token'];
-        $uname     = $row['username'];
-        try {
-            $data     = array_merge(["event_type" => $event_type], $extra_data);
-            $response = $sender->sendNotification($fcm_token, $title, $body, $data, $uname);
-            
-            // Log to history for this user
-            $data_json = json_encode($data);
-            $log_stmt = $conn->prepare("INSERT INTO notification_history (username, title, body, data, status) VALUES (?, ?, ?, ?, 'sent')");
-            $log_stmt->bind_param("ssss", $uname, $title, $body, $data_json);
-            $log_stmt->execute();
-            $log_stmt->close();
-
-            $success_count++;
-        } catch (Exception $e) {
-            $fail_count++;
-            error_log("Broadcast Error for user $uname: " . $e->getMessage());
-        }
-    }
-
-    echo json_encode(array(
-        "status"  => "success",
-        "message" => "Broadcast complete",
-        "details" => [
-            "role_filter"  => $role_key ? $role_key : "all",
-            "total_sent"   => $success_count,
-            "total_failed" => $fail_count
-        ]
-    ));
+    $response = FCMSender::broadcastToRole($serviceAccountPath, $dbConfig, $title, $body, $role_key, $event_type, $extra_data);
+    echo json_encode($response);
 } else {
     echo json_encode(array("status" => "success", "message" => "No users found for role: " . ($role_key ? $role_key : "all")));
 }

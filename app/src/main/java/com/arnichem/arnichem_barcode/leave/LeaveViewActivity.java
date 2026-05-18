@@ -46,7 +46,28 @@ public class LeaveViewActivity extends AppCompatActivity {
         android.util.Log.d("LeaveViewActivity", "onCreate: leave_id=" + leaveId);
 
         if (leaveId != null) {
-            fetchLeaveDetails(leaveId);
+            // Check if FCM data payload has embedded leave fields
+            String embeddedEmpName = getIntent().getStringExtra("emp_name");
+            String embeddedType    = getIntent().getStringExtra("leave_type");
+            String embeddedFrom    = getIntent().getStringExtra("from_date");
+            String embeddedTo      = getIntent().getStringExtra("to_date");
+            String embeddedReason  = getIntent().getStringExtra("reason");
+            String embeddedStatus  = getIntent().getStringExtra("leave_status");
+
+            if (embeddedEmpName != null && !embeddedEmpName.isEmpty()) {
+                // FCM payload has full leave details — show immediately, no network call
+                android.util.Log.d("LeaveViewActivity", "Populating UI from embedded FCM data for leave: " + leaveId);
+                empNameTxt.setText(embeddedEmpName);
+                typeTxt.setText(embeddedType != null ? embeddedType : "");
+                fromDateTxt.setText(embeddedFrom != null ? embeddedFrom : "");
+                toDateTxt.setText(embeddedTo != null ? embeddedTo : "");
+                reasonTxt.setText(embeddedReason != null ? embeddedReason : "");
+                statusTxt.setText(embeddedStatus != null ? embeddedStatus : "");
+            } else {
+                // Fallback: fetch from server (older notifications without embedded data)
+                android.util.Log.d("LeaveViewActivity", "No embedded data — triggering dynamic fetch for leave_id: " + leaveId);
+                fetchLeaveDetails(leaveId);
+            }
         } else {
             Toast.makeText(this, "No Leave ID found", Toast.LENGTH_SHORT).show();
             finish();

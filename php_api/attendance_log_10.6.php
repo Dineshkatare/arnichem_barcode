@@ -130,12 +130,25 @@ if (
                 if ($stmt->execute()) {
                     $log_id = $conn->insert_id;
                     
+                    // Prepare extra data for notification
+                    $image_url = $r2ObjectKey ? "https://pub-43521d84877b4742a78e72ca43058f96.r2.dev/" . $r2ObjectKey : "";
+                    $notif_extra = [
+                        'log_id'   => (string)$log_id,
+                        'emp_name' => $emp_name,
+                        'in_out'   => $in_out_type,
+                        'time'     => $time,
+                        'date'     => $main_today_mysql_ymd,
+                        'address'  => $address,
+                        'remarks'  => $remarks,
+                        'image_url' => $image_url
+                    ];
+
                     // Send push notification to HR role
                     $notif_response = sendBroadcastNotification(
                         "Attendance Logged: $in_out_type",
                         "$emp_name marked $in_out_type at $time.",
                         "attendance_entry",
-                        ['emp_id' => $emp_id, 'in_out' => $in_out_type, 'log_id' => (string)$log_id],
+                        $notif_extra,
                         "hr" // Targets users with 'hr' role
                     );
 
@@ -176,54 +189,29 @@ if (
 // ==========================================
 // HELPER FUNCTION WITH ENHANCED LOGGING
 // ==========================================
+// ==========================================
+// HELPER FUNCTION - NOW USING CENTRALIZED FCMSender
+// ==========================================
 function sendBroadcastNotification($title, $body, $event_type = 'broadcast', $extra_data = [], $role_key = null) {
     global $db_host, $db_username, $db_password, $db_name;
 
-    $broadcast_api_url = "http://arnichem.co.in/intranet/barcode/APP/app_apis/send_broadcast.php";
-
-    $postData = [
-        'db_host'     => $db_host,
-        'db_username' => $db_username,
-        'db_password' => $db_password,
-        'db_name'     => $db_name,
-        'title'       => $title,
-        'body'        => $body,
-        'event_type'  => $event_type,
-        'extra_data'  => json_encode($extra_data),
-        'role_key'    => $role_key
+    $fcm_file = __DIR__ . '/send_fcm_notification.php';
+    if (!file_exists($fcm_file)) {
+        error_log("Notification Error: send_fcm_notification.php missing.");
+        return ["status" => "error", "message" => "FCM library missing"];
+    }
+    
+    require_once $fcm_file;
+    $serviceAccountPath = __DIR__ . '/service-account.json';
+    
+    $dbConfig = [
+        'host' => $db_host,
+        'user' => $db_username,
+        'pass' => $db_password,
+        'name' => $db_name
     ];
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $broadcast_api_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
-    curl_close($ch);
-
-    if ($response === false) {
-        error_log("Notification Error: CURL failed. Error: $curl_error");
-        return ["status" => "error", "message" => "CURL Connection Error: " . $curl_error];
-    }
-
-    if ($http_code !== 200) {
-        error_log("Notification Error: Broadcast API returned HTTP $http_code. Response: $response");
-        return ["status" => "error", "message" => "Broadcast API returned HTTP $http_code."];
-    }
-
-    $decoded_response = json_decode($response, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("Notification Error: Failed to decode JSON response. Raw response: $response");
-        return ["status" => "error", "message" => "Invalid JSON response from Broadcast API"];
-    }
-
-    return $decoded_response;
+    return FCMSender::broadcastToRole($serviceAccountPath, $dbConfig, $title, $body, $role_key, $event_type, $extra_data);
 }
 
 // Send the final response as JSON

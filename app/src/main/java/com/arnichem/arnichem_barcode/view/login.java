@@ -235,6 +235,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
                   SharedPref.getInstance(getApplicationContext()).storeFName(object.getString("fname"));
                   SharedPref.getInstance(getApplicationContext()).storeLName(object.getString("lname"));
                   SharedPref.getInstance(getApplicationContext()).storeEmail(object.getString("email"));
+                  SharedPref.getInstance(getApplicationContext()).storeUserName(username.getText().toString());
                   SharedPref.getInstance(getApplicationContext()).storesuperId(object.getString("id"));
                   SharedPref.getInstance(getApplicationContext())
                       .store_call_log_access(object.getString("call_log_access"));
@@ -278,7 +279,7 @@ public class login extends AppCompatActivity implements Listener, LocationData.A
         params.put("app_pin", pinvalue.toString());
         params.put("ipaddress", ipstr);
         params.put("imei", imeistr);
-        params.put("appversion", "10.6");
+        params.put("appversion", "11");
         params.put("lati", latitude);
         params.put("logi", logitude);
         params.put("addr", address);

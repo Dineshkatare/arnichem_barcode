@@ -32,8 +32,8 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Fetch FCM Token for the target user
-$stmt = $conn->prepare("SELECT fcm_token FROM user_fcm_tokens WHERE username = ?");
+// Fetch FCM Token and Numeric ID for the target user
+$stmt = $conn->prepare("SELECT id, fcm_token FROM user_fcm_tokens WHERE username = ?");
 $stmt->bind_param("s", $user_id); // we treat $user_id as the username string
 $stmt->execute();
 $result = $stmt->get_result();
@@ -41,6 +41,7 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $fcm_token = $row['fcm_token'];
+    $numeric_id = $row['id'];
 
     // Include the sender utility
     $fcm_file = __DIR__ . '/send_fcm_notification.php';
@@ -65,16 +66,9 @@ if ($result->num_rows > 0) {
         
         $data = array_merge(["event_type" => $event_type], $extra_data);
         
-        // Send the notification
-        $response = $sender->sendNotification($fcm_token, $title, $body, $data, $user_id);
+        // Send the notification (Logging is now handled automatically inside sendNotification)
+        $response = $sender->sendNotification($fcm_token, $title, $body, $data, $numeric_id);
         
-        // Log to history
-        $data_json = json_encode($data);
-        $log_stmt = $conn->prepare("INSERT INTO notification_history (username, title, body, data, status) VALUES (?, ?, ?, ?, 'sent')");
-        $log_stmt->bind_param("ssss", $user_id, $title, $body, $data_json);
-        $log_stmt->execute();
-        $log_stmt->close();
-
         echo json_encode(array(
             "status" => "success", 
             "message" => "Notification sent and logged successfully",

@@ -29,20 +29,41 @@ if ($conn->connect_error) {
     exit;
 }
 
-// Create table if not exists
-$sql_create = "CREATE TABLE IF NOT EXISTS notification_history (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    body TEXT NOT NULL,
+// Create table if not exists and migrate
+$conn->query("CREATE TABLE IF NOT EXISTS notification_history (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(11),
+    title VARCHAR(255),
+    body TEXT,
     data TEXT,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('sent', 'delivered', 'opened') DEFAULT 'sent'
-)";
-$conn->query($sql_create);
+    status ENUM('sent','delivered','opened') DEFAULT 'sent'
+)");
+
+// Auto-migration: Check if 'username' column exists and rename/change it to 'user_id'
+$check_uname = $conn->query("SHOW COLUMNS FROM notification_history LIKE 'username'");
+if ($check_uname && $check_uname->num_rows > 0) {
+    $conn->query("ALTER TABLE notification_history CHANGE COLUMN username user_id INT(11)");
+}
+
+// Ensure status is ENUM
+$check_status = $conn->query("SHOW COLUMNS FROM notification_history LIKE 'status'");
+if ($check_status && $check_status->num_rows > 0) {
+    $status_row = $check_status->fetch_assoc();
+    if ($status_row && strpos($status_row['Type'], 'enum') === false) {
+         $conn->query("ALTER TABLE notification_history MODIFY COLUMN status ENUM('sent','delivered','opened') DEFAULT 'sent'");
+    }
+}
 
 // Fetch history
-$stmt = $conn->prepare("SELECT id, title, body, data, sent_at, status FROM notification_history WHERE username = ? ORDER BY sent_at DESC LIMIT 50");
+$stmt = $conn->prepare("
+    SELECT h.id, h.title, h.body, h.data, h.sent_at, h.status 
+    FROM notification_history h
+    INNER JOIN user_fcm_tokens t ON h.user_id = t.id
+    WHERE t.username = ? 
+    ORDER BY h.sent_at DESC 
+    LIMIT 50
+");
 $stmt->bind_param("s", $user_id); // we still use $user_id variable but it contains the username now
 $stmt->execute();
 $result = $stmt->get_result();

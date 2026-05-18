@@ -67,12 +67,40 @@ public class PickViewActivity extends AppCompatActivity {
         copyIcon = findViewById(R.id.text_copy);
         shareIcon = findViewById(R.id.text_whatsapp);
 
-        if (srno == null && notificationPickId != null) {
-            android.util.Log.d("PickViewActivity", "Triggering dynamic fetch for pick_id: " + notificationPickId);
-            fetchPickDetails(notificationPickId);
-        } else {
-            android.util.Log.d("PickViewActivity", "Populating UI from Intent extras");
+        if (srno != null) {
+            // Opened normally from a list — all data already in intent
+            android.util.Log.d("PickViewActivity", "Populating UI from Intent extras (srno present)");
             populateUI(srno, date, code, name, message, remarks, items, link);
+        } else if (notificationPickId != null) {
+            // Opened via notification tap — check if FCM data payload has embedded pick fields
+            String embeddedName    = getIntent().getStringExtra("name");
+            String embeddedMsg     = getIntent().getStringExtra("message");
+            String embeddedDate    = getIntent().getStringExtra("date_added");
+            String embeddedCode    = getIntent().getStringExtra("code");
+            String embeddedRemarks = getIntent().getStringExtra("remarks");
+            String embeddedLink    = getIntent().getStringExtra("link");
+
+            if (embeddedName != null && !embeddedName.isEmpty()) {
+                // FCM payload has full pick details — show immediately, no network call
+                android.util.Log.d("PickViewActivity", "Populating UI from embedded FCM data for pick: " + notificationPickId);
+                populateUI(
+                    notificationPickId,
+                    embeddedDate    != null ? embeddedDate    : "",
+                    embeddedCode    != null ? embeddedCode    : "",
+                    embeddedName,
+                    embeddedMsg     != null ? embeddedMsg     : "",
+                    embeddedRemarks != null ? embeddedRemarks : "",
+                    "",
+                    embeddedLink    != null ? embeddedLink    : ""
+                );
+            } else {
+                // Fallback: fetch from server (older notifications without embedded data)
+                android.util.Log.d("PickViewActivity", "No embedded data — triggering dynamic fetch for pick_id: " + notificationPickId);
+                fetchPickDetails(notificationPickId);
+            }
+        } else {
+            android.util.Log.d("PickViewActivity", "No pick data in intent");
+            Toast.makeText(this, "Pick data not found", Toast.LENGTH_SHORT).show();
         }
     }
 

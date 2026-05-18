@@ -297,8 +297,11 @@ public class SharedPref {
 
     public String UserName() {
         SharedPreferences sharedPreferences = mCtx.getSharedPreferences(SHARED_PREF_NAME, Context.MODE_PRIVATE);
-        return sharedPreferences.getString(USER_NAME, "");
-
+        String name = sharedPreferences.getString(USER_NAME, "");
+        if (name == null || name.trim().isEmpty()) {
+            name = sharedPreferences.getString(EMAIL, "");
+        }
+        return name;
     }
 
     public String FirstName() {

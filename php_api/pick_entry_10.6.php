@@ -99,12 +99,38 @@ if ($query->execute()) {
     $lp->bind_param("is", $srno, $cust_code);
     $lp->execute();
 
+    // Fetch customer name for notification payload
+    $cust_name_display = $cust_code;
+    $name_stmt = $conn->prepare("SELECT name FROM businesspartners WHERE code = ? LIMIT 1");
+    if ($name_stmt) {
+        $name_stmt->bind_param("s", $cust_code);
+        $name_stmt->execute();
+        $name_result = $name_stmt->get_result();
+        if ($name_row = $name_result->fetch_assoc()) {
+            $cust_name_display = $name_row['name'];
+        }
+        $name_stmt->close();
+    }
+
+    // Embed full pick details in data payload so app can render without a second API call
+    $link = "https://arnisol.com/intranet/view_business_partner.php?code=" . urlencode($cust_code);
+    $notif_extra = [
+        'pick_id'    => (string)$srno,
+        'srno'       => (string)$srno,
+        'code'       => $cust_code,
+        'name'       => $cust_name_display,
+        'message'    => $final_pick_msg,
+        'remarks'    => $remarks,
+        'date_added' => date('d-m-Y', strtotime($date_added)),
+        'link'       => $link,
+    ];
+
     // Send FCM notification to account role
     $notif_response = sendBroadcastNotification(
         "New Pick Request",
-        "Pick request for $cust_code added by user #$user.",
+        "Pick Request #$srno - $cust_name_display. Tap to view.",
         "pick_entry",
-        ['pick_id' => (string)$srno, 'cust_code' => $cust_code],
+        $notif_extra,
         "account" // Targets users with 'account' role
     );
 
@@ -132,55 +158,27 @@ $query->close();
 $conn->close(); // Close the database connection
 
 // ==========================================
-// HELPER FUNCTION WITH ENHANCED LOGGING
+// HELPER FUNCTION - NOW USING CENTRALIZED FCMSender
 // ==========================================
 function sendBroadcastNotification($title, $body, $event_type = 'broadcast', $extra_data = [], $role_key = null) {
     global $db_host, $db_username, $db_password, $db_name;
 
-    $broadcast_api_url = "http://arnichem.co.in/intranet/barcode/APP/app_apis/send_broadcast.php";
-
-    $postData = [
-        'db_host'     => $db_host,
-        'db_username' => $db_username,
-        'db_password' => $db_password,
-        'db_name'     => $db_name,
-        'title'       => $title,
-        'body'        => $body,
-        'event_type'  => $event_type,
-        'extra_data'  => json_encode($extra_data),
-        'role_key'    => $role_key
+    $fcm_file = __DIR__ . '/send_fcm_notification.php';
+    if (!file_exists($fcm_file)) {
+        error_log("Notification Error: send_fcm_notification.php missing.");
+        return ["status" => "error", "message" => "FCM library missing"];
+    }
+    
+    require_once $fcm_file;
+    $serviceAccountPath = __DIR__ . '/service-account.json';
+    
+    $dbConfig = [
+        'host' => $db_host,
+        'user' => $db_username,
+        'pass' => $db_password,
+        'name' => $db_name
     ];
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $broadcast_api_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postData));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-
-    $response = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curl_error = curl_error($ch);
-    curl_close($ch);
-
-    if ($response === false) {
-        error_log("Notification Error: CURL failed. Error: $curl_error");
-        return ["status" => "error", "message" => "CURL Connection Error: " . $curl_error];
-    }
-
-    if ($http_code !== 200) {
-        error_log("Notification Error: Broadcast API returned HTTP $http_code. Response: $response");
-        return ["status" => "error", "message" => "Broadcast API returned HTTP $http_code."];
-    }
-
-    $decoded_response = json_decode($response, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("Notification Error: Failed to decode JSON response. Raw response: $response");
-        return ["status" => "error", "message" => "Invalid JSON response from Broadcast API"];
-    }
-
-    return $decoded_response;
+    return FCMSender::broadcastToRole($serviceAccountPath, $dbConfig, $title, $body, $role_key, $event_type, $extra_data);
 }
 ?>

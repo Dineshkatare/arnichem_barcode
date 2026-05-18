@@ -46,28 +46,9 @@ public class NotificationHelper {
 
         Intent intent;
 
-        // Deep-link routing based on ID present in payload
-        if (orderId != null && !orderId.isEmpty()) {
-            Log.d("NotificationHelper", "Routing to OrderViewActivity for order: " + orderId);
-            intent = new Intent(context, com.arnichem.arnichem_barcode.order.OrderViewActivity.class);
-            intent.putExtra("order_id", orderId);
-        } else if (pickId != null && !pickId.isEmpty()) {
-            Log.d("NotificationHelper", "Routing to PickViewActivity for pick: " + pickId);
-            intent = new Intent(context, com.arnichem.arnichem_barcode.order.PickViewActivity.class);
-            intent.putExtra("pick_id", pickId);
-        } else if (leaveId != null && !leaveId.isEmpty()) {
-            Log.d("NotificationHelper", "Routing to LeaveViewActivity for leave: " + leaveId);
-            intent = new Intent(context, com.arnichem.arnichem_barcode.leave.LeaveViewActivity.class);
-            intent.putExtra("leave_id", leaveId);
-        } else if (data != null && data.containsKey("log_id")) {
-            String logId = data.get("log_id");
-            Log.d("NotificationHelper", "Routing to AttendanceViewActivity for log: " + logId);
-            intent = new Intent(context, com.arnichem.arnichem_barcode.attendance.AttendanceViewActivity.class);
-            intent.putExtra("log_id", logId);
-        } else {
-            Log.d("NotificationHelper", "No specific ID, routing to SplashScreen");
-            intent = new Intent(context, SplashScreen.class);
-        }
+        // Route all notification taps through SplashScreen to handle credentials loading and 'opened' status updates
+        Log.d("NotificationHelper", "Routing notification tap through SplashScreen");
+        intent = new Intent(context, SplashScreen.class);
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 

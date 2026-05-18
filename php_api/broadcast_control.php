@@ -41,16 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status_message = "Database Connection Failed: " . $conn->connect_error;
             $status_type = "error";
         } else {
-            // Ensure tables exist
-            $conn->query("CREATE TABLE IF NOT EXISTS notification_history (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255),
-                title TEXT,
-                body TEXT,
-                data TEXT,
-                status VARCHAR(50),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )");
 
             // Fetch tokens
             if ($role_key) {
@@ -76,33 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $status_type = "error";
                     } else {
                         $dbConfig = ['host' => $db_host, 'user' => $db_user, 'pass' => $db_pass, 'name' => $db_name];
-                        $sender = new FCMSender($serviceAccountPath, $dbConfig);
+                        $response = FCMSender::broadcastToRole($serviceAccountPath, $dbConfig, $title, $body, $role_key);
                         
-                        $success = 0;
-                        $failed = 0;
-                        
-                        while ($row = $result->fetch_assoc()) {
-                            $token = $row['fcm_token'];
-                            $uname = $row['username'];
-                            
-                            try {
-                                $data = ["event_type" => "broadcast", "sent_via" => "BroadcastControl"];
-                                $res = $sender->sendNotification($token, $title, $body, $data, $uname);
-                                
-                                // Log to history
-                                $data_json = json_encode($data);
-                                $log_stmt = $conn->prepare("INSERT INTO notification_history (username, title, body, data, status) VALUES (?, ?, ?, ?, 'sent')");
-                                $log_stmt->bind_param("ssss", $uname, $title, $body, $data_json);
-                                $log_stmt->execute();
-                                $log_stmt->close();
-                                
-                                $success++;
-                            } catch (Exception $e) {
-                                $failed++;
-                            }
+                        if ($response['status'] === 'success') {
+                            $status_message = "Broadcast Complete! Success: " . $response['total_sent'] . ", Failed: " . $response['total_failed'];
+                            $status_type = "success";
+                        } else {
+                            $status_message = "Broadcast Failed: " . $response['message'];
+                            $status_type = "error";
                         }
-                        $status_message = "Broadcast Complete! Success: $success, Failed: $failed";
-                        $status_type = "success";
                     }
                 }
             } else {

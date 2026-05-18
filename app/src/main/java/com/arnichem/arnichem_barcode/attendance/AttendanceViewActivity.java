@@ -53,7 +53,36 @@ public class AttendanceViewActivity extends AppCompatActivity {
         Log.d("AttendanceView", "onCreate: log_id=" + logId);
 
         if (logId != null) {
-            fetchAttendanceDetails(logId);
+            // Check if FCM data payload has embedded attendance fields
+            String embeddedEmpName = getIntent().getStringExtra("emp_name");
+            String embeddedInOut   = getIntent().getStringExtra("in_out");
+            String embeddedTime    = getIntent().getStringExtra("time");
+            String embeddedDate    = getIntent().getStringExtra("date");
+            String embeddedAddress = getIntent().getStringExtra("address");
+            String embeddedRemarks = getIntent().getStringExtra("remarks");
+            String embeddedImage   = getIntent().getStringExtra("image_url");
+
+            if (embeddedEmpName != null && !embeddedEmpName.isEmpty()) {
+                // FCM payload has full attendance details — show immediately, no network call
+                Log.d("AttendanceView", "Populating UI from embedded FCM data for log: " + logId);
+                empNameTxt.setText(embeddedEmpName);
+                typeTxt.setText(embeddedInOut != null ? embeddedInOut : "");
+                timeTxt.setText((embeddedTime != null ? embeddedTime : "") + " | " + (embeddedDate != null ? embeddedDate : ""));
+                addressTxt.setText(embeddedAddress != null ? embeddedAddress : "No location provided.");
+                remarksTxt.setText(embeddedRemarks != null ? embeddedRemarks : "No remarks.");
+
+                if (embeddedImage != null && !embeddedImage.isEmpty()) {
+                    Picasso.get()
+                            .load(embeddedImage)
+                            .placeholder(R.drawable.other)
+                            .error(R.drawable.other)
+                            .into(selfieImg);
+                }
+            } else {
+                // Fallback: fetch from server (older notifications without embedded data)
+                Log.d("AttendanceView", "No embedded data — triggering dynamic fetch for log_id: " + logId);
+                fetchAttendanceDetails(logId);
+            }
         } else {
             Toast.makeText(this, "No Attendance ID found", Toast.LENGTH_SHORT).show();
             finish();

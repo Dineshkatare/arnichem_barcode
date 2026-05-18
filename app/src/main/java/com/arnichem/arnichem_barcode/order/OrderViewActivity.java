@@ -67,12 +67,40 @@ public class OrderViewActivity extends AppCompatActivity {
         shareIcon = findViewById(R.id.text_whatsapp);
         progressBar = findViewById(R.id.progressBar);
 
-        if (srno == null && notificationOrderId != null) {
-            android.util.Log.d("OrderViewActivity", "Triggering dynamic fetch for order_id: " + notificationOrderId);
-            fetchOrderDetails(notificationOrderId);
-        } else {
-            android.util.Log.d("OrderViewActivity", "Populating UI from Intent extras");
+        if (srno != null) {
+            // Opened normally from a list — all data already in intent
+            android.util.Log.d("OrderViewActivity", "Populating UI from Intent extras (srno present)");
             populateUI(srno, date, code, name, message, remarks, items, link);
+        } else if (notificationOrderId != null) {
+            // Opened via notification tap — check if FCM data payload has embedded order fields
+            String embeddedName    = getIntent().getStringExtra("name");
+            String embeddedMsg     = getIntent().getStringExtra("message");
+            String embeddedDate    = getIntent().getStringExtra("date_added");
+            String embeddedCode    = getIntent().getStringExtra("code");
+            String embeddedRemarks = getIntent().getStringExtra("remarks");
+            String embeddedLink    = getIntent().getStringExtra("link");
+
+            if (embeddedName != null && !embeddedName.isEmpty()) {
+                // FCM payload has full order details — show immediately, no network call
+                android.util.Log.d("OrderViewActivity", "Populating UI from embedded FCM data for order: " + notificationOrderId);
+                populateUI(
+                    notificationOrderId,
+                    embeddedDate    != null ? embeddedDate    : "",
+                    embeddedCode    != null ? embeddedCode    : "",
+                    embeddedName,
+                    embeddedMsg     != null ? embeddedMsg     : "",
+                    embeddedRemarks != null ? embeddedRemarks : "",
+                    "",
+                    embeddedLink    != null ? embeddedLink    : ""
+                );
+            } else {
+                // Fallback: fetch from server (older notifications without embedded data)
+                android.util.Log.d("OrderViewActivity", "No embedded data — triggering dynamic fetch for order_id: " + notificationOrderId);
+                fetchOrderDetails(notificationOrderId);
+            }
+        } else {
+            android.util.Log.d("OrderViewActivity", "No order data in intent");
+            Toast.makeText(this, "Order data not found", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -86,23 +114,30 @@ public class OrderViewActivity extends AppCompatActivity {
                     if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                     android.util.Log.d("OrderViewActivity", "API Response: " + response);
                     try {
-                        JSONObject obj = new JSONObject(response);
-                        if ("success".equals(obj.optString("status"))) {
-                            String srno = obj.optString("srno", "");
-                            String date = obj.optString("date_added", "");
-                            String code = obj.optString("code", "");
-                            String name = obj.optString("name", "");
-                            String message = obj.optString("message", "");
-                            String remarks = obj.optString("remarks", "");
-                            String link = obj.optString("link", "");
-                            populateUI(srno, date, code, name, message, remarks, "", link);
+                        String trimmedResponse = response.trim();
+                        if (trimmedResponse.startsWith("{")) {
+                            JSONObject obj = new JSONObject(trimmedResponse);
+                            if ("success".equals(obj.optString("status"))) {
+                                String srno = obj.optString("srno", "");
+                                String date = obj.optString("date_added", "");
+                                String code = obj.optString("code", "");
+                                String name = obj.optString("name", "");
+                                String message = obj.optString("message", "");
+                                String remarks = obj.optString("remarks", "");
+                                String link = obj.optString("link", "");
+                                populateUI(srno, date, code, name, message, remarks, "", link);
+                            } else {
+                                Toast.makeText(this, "API Error: " + obj.optString("message"), Toast.LENGTH_LONG).show();
+                            }
                         } else {
-                            Toast.makeText(this, "API Error: " + obj.optString("message"), Toast.LENGTH_LONG).show();
+                            // Server returned plain text instead of JSON (e.g., "Could not connect")
+                            android.util.Log.e("OrderViewActivity", "Non-JSON response: " + trimmedResponse);
+                            Toast.makeText(this, "Server Error: " + trimmedResponse, Toast.LENGTH_LONG).show();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
                         android.util.Log.e("OrderViewActivity", "Parse error", e);
-                        Toast.makeText(this, "Parse error. Server returned: " + response, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Parse error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 },
                 error -> {

@@ -154,7 +154,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         } else {
             tvVehicle.setText("NO VEHICLE |");
         }
-        tvVersion.setText(" Version :" + "10.6");
+        tvVersion.setText(" Version :" + "11");
 
         // click listeners
         icSync.setOnClickListener(v -> startActivity(new Intent(Dashboard.this, Test.class)));
@@ -219,7 +219,7 @@ public class Dashboard extends AppCompatActivity implements Listener, LocationDa
         tvTaskCount = findViewById(R.id.tvTaskCount);
         printhistory = findViewById(R.id.printhistory);
         notificationHistoryCl = findViewById(R.id.notificationHistoryCl);
-        notificationHistoryCl.setVisibility(View.GONE);
+        notificationHistoryCl.setVisibility(View.VISIBLE);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (SharedPref.getInstance(Dashboard.this).get_report_status().equalsIgnoreCase("1")) {
             report.setVisibility(View.VISIBLE);
